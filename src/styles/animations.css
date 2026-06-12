@@ -1,0 +1,55 @@
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes screenIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes screenOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-18px)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{
+  0%{filter:drop-shadow(0 2px 8px rgba(102,126,234,.35))}
+  100%{filter:drop-shadow(0 2px 18px rgba(168,85,247,.6))}
+}
+@keyframes twinkle{0%{opacity:.4}100%{opacity:1}}
+@keyframes comboPop{
+  0%{transform:scale(0) rotate(-6deg);opacity:0}
+  70%{transform:scale(1.15) rotate(2deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+@keyframes ultraGlow{
+  0%{box-shadow:0 0 20px rgba(245,158,11,.6),0 0 40px rgba(139,92,246,.3)}
+  100%{box-shadow:0 0 35px rgba(239,68,68,.8),0 0 70px rgba(59,130,246,.5)}
+}
+@keyframes emojiSalto{
+  0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}
+  35%{opacity:1;transform:translateY(var(--saltoY,-80px)) scale(1.35) rotate(var(--rotDir,12deg))}
+  65%{opacity:.8;transform:translateY(var(--caerY,20px)) scale(.9) rotate(calc(var(--rotDir,12deg)*-0.5))}
+  85%{opacity:.5;transform:translateY(var(--caerY2,-10px)) scale(.8)}
+  100%{opacity:0;transform:translateY(var(--finalY,10px)) scale(.6)}
+}
+@keyframes stickerIn{
+  0%{transform:scale(0) rotate(-20deg);opacity:0}
+  70%{transform:scale(1.25) rotate(5deg);opacity:1}
+  100%{transform:scale(1) rotate(0deg);opacity:1}
+}
+@keyframes stickerOut{
+  0%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(.5) translateY(-20px)}
+}
+@keyframes glowPulse{
+  0%,100%{box-shadow:none}
+  50%{box-shadow:0 0 18px var(--glow-color,#fff)}
+}
+@keyframes hitOk{
+  0%{transform:scale(1);opacity:1}
+  40%{transform:scale(1.4);background:rgba(16,185,129,.9)}
+  100%{transform:scale(0);opacity:0}
+}
+@keyframes hitMal{
+  0%{transform:scale(1);opacity:1}
+  25%{transform:scale(1.2) rotate(-8deg);background:rgba(239,68,68,.9)}
+  50%{transform:scale(1.2) rotate(8deg)}
+  100%{transform:scale(0) rotate(0);opacity:0}
+}
+@keyframes floatUp{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-60px)}
+}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes slideDown{from{opacity:0;top:-2rem}to{opacity:1;top:1rem}}

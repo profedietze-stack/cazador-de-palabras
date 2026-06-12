@@ -1,0 +1,10 @@
+{
+  "name": "Cazador de Palabras",
+  "short_name": "CazadorPalabras",
+  "description": "Juego educativo de gramática española",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "icons": []
+}

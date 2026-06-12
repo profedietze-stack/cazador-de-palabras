@@ -1,0 +1,321 @@
+/* ─── PALABRAS DECORATIVAS MENÚ ─── */
+#menuBg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.deco-palabra{
+  position:absolute;top:-60px;font-weight:700;
+  color:rgba(255,255,255,.18);white-space:nowrap;
+  user-select:none;pointer-events:none;will-change:transform;
+}
+
+/* ─── MENÚ PRINCIPAL ─── */
+#menuPrincipal{position:relative}
+#menuPrincipal .card{position:relative;z-index:1}
+#menuPrincipal .logo-wrap{text-align:center;margin-bottom:.5rem;position:relative}
+#menuPrincipal .logo-icon{font-size:3.5rem;display:block;animation:bounce 2s ease-in-out infinite}
+#menuPrincipal .logo{
+  font-size:2.6rem;font-weight:900;line-height:1.1;
+  background:linear-gradient(135deg,#667eea 0%,#a855f7 40%,#ec4899 70%,#f59e0b 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-align:center;letter-spacing:-1px;
+  filter:drop-shadow(0 2px 8px rgba(102,126,234,.35));
+  animation:shimmer 3s ease-in-out infinite alternate;
+}
+#menuPrincipal .logo-stars{
+  font-size:.85rem;letter-spacing:6px;color:#a855f7;
+  text-align:center;margin-bottom:.3rem;opacity:.8;
+  animation:twinkle 1.8s ease-in-out infinite alternate;
+}
+#menuPrincipal .logo-sub{
+  font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text-faint);text-align:center;margin-bottom:1.5rem;
+}
+#menuPrincipal .sub{color:var(--text-muted);margin-bottom:2rem;text-align:center}
+.menu-btns{display:flex;flex-direction:column;gap:.8rem}
+.footer-credit{margin-top:1.5rem;text-align:center;color:var(--text-faint);font-size:.85rem;font-style:italic}
+.btn-borrar{background:transparent;color:#ef4444;border:1.5px solid #ef444455;font-size:.82rem;padding:.6rem 1rem;opacity:.75}
+.btn-borrar:hover{background:#fef2f2;opacity:1;border-color:#ef4444}
+
+/* ─── SELECCIÓN CATEGORÍAS ─── */
+.screen-title{color:#fff;font-size:2rem;font-weight:800;margin-bottom:.5rem;text-align:center}
+.screen-sub{color:rgba(255,255,255,.8);margin-bottom:1.5rem;text-align:center}
+.cats-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1rem;width:100%;max-width:780px;margin-bottom:1.5rem;
+  box-sizing:border-box;padding:0 .5rem;
+}
+.cat-card{
+  background:var(--panel-bg);border-radius:var(--radius);
+  padding:1.1rem .9rem;box-shadow:var(--shadow);text-align:center;
+  transition:all var(--trans);display:flex;flex-direction:column;
+  align-items:center;justify-content:space-between;min-height:100px;box-sizing:border-box;
+}
+.cat-card:hover{transform:translateY(-4px)}
+.cat-card h3{color:#667eea;margin-bottom:.7rem;font-size:.95rem;line-height:1.3;word-break:break-word}
+.nivel-row{display:flex;gap:.4rem;justify-content:center;flex-wrap:nowrap}
+.nv-btn{
+  padding:.35rem .7rem;border:2px solid var(--border);border-radius:8px;
+  background:var(--panel-bg);color:var(--text);cursor:pointer;font-weight:700;
+  transition:all var(--trans);font-size:.82rem;white-space:nowrap;flex-shrink:0;
+}
+.nv-btn:hover{border-color:#667eea;color:#667eea}
+
+/* ─── PRE-NIVEL ─── */
+.pre-box{
+  background:var(--panel-bg);border-radius:var(--radius);padding:2rem;
+  max-width:640px;width:100%;box-shadow:var(--shadow);animation:screenIn .35s cubic-bezier(.22,1,.36,1);
+}
+.pre-box h2{color:#667eea;font-size:1.6rem;margin-bottom:.8rem}
+.definicion{
+  background:var(--panel-acc);padding:1rem;border-radius:10px;
+  border-left:4px solid var(--border-acc);margin-bottom:1rem;
+  line-height:1.6;color:var(--text-soft);
+}
+.ejemplos-lista{margin-bottom:1rem}
+.ejemplo-item{background:var(--panel-alt);padding:.5rem .8rem;border-radius:8px;margin:.4rem 0;font-style:italic;color:var(--text-soft)}
+.distractor-warn{background:#fef9c3;padding:.8rem 1rem;border-radius:10px;border-left:4px solid var(--warn);margin-bottom:1.5rem;font-size:.9rem;color:#854d0e}
+.pre-actions{text-align:center}
+
+/* ─── PANTALLA DE JUEGO ─── */
+#gameScreen{padding:0;transition:background .6s ease}
+.game-hud{
+  background:rgba(255,255,255,.15);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex;justify-content:space-around;align-items:center;
+  padding:.6rem max(1rem, env(safe-area-inset-right)) .6rem max(1rem, env(safe-area-inset-left));
+  padding-top:calc(.6rem + env(safe-area-inset-top));
+  color:#fff;flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.2);
+}
+.hud-stat{text-align:center}
+.hud-label{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:.5px}
+.hud-val{font-size:1.4rem;font-weight:800}
+#gameArea{position:relative;flex:1;overflow:hidden;width:100%}
+#tiempoBar{height:4px;background:rgba(255,255,255,.3);position:absolute;top:0;left:0;right:0}
+#tiempoBarFill{height:100%;background:#10b981;transition:width .9s linear}
+.game-btns{position:absolute;top:10px;right:10px;display:flex;gap:.5rem;z-index:10}
+.game-btns button{
+  background:rgba(255,255,255,.2);color:#fff;border:none;
+  padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.8rem;
+  backdrop-filter:blur(6px);transition:all var(--trans);
+}
+.game-btns button:hover{background:rgba(255,255,255,.35)}
+
+/* ─── CATEGORY BACKGROUNDS ─── */
+#gameScreen.cat-bg-sustantivos{background:linear-gradient(135deg,#667eea,#764ba2)}
+#gameScreen.cat-bg-adjetivos{background:linear-gradient(135deg,#f59e0b,#ec4899)}
+#gameScreen.cat-bg-verbos{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+#gameScreen.cat-bg-adverbios{background:linear-gradient(135deg,#14b8a6,#0891b2)}
+#gameScreen.cat-bg-articulos{background:linear-gradient(135deg,#6366f1,#a855f7)}
+#gameScreen.cat-bg-pronombres{background:linear-gradient(135deg,#ec4899,#be185d)}
+#gameScreen.cat-bg-preposiciones{background:linear-gradient(135deg,#10b981,#059669)}
+#gameScreen.cat-bg-conjunciones{background:linear-gradient(135deg,#f97316,#dc2626)}
+#gameScreen.cat-bg-interjecciones{background:linear-gradient(135deg,#eab308,#16a34a)}
+
+/* ─── PALABRAS ─── */
+.palabra{
+  position:absolute;padding:.35rem .8rem;border-radius:8px;
+  cursor:pointer;font-weight:700;user-select:none;
+  background:rgba(255,255,255,.15);color:#fff;
+  border:2px solid rgba(255,255,255,.4);
+  transition:border-color .15s,box-shadow .15s;
+  text-shadow:0 1px 3px rgba(0,0,0,.3);will-change:transform;
+  touch-action:none;-webkit-tap-highlight-color:transparent;
+}
+.palabra:hover{background:rgba(255,255,255,.3);box-shadow:0 0 16px rgba(255,255,255,.5)}
+.palabra.glow-anim{animation:glowPulse 1.5s ease infinite}
+.hit-ok{animation:hitOk .45s ease forwards}
+.hit-mal{animation:hitMal .45s ease forwards}
+.punto-flotante{
+  position:absolute;font-weight:800;font-size:1.1rem;
+  color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.5);
+  pointer-events:none;z-index:20;
+  animation:floatUp .9s ease forwards;
+}
+
+/* ─── RESULTADO ─── */
+.resultado-card{max-width:560px;text-align:center}
+.medalla-grande{font-size:5rem;margin:.5rem 0;animation:pop .5s ease}
+.pts-grande{font-size:3rem;font-weight:800;color:#667eea;margin:.3rem 0}
+.stats-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:.5rem;
+  background:var(--panel-alt);border-radius:12px;padding:1rem;margin:1rem 0;text-align:left;
+}
+.sg-row{display:flex;justify-content:space-between;font-size:.9rem;color:var(--text-soft)}
+.sg-row strong{color:#667eea}
+.res-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem}
+
+/* ─── MEDALLAS Y LOGROS ─── */
+.perfil-header{color:#fff;text-align:center;margin-bottom:1rem}
+.perfil-nombre{font-size:2rem;font-weight:800}
+.perfil-titulo{font-size:1rem;opacity:.85;margin-top:.2rem}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.8rem;margin-bottom:1rem}
+.scard{background:var(--panel-bg);border-radius:12px;padding:1rem;text-align:center;box-shadow:var(--shadow)}
+.scard .sl{font-size:.75rem;color:var(--text-muted);margin-bottom:.3rem}
+.scard .sv{font-size:1.6rem;font-weight:800;color:#667eea}
+.medallas-screen{padding:0!important;overflow:hidden!important;justify-content:flex-start!important}
+#medallasScrollWrap{
+  width:100%;height:100%;overflow-y:auto;overflow-x:hidden;
+  padding:1.5rem 1rem 2rem;display:flex;flex-direction:column;
+  align-items:center;position:relative;box-sizing:border-box;
+}
+.seccion{
+  background:var(--panel-bg);border-radius:var(--radius);padding:1.5rem;
+  margin-bottom:1rem;box-shadow:var(--shadow);width:100%;max-width:860px;
+}
+.seccion h3{color:#667eea;margin-bottom:1rem;font-size:1.1rem}
+.medals-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.medals-table th{background:var(--panel-acc);padding:.5rem .6rem;color:#667eea;font-weight:700;text-align:left}
+.medals-table td{padding:.5rem .6rem;border-bottom:1px solid var(--panel-acc);text-align:center;color:var(--text-soft)}
+.medals-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.logros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+.logro-card{
+  background:var(--panel-alt);border-radius:12px;padding:.9rem;
+  text-align:center;border:2px solid var(--border);opacity:.45;transition:all var(--trans);
+}
+.logro-card.ok{opacity:1;border-color:#10b981;background:#ecfdf5}
+html[data-theme="dark"] .logro-card.ok{background:#052e16}
+.logro-card .le{font-size:1.8rem;margin-bottom:.3rem}
+.logro-card .ln{font-size:.8rem;font-weight:700;margin-bottom:.2rem;color:var(--text)}
+.logro-card .ld{font-size:.72rem;color:var(--text-muted)}
+.ranking-tbl{width:100%;border-collapse:collapse;font-size:.88rem}
+.ranking-tbl th{background:var(--panel-acc);padding:.5rem;color:#667eea;font-weight:700}
+.ranking-tbl td{padding:.5rem;border-bottom:1px solid var(--panel-acc);text-align:center;color:var(--text-soft)}
+.ranking-tbl td:first-child{text-align:left;color:var(--text)}
+
+/* ─── INFO DIDÁCTICA — TABS ─── */
+.info-tabs-wrap{width:100%;max-width:780px;display:flex;flex-direction:column;gap:0}
+
+.info-tabs{
+  display:flex;gap:.4rem;flex-wrap:wrap;
+  background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+  border-radius:12px 12px 0 0;padding:.5rem .5rem 0;
+}
+.info-tab{
+  flex:1;min-width:0;
+  padding:.55rem .7rem;border:none;border-radius:8px 8px 0 0;
+  background:transparent;color:rgba(255,255,255,.75);
+  font-size:.82rem;font-weight:700;cursor:pointer;
+  transition:all var(--trans);white-space:nowrap;
+}
+.info-tab:hover{background:rgba(255,255,255,.15);color:#fff}
+.info-tab.active{
+  background:var(--panel-bg);color:#667eea;
+  box-shadow:0 -2px 8px rgba(0,0,0,.08);
+}
+
+.info-panel{display:none;flex-direction:column;gap:0}
+.info-panel.active{display:flex;animation:fadeIn .25s ease}
+
+.info-sec{
+  background:var(--panel-bg);padding:1.5rem;
+  margin-bottom:.8rem;border-radius:0 0 var(--radius) var(--radius);
+  box-shadow:var(--shadow);width:100%;
+}
+.info-sec:first-child{border-radius:0}
+.info-sec:not(:first-child){border-radius:var(--radius)}
+.info-sec h2{color:#667eea;font-size:1.2rem;margin-bottom:.8rem}
+.info-sec h3{color:#764ba2;margin:.8rem 0 .4rem;font-size:.95rem}
+.info-sec p,.info-sec li{color:var(--text-soft);line-height:1.7;font-size:.93rem}
+.info-sec ul{padding-left:1.2rem;margin:.4rem 0}
+
+.cat-def{
+  display:flex;align-items:flex-start;gap:.7rem;
+  background:var(--panel-acc);padding:.75rem 1rem;border-radius:10px;
+  border-left:4px solid var(--border-acc);margin:.45rem 0;font-size:.9rem;color:var(--text-soft);
+}
+.cat-def strong{color:var(--border-acc)}
+.cat-icon{font-size:1.3rem;flex-shrink:0;margin-top:.1rem}
+
+.medal-row{
+  display:flex;align-items:flex-start;gap:.8rem;
+  padding:.7rem 0;border-bottom:1px solid var(--border);
+}
+.medal-row:last-child{border-bottom:none}
+.medal-em{font-size:1.8rem;flex-shrink:0}
+.medal-row div{color:var(--text-soft);font-size:.93rem;line-height:1.5;padding-top:.2rem}
+.medal-row strong{color:var(--text)}
+
+.info-sec-brand{
+  background:linear-gradient(135deg,#667eea,#764ba2)!important;
+  color:#fff;text-align:center;
+}
+.info-sec-brand h2{color:#fff!important}
+.info-sec-brand p{color:rgba(255,255,255,.88)!important}
+
+/* ─── RANKING TABS ─── */
+.rk-tabs{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
+.rk-tab{
+  flex:1;padding:.5rem .7rem;border:2px solid var(--border);border-radius:8px;
+  background:var(--panel-alt);color:var(--text-muted);font-size:.82rem;font-weight:700;
+  cursor:pointer;transition:all var(--trans);white-space:nowrap;
+}
+.rk-tab:hover{border-color:#667eea;color:#667eea}
+.rk-tab.active{background:#667eea;color:#fff;border-color:#667eea}
+
+/* ─── RANKING / PODIO ─── */
+.podio{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+.podio-item{text-align:center;padding:1.2rem;background:var(--panel-alt);border-radius:14px;min-width:130px}
+.podio-pos{font-size:2.5rem}
+.podio-nom{font-weight:700;color:#667eea;margin:.3rem 0}
+.podio-pts{font-size:1.2rem;color:#764ba2;font-weight:800}
+
+/* ─── SALA ─── */
+.sala-card{width:100%;max-width:560px}
+.sala-modo-tabs{display:flex;gap:.5rem;margin:1rem 0;flex-wrap:wrap}
+.sala-modo-btn{
+  flex:1;padding:.6rem .8rem;border:2px solid var(--border);border-radius:10px;
+  background:var(--panel-alt);color:var(--text-muted);font-size:.85rem;font-weight:700;
+  cursor:pointer;transition:all var(--trans);white-space:nowrap;
+}
+.sala-modo-btn:hover{border-color:#667eea;color:#667eea}
+.sala-modo-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+.sala-section{margin-top:1rem}
+.sala-section h3{color:var(--text);margin-bottom:.4rem;font-size:1rem}
+.sala-hint{color:var(--text-muted);font-size:.85rem;margin-bottom:.8rem;line-height:1.5}
+.sala-input-row{display:flex;gap:.5rem;align-items:center}
+.sala-input{
+  width:100%;padding:.6rem .9rem;border:2px solid var(--border);border-radius:10px;
+  background:var(--input-bg);color:var(--text);font-size:.95rem;box-sizing:border-box;
+  transition:border-color var(--trans);
+}
+.sala-input:focus{outline:none;border-color:#667eea}
+.sala-form{display:flex;flex-direction:column;gap:.6rem}
+.sala-activa{
+  background:var(--panel-acc);border:2px solid #667eea44;border-radius:14px;
+  padding:1.2rem;margin-bottom:.5rem;
+}
+.sala-badge{font-size:.78rem;font-weight:800;color:#667eea;letter-spacing:1px;text-transform:uppercase}
+.sala-info-row{display:flex;align-items:center;gap:1rem;margin:.6rem 0}
+.sala-code-display{
+  font-size:2rem;font-weight:900;color:#667eea;
+  background:var(--panel-bg);padding:.3rem .9rem;border-radius:10px;
+  letter-spacing:2px;border:2px solid #667eea33;
+}
+.sala-nombre-display{font-size:1rem;font-weight:700;color:var(--text)}
+.btn-sala-menu{position:relative}
+.btn-sala-menu .sala-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:#22c55e;margin-left:6px;vertical-align:middle;
+}
+.sala-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:#22c55e;margin-left:6px;vertical-align:middle;
+}
+
+/* ─── PANEL DOCENTE ─── */
+.sala-mis-salas{margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1rem}
+.sala-mis-salas h3{color:var(--text);margin-bottom:.8rem;font-size:1rem}
+.sala-docente-card{
+  background:var(--panel-alt);border:1.5px solid var(--border);border-radius:12px;
+  padding:1rem;margin-bottom:.8rem;
+}
+.sala-docente-header{display:flex;align-items:center;gap:.8rem;margin-bottom:.3rem}
+.sala-estado{font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:.2rem .5rem;border-radius:6px}
+.sala-estado.activa{background:#dcfce7;color:#15803d}
+.sala-estado.inactiva{background:#f1f5f9;color:#64748b}
+html[data-theme="dark"] .sala-estado.activa{background:#14532d;color:#4ade80}
+html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
+.sala-docente-nombre{font-weight:700;color:var(--text);margin-bottom:.2rem}
+.sala-docente-desc{color:var(--text-muted);font-size:.85rem;margin-bottom:.2rem}
+.sala-docente-fecha{color:var(--text-faint);font-size:.78rem;margin-bottom:.7rem}
+.sala-docente-btns{display:flex;gap:.4rem;flex-wrap:wrap}
+.btn-xs{padding:.3rem .6rem!important;font-size:.78rem!important}

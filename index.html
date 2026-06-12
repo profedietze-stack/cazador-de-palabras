@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Cazador de Palabras</title>
+  <meta name="description" content="Juego educativo de gramática española. Cazá palabras por categoría gramatical.">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cazador">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+
+<!-- ═══════════════════════════════ MODAL NOMBRE ═══════════════════════════════ -->
+<div id="modalNombre">
+  <div class="modal-box">
+    <div style="font-size:2.5rem;margin-bottom:.5rem">🎮</div>
+    <h2>¡Bienvenido!</h2>
+    <p>¿Cuál es tu nombre, cazador?</p>
+    <input type="text" id="inputNombre" placeholder="Tu nombre aquí..." maxlength="20" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" inputmode="text">
+    <button class="btn btn-primary" style="width:100%" id="btnContinuar">Continuar →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MENÚ PRINCIPAL ═══════════════════════════════ -->
+<div id="menuPrincipal" class="screen">
+  <div id="menuBg"></div>
+  <div class="card">
+    <div class="logo-wrap">
+      <span class="logo-icon">🎯</span>
+      <div class="logo-stars">✦ ✦ ✦ ✦ ✦</div>
+      <div class="logo">Cazador<br>de Palabras</div>
+      <div class="logo-sub">Juego Educativo de Gramática</div>
+    </div>
+    <div class="menu-btns">
+      <button class="btn btn-primary" id="btnIniciar">🚀 Iniciar Partida</button>
+      <button class="btn btn-outline" id="btnRanking">🏆 Mejores Puntuaciones</button>
+      <button class="btn btn-outline" id="btnLogros">🥇 Medallas y Logros</button>
+      <button class="btn btn-outline" id="btnSala">🏫 Mi Sala</button>
+      <button class="btn btn-outline" id="btnInfo">📚 Info Didáctica</button>
+      <button class="btn btn-borrar" id="btnBorrar">🗑️ Borrar Progreso</button>
+    </div>
+    <div class="footer-credit">✨ Creado por ProfeD.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SELECCIÓN CATEGORÍA ═══════════════════════════════ -->
+<div id="seleccionCategoria" class="screen">
+  <h1 class="screen-title">📂 Elige una Categoría</h1>
+  <p class="screen-sub">Selecciona qué tipo de palabra quieres cazar</p>
+  <div class="cats-grid" id="catsGrid"></div>
+  <button class="back-btn" id="backFromCats">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ PRE-NIVEL ═══════════════════════════════ -->
+<div id="preNivel" class="screen">
+  <div class="pre-box">
+    <h2 id="preTitle">Sustantivos — Nivel 1</h2>
+    <div class="definicion" id="preDef"></div>
+    <div class="ejemplos-lista" id="preEjs"></div>
+    <div class="distractor-warn">
+      ⚠️ <strong>¡Cuidado!</strong> Caerán también palabras de otras categorías.
+      Si las cazas, ¡perderás puntos! Lee bien cada palabra antes de hacer clic.
+    </div>
+    <div class="pre-actions">
+      <button class="btn btn-primary" id="btnEntendido">✅ Entendido, ¡A cazar!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ JUEGO ═══════════════════════════════ -->
+<div id="gameScreen" class="screen">
+  <div class="game-hud">
+    <div class="hud-stat"><div class="hud-label">Puntos</div><div class="hud-val" id="hudPts">0</div></div>
+    <div class="hud-stat"><div class="hud-label">Objetivo</div><div class="hud-val" id="hudObj">500</div></div>
+    <div class="hud-stat"><div class="hud-label">Tiempo</div><div class="hud-val" id="hudTime">5:00</div></div>
+    <div class="hud-stat"><div class="hud-label">Categoría</div><div class="hud-val" id="hudCat" style="font-size:.85rem">-</div></div>
+  </div>
+  <div id="gameArea">
+    <div id="tiempoBar"><div id="tiempoBarFill" style="width:100%"></div></div>
+    <div id="comboDisplay"></div>
+    <div class="game-btns">
+      <button id="btnVolver">🔙 Salir</button>
+      <button id="btnPausa">⏸ Pausa</button>
+      <button id="btnFs">⛶ Pantalla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RESULTADO ═══════════════════════════════ -->
+<div id="resultadoScreen" class="screen">
+  <div class="card resultado-card">
+    <h2 id="resTitle" style="color:#667eea;font-size:1.5rem">¡Nivel Completado!</h2>
+    <div class="medalla-grande" id="resMedalla">🥇</div>
+    <div class="pts-grande" id="resPts">0</div>
+    <div class="stats-grid" id="resStats"></div>
+    <div id="resLogros" style="display:none;background:#fef9c3;padding:.8rem;border-radius:10px;margin-bottom:.5rem;font-size:.9rem"></div>
+    <div id="resTitulo" style="display:none;background:#d4edda;padding:.8rem;border-radius:10px;text-align:center;font-weight:700;color:#155724;margin-bottom:.5rem"></div>
+    <div class="res-btns">
+      <button class="btn btn-outline" id="btnResMenu">🏠 Menú</button>
+      <button class="btn btn-primary" id="btnResReintentar">🔁 Reintentar</button>
+      <button class="btn btn-ok" id="btnResSiguiente">▶ Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MEDALLAS Y LOGROS ═══════════════════════════════ -->
+<div id="medallasScreen" class="screen medallas-screen">
+  <div id="medallasScrollWrap">
+    <div id="stickerLayerLogros"></div>
+    <div class="perfil-header">
+      <div id="perfilNombre" class="perfil-nombre">Jugador</div>
+      <div id="perfilTitulo" class="perfil-titulo">Aprendiz de Palabras</div>
+    </div>
+    <div class="stats-row" id="statsRow" style="width:100%;max-width:860px"></div>
+    <div class="seccion">
+      <h3>🏅 Medallas por Categoría y Nivel</h3>
+      <div style="overflow-x:auto"><table class="medals-table" id="medallasTable">
+        <thead><tr><th>Categoría</th><th>Nivel 1</th><th>Nivel 2</th><th>Nivel 3</th></tr></thead>
+        <tbody id="medallasBody"></tbody>
+      </table></div>
+    </div>
+    <div class="seccion">
+      <h3>🏆 Logros</h3>
+      <div class="logros-grid" id="logrosGrid"></div>
+    </div>
+    <div class="seccion">
+      <h3>📊 Mis Mejores Partidas</h3>
+      <div style="overflow-x:auto"><table class="ranking-tbl">
+        <thead><tr><th>#</th><th>Categoría</th><th>Nivel</th><th>Puntos</th><th>Precisión</th><th>Fecha</th></tr></thead>
+        <tbody id="misPartidasBody"></tbody>
+      </table></div>
+    </div>
+    <div style="text-align:center;margin:1rem 0">
+      <button class="btn btn-outline btn-sm" id="btnCaptura">📸 Capturar Progreso</button>
+    </div>
+    <button class="back-btn" id="backFromLogros">← Volver al Menú</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RANKING ═══════════════════════════════ -->
+<div id="rankingScreen" class="screen">
+  <h1 class="screen-title">🏆 Mejores Puntuaciones</h1>
+  <div class="card wide">
+    <div class="rk-tabs">
+      <button class="rk-tab active" data-tab="global">🌐 Global</button>
+      <button class="rk-tab" data-tab="local">💾 Este dispositivo</button>
+      <button class="rk-tab" data-tab="sala">🏫 Mi Sala</button>
+    </div>
+    <div id="rkSalaRow" style="display:none;gap:.5rem;margin-bottom:1rem;align-items:center">
+      <input type="text" id="rkSalaInput" placeholder="Código de sala (ej: 7B)" maxlength="12"
+        autocapitalize="characters" autocorrect="off" spellcheck="false"
+        style="flex:1;padding:.5rem .8rem;border-radius:8px;border:2px solid var(--border);background:var(--input-bg);color:var(--text);font-size:.9rem">
+      <button class="btn btn-primary btn-sm" id="rkSalaBtn">Buscar</button>
+    </div>
+    <div class="podio" id="podioCont"></div>
+    <div style="overflow-x:auto"><table class="ranking-tbl">
+      <thead><tr><th>#</th><th>Jugador</th><th>Puntos</th><th>Categoría</th><th>Nivel</th><th>Fecha</th></tr></thead>
+      <tbody id="rankingBody"></tbody>
+    </table></div>
+  </div>
+  <button class="back-btn" id="backFromRanking">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ INFO DIDÁCTICA ═══════════════════════════════ -->
+<div id="infoScreen" class="screen">
+  <h1 class="screen-title">📚 Info Didáctica</h1>
+  <div class="info-tabs-wrap">
+
+    <nav class="info-tabs" role="tablist">
+      <button class="info-tab active" data-tab="jugar" role="tab" aria-selected="true" aria-controls="info-jugar">🎯 Cómo Jugar</button>
+      <button class="info-tab" data-tab="categorias" role="tab" aria-selected="false" aria-controls="info-categorias">📖 Categorías</button>
+      <button class="info-tab" data-tab="premios" role="tab" aria-selected="false" aria-controls="info-premios">🏅 Premios</button>
+      <button class="info-tab" data-tab="aula" role="tab" aria-selected="false" aria-controls="info-aula">👩‍🏫 Aula</button>
+    </nav>
+
+    <!-- ── PESTAÑA: CÓMO JUGAR ── -->
+    <div class="info-panel active" id="info-jugar" role="tabpanel">
+      <div class="info-sec">
+        <h2>🎯 Objetivo del Juego</h2>
+        <p>"Cazador de Palabras" es un juego educativo interactivo para aprender y reforzar las categorías gramaticales del español. Las palabras caen desde arriba y el jugador debe identificar y cazar solo las que corresponden a la categoría indicada.</p>
+      </div>
+      <div class="info-sec">
+        <h2>🎮 Controles</h2>
+        <p>Hacé clic o tocá con el dedo las palabras correctas. Las incorrectas te restan puntos, así que ¡pensá antes de cazar!</p>
+        <h3>Objetivos por Nivel</h3>
+        <ul>
+          <li><strong>Nivel 1:</strong> 250 puntos (×1 por letra)</li>
+          <li><strong>Nivel 2:</strong> 350 puntos (×1.5 por letra)</li>
+          <li><strong>Nivel 3:</strong> 500 puntos (×2 por letra)</li>
+        </ul>
+        <h3>Tiempo</h3>
+        <p>Cada nivel dura 3 minutos. Si no alcanzás el objetivo, se suman 3 minutos extra, pero la medalla máxima posible será Plata.</p>
+        <h3>Combos</h3>
+        <p>Cazar palabras correctas en cadena activa combos que multiplican los puntos. ¡Cuanto más larga la racha, mayor el multiplicador!</p>
+      </div>
+    </div>
+
+    <!-- ── PESTAÑA: CATEGORÍAS ── -->
+    <div class="info-panel" id="info-categorias" role="tabpanel">
+      <div class="info-sec">
+        <h2>📖 Categorías Gramaticales</h2>
+        <div class="cat-def"><span class="cat-icon">🏠</span><div><strong>Sustantivos:</strong> Nombran personas, animales, cosas o conceptos abstractos. <em>Ej: casa, gato, libertad, montaña</em></div></div>
+        <div class="cat-def"><span class="cat-icon">🎨</span><div><strong>Adjetivos:</strong> Describen o modifican al sustantivo, indicando cualidades. <em>Ej: grande, hermoso, rojo, triste</em></div></div>
+        <div class="cat-def"><span class="cat-icon">⚡</span><div><strong>Verbos:</strong> Expresan acciones, estados o procesos en el tiempo. <em>Ej: correr, ser, pensar, cantar</em></div></div>
+        <div class="cat-def"><span class="cat-icon">📍</span><div><strong>Adverbios:</strong> Modifican verbos, adjetivos u otros adverbios. Indican modo, lugar o tiempo. <em>Ej: rápidamente, aquí, siempre</em></div></div>
+        <div class="cat-def"><span class="cat-icon">📌</span><div><strong>Artículos:</strong> Preceden al sustantivo e indican género, número y si es definido o indefinido. <em>Ej: el, la, un, unas</em></div></div>
+        <div class="cat-def"><span class="cat-icon">👤</span><div><strong>Pronombres:</strong> Reemplazan al sustantivo para evitar repeticiones. <em>Ej: yo, tú, él, nosotros</em></div></div>
+        <div class="cat-def"><span class="cat-icon">🔗</span><div><strong>Preposiciones:</strong> Establecen relaciones de lugar, tiempo o modo entre palabras. <em>Ej: en, de, a, con, por</em></div></div>
+        <div class="cat-def"><span class="cat-icon">🔀</span><div><strong>Conjunciones:</strong> Unen palabras, frases u oraciones entre sí. <em>Ej: y, o, pero, aunque, porque</em></div></div>
+        <div class="cat-def"><span class="cat-icon">💬</span><div><strong>Interjecciones:</strong> Expresan sentimientos o emociones de forma exclamativa. <em>Ej: ¡ay!, ¡bravo!, ¡cuidado!</em></div></div>
+      </div>
+    </div>
+
+    <!-- ── PESTAÑA: PREMIOS ── -->
+    <div class="info-panel" id="info-premios" role="tabpanel">
+      <div class="info-sec">
+        <h2>🏅 Medallas</h2>
+        <div class="medal-row"><span class="medal-em">🥇</span><div><strong>Oro:</strong> Objetivo alcanzado en tiempo normal con ≥90% de precisión</div></div>
+        <div class="medal-row"><span class="medal-em">🥈</span><div><strong>Plata:</strong> Objetivo alcanzado con ≥75% de precisión (o en tiempo extra)</div></div>
+        <div class="medal-row"><span class="medal-em">🥉</span><div><strong>Bronce:</strong> Objetivo alcanzado con menos del 75% de precisión</div></div>
+        <div class="medal-row"><span class="medal-em">❌</span><div><strong>Sin medalla:</strong> No se alcanzó el objetivo</div></div>
+      </div>
+      <div class="info-sec">
+        <h2>🏆 Logros y Títulos</h2>
+        <p>Hay <strong>10 logros</strong> que se desbloquean automáticamente según tu desempeño — primera partida, combos, precisión perfecta, jugar todas las categorías, y más.</p>
+        <p style="margin-top:.8rem">Hay <strong>7 títulos progresivos</strong> que reflejan tu nivel acumulado como cazador de palabras, desde "Aprendiz de Palabras" hasta el rango máximo.</p>
+      </div>
+    </div>
+
+    <!-- ── PESTAÑA: AULA ── -->
+    <div class="info-panel" id="info-aula" role="tabpanel">
+      <div class="info-sec">
+        <h2>👩‍🏫 Uso en el Aula</h2>
+        <ul>
+          <li>Usalo como actividad de cierre o repaso de clases de gramática</li>
+          <li>Asigná categorías específicas como tarea o práctica adicional</li>
+          <li>Pedí al alumno que muestre su pantalla de Medallas y Logros al docente</li>
+          <li>Usá el botón "Capturar Progreso" para documentar el desempeño</li>
+          <li>Edad sugerida: 8–15 años (también válido para adultos)</li>
+        </ul>
+        <h3 style="margin-top:1rem">Niveles de dificultad</h3>
+        <ul>
+          <li><strong>Nivel 1:</strong> Velocidad base, objetivo menor — ideal para introducir la categoría</li>
+          <li><strong>Nivel 2:</strong> Mayor velocidad y puntaje — consolidación</li>
+          <li><strong>Nivel 3:</strong> Desafío máximo — evaluación de dominio</li>
+        </ul>
+      </div>
+      <div class="info-sec info-sec-brand">
+        <h2>✨ Creado por ProfeD.</h2>
+        <p>Una herramienta educativa para hacer el aprendizaje del lenguaje más divertido e interactivo.</p>
+      </div>
+    </div>
+
+  </div>
+  <button class="back-btn" id="backFromInfo">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ SALA ═══════════════════════════════ -->
+<div id="salaScreen" class="screen">
+  <h1 class="screen-title">🏫 Mi Sala</h1>
+  <p class="screen-sub">Jugá con tu clase y compará puntajes</p>
+  <div class="card wide sala-card">
+
+    <!-- Estado actual -->
+    <div id="salaEstado"></div>
+
+    <!-- Selector de modo (visible solo si no hay sala activa) -->
+    <div id="salaModoTabs" class="sala-modo-tabs">
+      <button class="sala-modo-btn active" id="btnModoUnirse">🔑 Unirme a una sala</button>
+      <button class="sala-modo-btn" id="btnModoCrear">➕ Crear sala (docente)</button>
+    </div>
+
+    <!-- UNIRSE -->
+    <div id="salaJoinSection" class="sala-section">
+      <h3>Ingresar código de sala</h3>
+      <p class="sala-hint">Tu docente te dará un código de sala. Ingresalo aquí para que tus puntajes aparezcan en el ranking de la clase.</p>
+      <div class="sala-input-row">
+        <input type="text" id="inputJoinCode" placeholder="Ej: 7B" maxlength="12"
+          autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text"
+          class="sala-input">
+        <button class="btn btn-primary btn-sm" id="btnUnirme">✅ Unirme</button>
+      </div>
+    </div>
+
+    <!-- CREAR -->
+    <div id="salaCreateSection" class="sala-section" style="display:none">
+      <h3>Crear una nueva sala</h3>
+      <p class="sala-hint">Elegí un código único para tu clase (ej: 3A, PROFE2025). Los alumnos lo usarán para unirse.</p>
+      <div class="sala-form">
+        <input type="text" id="inputCrearCode" placeholder="Código (ej: 7B)" maxlength="12"
+          autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text"
+          class="sala-input">
+        <input type="text" id="inputCrearNombre" placeholder="Nombre de la sala (ej: 7° Grado B)" maxlength="40"
+          autocapitalize="words" autocorrect="off" spellcheck="false"
+          class="sala-input">
+        <input type="text" id="inputCrearDesc" placeholder="Descripción opcional" maxlength="80"
+          autocapitalize="sentences" autocorrect="on"
+          class="sala-input">
+        <button class="btn btn-primary" id="btnCrearSala">🏫 Crear Sala</button>
+      </div>
+      <div class="sala-mis-salas">
+        <h3>📋 Mis Salas</h3>
+        <div id="misSalasContainer"></div>
+      </div>
+    </div>
+
+  </div>
+  <button class="back-btn" id="backFromSala">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ DIALOG CUSTOM ═══════════════════════════════ -->
+<div id="dialogOverlay" role="dialog" aria-modal="true" aria-labelledby="dialogMsg">
+  <div id="dialogBox" class="modal-box dialog-box">
+    <p id="dialogMsg"></p>
+    <div class="dialog-btns">
+      <button class="btn btn-outline btn-sm" id="dialogCancel">Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="dialogOk">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ BOTONES FLOTANTES ═══════════════════════════════ -->
+<button class="vol-btn" id="volBtn">🔊</button>
+<button class="theme-btn" id="themeBtn" aria-label="Cambiar tema">🌙</button>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

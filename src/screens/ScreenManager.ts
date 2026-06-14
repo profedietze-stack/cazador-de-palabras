@@ -5,6 +5,7 @@ export type ScreenId =
   | 'menuPrincipal' | 'seleccionCategoria' | 'preNivel'
   | 'gameScreen' | 'resultadoScreen' | 'medallasScreen'
   | 'rankingScreen' | 'infoScreen' | 'salaScreen'
+  | 'duelMenuScreen' | 'duelLobbyScreen' | 'duelGameScreen' | 'duelResultScreen'
 
 let _pending: ScreenId | null = null
 let _screens: NodeListOf<Element> | null = null

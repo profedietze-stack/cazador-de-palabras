@@ -18,6 +18,10 @@ import { sonidoBtn } from './audio/AudioEngine'
 import { initDialog } from './ui/Dialog'
 import { initInfoScreen } from './screens/InfoScreen'
 import { initSalaScreen } from './screens/SalaScreen'
+import { initDuelMenuScreen } from './screens/DuelMenuScreen'
+import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
+import { initDuelGameScreen } from './screens/DuelGameScreen'
+import { initDuelResultScreen } from './screens/DuelResultScreen'
 
 // Init all screens
 initDialog()
@@ -30,6 +34,10 @@ initResultScreen()
 initAchievementsScreen()
 initRankingScreen()
 initSalaScreen()
+initDuelMenuScreen()
+initDuelLobbyScreen()
+initDuelGameScreen()
+initDuelResultScreen()
 
 // Global sound on button click
 document.addEventListener('click', (e) => {

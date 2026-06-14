@@ -54,6 +54,7 @@ export function initMenuScreen(): void {
   btnSala.addEventListener('click', () => { mostrarSala(); })
   // Refresh dot when returning from sala screen
   document.getElementById('backFromSala')?.addEventListener('click', refreshSalaBtn)
+  document.getElementById('btnDuelo')!.addEventListener('click', () => mostrar('duelMenuScreen'))
   document.getElementById('btnInfo')!.addEventListener('click', () => mostrar('infoScreen'))
 
   document.getElementById('btnBorrar')!.addEventListener('click', async () => {

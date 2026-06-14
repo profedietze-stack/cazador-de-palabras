@@ -45,7 +45,7 @@ class DuelService {
   disconnect(): void {
     this.socket?.disconnect()
     this.socket = null
-    this.handlers.clear()
+    // handlers kept intentionally — init-time registrations must survive reconnects
   }
 
   on<K extends keyof DuelEventMap>(event: K, handler: DuelEventMap[K]): void {

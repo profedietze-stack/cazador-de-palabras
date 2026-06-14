@@ -319,3 +319,165 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .sala-docente-fecha{color:var(--text-faint);font-size:.78rem;margin-bottom:.7rem}
 .sala-docente-btns{display:flex;gap:.4rem;flex-wrap:wrap}
 .btn-xs{padding:.3rem .6rem!important;font-size:.78rem!important}
+
+/* ─── DUELO: MENÚ ─── */
+.duel-menu-card{max-width:520px}
+.duel-tabs{display:flex;gap:.4rem;margin-bottom:1.2rem}
+.duel-tab{
+  flex:1;padding:.6rem .8rem;border:2px solid var(--border);border-radius:10px;
+  background:var(--panel-alt);color:var(--text-muted);font-size:.9rem;font-weight:700;
+  cursor:pointer;transition:all var(--trans);
+}
+.duel-tab:hover{border-color:#667eea;color:#667eea}
+.duel-tab.active{background:#667eea;color:#fff;border-color:#667eea}
+.duel-section{display:flex;flex-direction:column;gap:1rem}
+.duel-field{display:flex;flex-direction:column;gap:.4rem}
+.duel-row{flex-direction:row!important;gap:1rem}
+.duel-field-half{flex:1;display:flex;flex-direction:column;gap:.4rem}
+.duel-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.duel-input{
+  width:100%;padding:.65rem .9rem;border:2px solid var(--border);border-radius:10px;
+  background:var(--input-bg);color:var(--text);font-size:1rem;box-sizing:border-box;
+  transition:border-color var(--trans);text-align:center;letter-spacing:3px;font-weight:800;
+}
+.duel-input:focus{outline:none;border-color:#667eea}
+.duel-btn-group{display:flex;gap:.4rem}
+.duel-opt-btn{
+  flex:1;padding:.5rem .4rem;border:2px solid var(--border);border-radius:8px;
+  background:var(--panel-alt);color:var(--text-muted);font-weight:700;font-size:.88rem;
+  cursor:pointer;transition:all var(--trans);
+}
+.duel-opt-btn:hover{border-color:#667eea;color:#667eea}
+.duel-opt-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+.duel-cats-wrap{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;
+  max-height:160px;overflow-y:auto;
+}
+.duel-cat-btn{
+  padding:.45rem .4rem;border:2px solid var(--border);border-radius:8px;
+  background:var(--panel-alt);color:var(--text-muted);font-size:.78rem;font-weight:700;
+  cursor:pointer;transition:all var(--trans);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.duel-cat-btn:hover{border-color:#667eea;color:#667eea}
+.duel-cat-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+
+/* ─── DUELO: LOBBY ─── */
+.duel-lobby-card{max-width:500px}
+.duel-code-display-wrap{text-align:center;margin-bottom:1.5rem}
+.duel-code-display{
+  font-size:2.8rem;font-weight:900;color:#667eea;letter-spacing:6px;
+  background:var(--panel-acc);padding:.5rem 1.2rem;border-radius:12px;
+  border:2px solid #667eea33;display:inline-block;margin:.4rem 0;
+}
+.duel-players-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.2rem}
+.duel-player-card{
+  flex:1;background:var(--panel-acc);border-radius:14px;padding:1rem;
+  text-align:center;border:2px solid var(--border);transition:border-color var(--trans);
+}
+.duel-player-card.connected{border-color:#22c55e}
+.dpl-slot{
+  display:inline-block;width:32px;height:32px;border-radius:50%;
+  background:#667eea;color:#fff;font-weight:900;font-size:1rem;
+  line-height:32px;margin-bottom:.4rem;
+}
+.dpl-nombre{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:.3rem}
+.dpl-ready{font-size:1.2rem}
+.dpl-ready.ready{color:#22c55e}
+.duel-vs{font-size:1.4rem;font-weight:900;color:var(--text-faint)}
+.duel-lobby-info{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:1rem}
+.duel-countdown-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+}
+.duel-countdown-num{
+  font-size:10rem;font-weight:900;color:#fff;
+  text-shadow:0 0 40px rgba(102,126,234,.8);
+  animation:pop .4s ease;
+}
+
+/* ─── DUELO: JUEGO ─── */
+#duelGameScreen{padding:0;display:flex;flex-direction:column;background:linear-gradient(135deg,#1a1a2e,#16213e)}
+.duel-hud{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 1rem;padding-top:calc(.6rem + env(safe-area-inset-top));
+  background:rgba(255,255,255,.08);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.12);color:#fff;flex-shrink:0;
+}
+.duel-hud-player{text-align:center;flex:1}
+.duel-hud-nombre{font-size:.72rem;opacity:.75;text-transform:uppercase;letter-spacing:.5px}
+.duel-hud-score{font-size:1.6rem;font-weight:800}
+.duel-hud-center{text-align:center;flex:1}
+.duel-hud-timer{font-size:1.4rem;font-weight:800;color:#fbbf24}
+.duel-hud-cat{font-size:.7rem;opacity:.65;margin-top:.1rem}
+.duel-hud-rival .duel-hud-score{color:#f87171}
+.duel-hud-me .duel-hud-score{color:#86efac}
+#duelTimerBar{height:3px;background:rgba(255,255,255,.15);flex-shrink:0}
+#duelTimerBarFill{height:100%;background:#fbbf24;transition:width .9s linear;width:100%}
+.duel-board{
+  flex:1;overflow-y:auto;display:flex;flex-wrap:wrap;
+  align-content:flex-start;gap:.5rem;padding:1rem;
+  box-sizing:border-box;
+}
+.duel-chip{
+  padding:.45rem .9rem;border-radius:20px;cursor:pointer;
+  font-weight:700;font-size:.9rem;user-select:none;touch-action:none;
+  transition:all .15s;border:2px solid transparent;
+  -webkit-tap-highlight-color:transparent;
+}
+.duel-chip.free{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
+.duel-chip.free:active{background:rgba(255,255,255,.3);transform:scale(.96)}
+.duel-chip.taken-me{background:#22c55e33;color:#86efac;border-color:#22c55e66;cursor:default}
+.duel-chip.taken-rival{background:#f8717133;color:#fca5a5;border-color:#f8717166;cursor:default}
+.duel-chip.hit-anim{animation:hitOk .35s ease forwards}
+.duel-chip.decoy{opacity:.55;font-style:italic}
+.duel-powers-bar{
+  flex-shrink:0;padding:.6rem 1rem;
+  background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:.8rem;
+  padding-bottom:calc(.6rem + env(safe-area-inset-bottom));
+}
+.duel-powers-label{color:rgba(255,255,255,.5);font-size:.72rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.duel-power-slots{display:flex;gap:.5rem;flex:1}
+.duel-power-slot{
+  flex:1;max-width:120px;padding:.5rem .6rem;border-radius:10px;
+  border:2px dashed rgba(255,255,255,.2);background:rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:.4rem;cursor:pointer;
+  transition:all var(--trans);min-height:44px;position:relative;
+}
+.duel-power-slot.empty{cursor:default}
+.duel-power-slot.ready:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.5)}
+.duel-power-slot.ready{border-style:solid;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.08)}
+.duel-power-slot.cooldown{opacity:.45;cursor:not-allowed}
+.dps-icon{font-size:1.3rem}
+.dps-label{color:#fff;font-size:.72rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden}
+.dps-cd{
+  font-size:.65rem;color:#fbbf24;font-weight:800;
+  position:absolute;bottom:3px;right:5px;
+}
+.duel-freeze-overlay{
+  position:absolute;inset:0;background:rgba(100,180,255,.25);
+  z-index:50;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);pointer-events:none;
+}
+.duel-freeze-msg{font-size:2rem;font-weight:800;color:#fff;text-shadow:0 2px 12px #60a5fa}
+.duel-decoy-notice{
+  position:absolute;top:55px;left:50%;transform:translateX(-50%);
+  background:#7c3aed;color:#fff;padding:.4rem 1rem;border-radius:20px;
+  font-size:.85rem;font-weight:700;z-index:51;pointer-events:none;
+  animation:fadeIn .3s ease;
+}
+
+/* ─── DUELO: RESULTADO ─── */
+.duel-result-card{max-width:460px;text-align:center}
+.duel-result-title{font-size:2rem;font-weight:900;color:#667eea;margin-bottom:1.2rem}
+.duel-result-scores{
+  display:flex;align-items:center;justify-content:center;gap:1.5rem;
+  background:var(--panel-acc);border-radius:16px;padding:1.2rem;margin-bottom:1rem;
+}
+.duel-rs-player{text-align:center}
+.duel-rs-nombre{font-size:.85rem;font-weight:700;color:var(--text-muted);margin-bottom:.3rem}
+.duel-rs-score{font-size:2.5rem;font-weight:900;color:#667eea}
+.duel-rs-sep{font-size:1.5rem;font-weight:900;color:var(--text-faint)}
+.duel-result-reason{color:var(--text-muted);font-size:.85rem;margin-bottom:1.2rem}
+.duel-result-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.duel-rematch-status{color:var(--text-muted);font-size:.85rem;margin-top:.8rem;font-style:italic}

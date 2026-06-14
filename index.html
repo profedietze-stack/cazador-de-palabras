@@ -311,6 +311,167 @@
   <button class="back-btn" id="backFromSala">← Volver al Menú</button>
 </div>
 
+<!-- ═══════════════════════════════ DUELO: MENÚ ═══════════════════════════════ -->
+<div id="duelMenuScreen" class="screen">
+  <h1 class="screen-title">⚔️ Modo Duelo</h1>
+  <p class="screen-sub">Jugá en tiempo real contra otro jugador</p>
+  <div class="card wide duel-menu-card">
+
+    <div class="duel-tabs">
+      <button class="duel-tab active" id="duelTabCrear">➕ Crear Sala</button>
+      <button class="duel-tab" id="duelTabUnirse">🔑 Unirse</button>
+    </div>
+
+    <!-- CREAR -->
+    <div id="duelCreateSection" class="duel-section">
+      <div class="duel-field">
+        <label class="duel-label">Categoría</label>
+        <div class="duel-cats-wrap" id="duelCatsWrap"></div>
+      </div>
+      <div class="duel-field duel-row">
+        <div class="duel-field-half">
+          <label class="duel-label">Nivel</label>
+          <div class="duel-btn-group" id="duelNivelGroup">
+            <button class="duel-opt-btn active" data-val="1">1</button>
+            <button class="duel-opt-btn" data-val="2">2</button>
+            <button class="duel-opt-btn" data-val="3">3</button>
+          </div>
+        </div>
+        <div class="duel-field-half">
+          <label class="duel-label">Duración</label>
+          <div class="duel-btn-group" id="duelDurGroup">
+            <button class="duel-opt-btn active" data-val="60">1m</button>
+            <button class="duel-opt-btn" data-val="120">2m</button>
+            <button class="duel-opt-btn" data-val="180">3m</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnCrearDuelo">⚔️ Crear Sala</button>
+    </div>
+
+    <!-- UNIRSE -->
+    <div id="duelJoinSection" class="duel-section" style="display:none">
+      <div class="duel-field">
+        <label class="duel-label">Código de sala</label>
+        <input type="text" id="duelCodeInput" class="duel-input"
+          placeholder="Ej: A3B7" maxlength="4"
+          autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text">
+      </div>
+      <button class="btn btn-primary" id="btnUnirseDuelo">🔑 Unirse</button>
+    </div>
+
+  </div>
+  <button class="back-btn" id="backFromDuelMenu">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ DUELO: LOBBY ═══════════════════════════════ -->
+<div id="duelLobbyScreen" class="screen">
+  <h1 class="screen-title">🎮 Sala de Espera</h1>
+  <div class="card wide duel-lobby-card">
+
+    <div class="duel-code-display-wrap">
+      <span class="duel-label">Código de sala</span>
+      <div class="duel-code-display" id="lobbyCode">----</div>
+      <span class="duel-label" id="lobbyCodeHint">Compartí este código con tu rival</span>
+    </div>
+
+    <div class="duel-players-row">
+      <div class="duel-player-card" id="lobbySlotA">
+        <div class="dpl-slot">A</div>
+        <div class="dpl-nombre" id="lobbyNombreA">Esperando...</div>
+        <div class="dpl-ready" id="lobbyReadyA">⏳</div>
+      </div>
+      <div class="duel-vs">VS</div>
+      <div class="duel-player-card" id="lobbySlotB">
+        <div class="dpl-slot">B</div>
+        <div class="dpl-nombre" id="lobbyNombreB">Esperando...</div>
+        <div class="dpl-ready" id="lobbyReadyB">⏳</div>
+      </div>
+    </div>
+
+    <div class="duel-lobby-info" id="lobbyInfo">Esperando al segundo jugador...</div>
+    <button class="btn btn-primary" id="btnLobbyReady" disabled>✅ ¡Listo!</button>
+
+  </div>
+
+  <!-- Overlay countdown -->
+  <div id="duelCountdownOverlay" class="duel-countdown-overlay" style="display:none">
+    <div class="duel-countdown-num" id="duelCountdownNum">3</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ DUELO: JUEGO ═══════════════════════════════ -->
+<div id="duelGameScreen" class="screen">
+
+  <!-- HUD duelo -->
+  <div class="duel-hud">
+    <div class="duel-hud-player duel-hud-me">
+      <div class="duel-hud-nombre" id="duelHudNombreMe">Tú</div>
+      <div class="duel-hud-score" id="duelHudScoreMe">0</div>
+    </div>
+    <div class="duel-hud-center">
+      <div class="duel-hud-timer" id="duelHudTimer">1:00</div>
+      <div class="duel-hud-cat" id="duelHudCat">-</div>
+    </div>
+    <div class="duel-hud-player duel-hud-rival">
+      <div class="duel-hud-nombre" id="duelHudNombreRival">Rival</div>
+      <div class="duel-hud-score" id="duelHudScoreRival">0</div>
+    </div>
+  </div>
+
+  <!-- Timer bar -->
+  <div id="duelTimerBar"><div id="duelTimerBarFill"></div></div>
+
+  <!-- Tablero de palabras -->
+  <div class="duel-board" id="duelBoard"></div>
+
+  <!-- Poderes -->
+  <div class="duel-powers-bar" id="duelPowersBar">
+    <div class="duel-powers-label">Poderes</div>
+    <div class="duel-power-slots" id="duelPowerSlots">
+      <div class="duel-power-slot empty" id="duelPowerSlot0"></div>
+      <div class="duel-power-slot empty" id="duelPowerSlot1"></div>
+    </div>
+  </div>
+
+  <!-- Overlay freeze -->
+  <div id="duelFreezeOverlay" class="duel-freeze-overlay" style="display:none">
+    <div class="duel-freeze-msg">❄️ ¡Congelado!</div>
+  </div>
+
+  <!-- Notificación decoy -->
+  <div id="duelDecoyNotice" class="duel-decoy-notice" style="display:none">
+    👻 ¡Señuelo activo!
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════ DUELO: RESULTADO ═══════════════════════════════ -->
+<div id="duelResultScreen" class="screen">
+  <div class="card wide duel-result-card">
+    <div class="duel-result-title" id="duelResultTitle">🏆 ¡Ganaste!</div>
+    <div class="duel-result-scores">
+      <div class="duel-rs-player" id="duelRsMe">
+        <div class="duel-rs-nombre" id="duelRsNombreMe">Tú</div>
+        <div class="duel-rs-score" id="duelRsScoreMe">0</div>
+      </div>
+      <div class="duel-rs-sep">-</div>
+      <div class="duel-rs-player" id="duelRsRival">
+        <div class="duel-rs-nombre" id="duelRsNombreRival">Rival</div>
+        <div class="duel-rs-score" id="duelRsScoreRival">0</div>
+      </div>
+    </div>
+    <div class="duel-result-reason" id="duelResultReason"></div>
+    <div class="duel-result-btns">
+      <button class="btn btn-outline" id="btnDuelResultMenu">🏠 Menú</button>
+      <button class="btn btn-primary" id="btnDuelRematch" style="display:none">🔁 Revancha</button>
+    </div>
+    <div class="duel-rematch-status" id="duelRematchStatus" style="display:none">
+      Esperando respuesta del rival...
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════ DIALOG CUSTOM ═══════════════════════════════ -->
 <div id="dialogOverlay" role="dialog" aria-modal="true" aria-labelledby="dialogMsg">
   <div id="dialogBox" class="modal-box dialog-box">

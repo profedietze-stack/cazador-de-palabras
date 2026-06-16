@@ -96,7 +96,7 @@ describe('catchWord', () => {
     room = makeRoom()
     addPlayer(room, 'sockA', 'Alice')
     addPlayer(room, 'sockB', 'Bob')
-    setBoard(room, makeWords(5), 60, 'sustantivos', 1)
+    setBoard(room, makeWords(5), 60, ['sustantivos'], 1)
     room.phase = 'playing'
   })
 
@@ -124,7 +124,7 @@ describe('catchWord', () => {
   })
 
   it('nivel 2 gives 20 points per correct word', () => {
-    setBoard(room, makeWords(3), 60, 'sustantivos', 2)
+    setBoard(room, makeWords(3), 60, ['sustantivos'], 2)
     catchWord(room, 'sockA', 'w0')
     expect(getScores(room).A).toBe(20)
   })
@@ -143,7 +143,7 @@ describe('determineWinner', () => {
     const room = makeRoom()
     addPlayer(room, 'sockA', 'Alice')
     addPlayer(room, 'sockB', 'Bob')
-    setBoard(room, makeWords(3), 60, 'sustantivos', 1)
+    setBoard(room, makeWords(3), 60, ['sustantivos'], 1)
     room.phase = 'playing'
     catchWord(room, 'sockA', 'w0')
     expect(determineWinner(room)).toBe('A')

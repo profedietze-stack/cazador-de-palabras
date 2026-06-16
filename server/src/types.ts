@@ -30,7 +30,7 @@ export interface RoomState {
   players: Map<PlayerSlot, PlayerState>
   words: DuelWord[]
   duracion: number              // seconds
-  cat: string
+  cats: string[]
   nivel: number
   startedAt: number | null
   timerHandle: ReturnType<typeof setTimeout> | null

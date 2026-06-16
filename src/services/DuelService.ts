@@ -9,7 +9,7 @@ export type DuelEventMap = {
   duel_joined:        (data: { slot: PlayerSlot; rivalNombre: string }) => void
   rival_joined:       (data: { nombre: string }) => void
   countdown_start:    () => void
-  duel_start:         (data: { words: DuelWord[]; duracion: number; cat: string; nivel: number }) => void
+  duel_start:         (data: { words: DuelWord[]; duracion: number; cats: string[]; nivel: number }) => void
   word_taken:         (data: { wordId: string; bySlot: PlayerSlot; stolenByRival: boolean; scores: DuelScores }) => void
   word_already_taken: (wordId: string) => void
   power_earned:       (powerId: PowerId) => void
@@ -59,7 +59,7 @@ class DuelService {
 
   createDuel(data: {
     nombre: string
-    cat: string
+    cats: string[]
     nivel: number
     duracion: number
     words: Array<{ id: string; text: string; isCorrect: boolean }>

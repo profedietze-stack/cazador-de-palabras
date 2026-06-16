@@ -15,7 +15,7 @@ export function createRoom(code: string): RoomState {
     players: new Map(),
     words: [],
     duracion: 180,
-    cat: '',
+    cats: [],
     nivel: 1,
     startedAt: null,
     timerHandle: null,
@@ -61,10 +61,10 @@ export function getRival(room: RoomState, slot: PlayerSlot): PlayerState | null 
   return room.players.get(rivalSlot) ?? null
 }
 
-export function setBoard(room: RoomState, words: DuelWord[], duracion: number, cat: string, nivel: number): void {
+export function setBoard(room: RoomState, words: DuelWord[], duracion: number, cats: string[], nivel: number): void {
   room.words = words
   room.duracion = duracion
-  room.cat = cat
+  room.cats = cats
   room.nivel = nivel
 }
 

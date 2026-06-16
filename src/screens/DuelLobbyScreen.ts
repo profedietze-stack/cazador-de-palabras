@@ -92,16 +92,16 @@ export function initDuelLobbyScreen(): void {
   })
 
   // Duel start → hand off to game screen
-  duelService.on('duel_start', ({ words, duracion, cat, nivel }) => {
+  duelService.on('duel_start', ({ words, duracion, cats, nivel }) => {
     if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null }
     document.getElementById('duelCountdownOverlay')!.style.display = 'none'
     D.words = words
     D.duracion = duracion
-    // Joiner needs cat/nivel from server (creator already has them set)
-    if (cat) {
-      D.cat = cat as CategoryKey
+    // Joiner needs cats/nivel from server (creator already has them set)
+    if (cats?.length) {
+      D.cats = cats as CategoryKey[]
       D.nivel = nivel
-      D.catNombre = CATS[cat as CategoryKey]?.nombre ?? cat
+      D.catsNombre = cats.map((c: string) => CATS[c as CategoryKey]?.nombre ?? c).join(', ')
     }
     D.phase = 'playing'
     mostrarDuelGame()

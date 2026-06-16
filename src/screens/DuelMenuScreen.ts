@@ -14,22 +14,34 @@ export function mostrarDuelMenu(): void {
 }
 
 export function initDuelMenuScreen(): void {
-  // Populate category buttons
+  // Populate category checkboxes (multi-select, min 1)
   const catsWrap = document.getElementById('duelCatsWrap')!
+  D.cats = ['sustantivos']
+  D.catsNombre = CATS['sustantivos'].nombre
+
+  function syncCats(): void {
+    const checked = [...catsWrap.querySelectorAll<HTMLInputElement>('input[type=checkbox]:checked')]
+    D.cats = checked.map(cb => cb.value as CategoryKey)
+    D.catsNombre = checked.map(cb => CATS[cb.value as CategoryKey].nombre).join(', ')
+  }
+
   Object.entries(CATS).forEach(([key, cat]) => {
-    const btn = document.createElement('button')
-    btn.className = 'duel-cat-btn'
-    btn.dataset.cat = key
-    btn.textContent = `${cat.icon} ${cat.nombre}`
-    btn.addEventListener('click', () => {
-      catsWrap.querySelectorAll('.duel-cat-btn').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      D.cat = key as CategoryKey
-      D.catNombre = cat.nombre
+    const label = document.createElement('label')
+    label.className = 'duel-cat-check'
+    const cb = document.createElement('input')
+    cb.type = 'checkbox'
+    cb.value = key
+    cb.checked = key === 'sustantivos'
+    cb.addEventListener('change', () => {
+      // Prevent deselecting all
+      const checkedCount = catsWrap.querySelectorAll<HTMLInputElement>('input:checked').length
+      if (checkedCount === 0) { cb.checked = true; return }
+      syncCats()
     })
-    catsWrap.appendChild(btn)
+    label.appendChild(cb)
+    label.appendChild(document.createTextNode(` ${cat.icon} ${cat.nombre}`))
+    catsWrap.appendChild(label)
   })
-  ;(catsWrap.firstElementChild as HTMLButtonElement)?.click()
 
   // Nivel group
   document.getElementById('duelNivelGroup')!.addEventListener('click', (e) => {
@@ -113,9 +125,9 @@ export function initDuelMenuScreen(): void {
     crearBtn().textContent = '⏳ Conectando...'
     D.myNombre = G.jugador
     D.phase = 'creating'
-    const words = buildDuelWords(D.cat, D.nivel)
+    const words = buildDuelWords(D.cats, D.nivel)
     duelService.connect()
-    duelService.createDuel({ nombre: G.jugador, cat: D.cat, nivel: D.nivel, duracion: D.duracion, words })
+    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion, words })
   })
 
   // Unirse

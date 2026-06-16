@@ -211,7 +211,7 @@ export function mostrarDuelGame(): void {
   // HUD setup
   document.getElementById('duelHudNombreMe')!.textContent = D.myNombre
   document.getElementById('duelHudNombreRival')!.textContent = D.rivalNombre
-  document.getElementById('duelHudCat')!.textContent = `${D.catNombre} · Nv ${D.nivel}`
+  document.getElementById('duelHudCat')!.textContent = `${D.catsNombre} · Nv ${D.nivel}`
   updateScores({ A: 0, B: 0 })
 
   // Board

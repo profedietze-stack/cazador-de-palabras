@@ -52,7 +52,7 @@ io.on('connection', (socket: Socket) => {
   // ── Create duel ──────────────────────────────────────────────────────────
   socket.on('create_duel', (data: {
     nombre: string
-    cat: string
+    cats: string[]
     nivel: number
     duracion: number
     words: Array<{ id: string; text: string; isCorrect: boolean }>
@@ -61,7 +61,7 @@ io.on('connection', (socket: Socket) => {
     const room = createRoom(code)
 
     const duelWords: DuelWord[] = data.words.map(w => ({ ...w, takenBy: null }))
-    setBoard(room, duelWords, data.duracion, data.cat, data.nivel)
+    setBoard(room, duelWords, data.duracion, data.cats, data.nivel)
 
     const slot = addPlayer(room, socket.id, data.nombre)
     if (!slot) { socket.emit('error', 'No se pudo crear la sala'); return }
@@ -116,7 +116,7 @@ io.on('connection', (socket: Socket) => {
         io.to(code).emit('duel_start', {
           words: room.words,
           duracion: room.duracion,
-          cat: room.cat,
+          cats: room.cats,
           nivel: room.nivel,
         })
         room.timerHandle = setTimeout(() => endDuel(room, 'time'), room.duracion * 1000)

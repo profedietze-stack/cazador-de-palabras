@@ -19,34 +19,34 @@ describe('shuffle', () => {
 
 describe('buildDuelWords', () => {
   it('nivel 1: returns 12 ok + 8 mal = 20 words', () => {
-    const words = buildDuelWords('sustantivos', 1)
+    const words = buildDuelWords(['sustantivos'], 1)
     expect(words).toHaveLength(20)
     expect(words.filter(w => w.isCorrect)).toHaveLength(12)
     expect(words.filter(w => !w.isCorrect)).toHaveLength(8)
   })
 
   it('nivel 2: returns 15 ok + 9 mal = 24 words', () => {
-    const words = buildDuelWords('verbos', 2)
+    const words = buildDuelWords(['verbos'], 2)
     expect(words).toHaveLength(24)
     expect(words.filter(w => w.isCorrect)).toHaveLength(15)
     expect(words.filter(w => !w.isCorrect)).toHaveLength(9)
   })
 
   it('nivel 3: returns 18 ok + 10 mal = 28 words', () => {
-    const words = buildDuelWords('adjetivos', 3)
+    const words = buildDuelWords(['adjetivos'], 3)
     expect(words).toHaveLength(28)
     expect(words.filter(w => w.isCorrect)).toHaveLength(18)
     expect(words.filter(w => !w.isCorrect)).toHaveLength(10)
   })
 
   it('all words have unique ids', () => {
-    const words = buildDuelWords('adverbios', 1)
+    const words = buildDuelWords(['adverbios'], 1)
     const ids = words.map(w => w.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
   it('all words have non-empty text', () => {
-    const words = buildDuelWords('preposiciones', 1)
+    const words = buildDuelWords(['preposiciones'], 1)
     expect(words.every(w => typeof w.text === 'string' && w.text.length > 0)).toBe(true)
   })
 
@@ -54,7 +54,14 @@ describe('buildDuelWords', () => {
     const cats = ['sustantivos', 'adjetivos', 'verbos', 'adverbios', 'articulos',
                   'pronombres', 'preposiciones', 'conjunciones', 'interjecciones'] as const
     for (const cat of cats) {
-      expect(() => buildDuelWords(cat, 1)).not.toThrow()
+      expect(() => buildDuelWords([cat], 1)).not.toThrow()
     }
+  })
+
+  it('multi-cat: returns correct totals', () => {
+    const words = buildDuelWords(['sustantivos', 'verbos'], 1)
+    expect(words).toHaveLength(20)
+    expect(words.filter(w => w.isCorrect)).toHaveLength(12)
+    expect(words.filter(w => !w.isCorrect)).toHaveLength(8)
   })
 })

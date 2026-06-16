@@ -6,8 +6,8 @@ export interface DuelState {
   myNombre: string
   rivalNombre: string
   roomCode: string
-  cat: CategoryKey
-  catNombre: string
+  cats: CategoryKey[]
+  catsNombre: string
   nivel: number
   duracion: number
   words: DuelWord[]
@@ -21,8 +21,8 @@ export const D: DuelState = {
   myNombre: '',
   rivalNombre: '',
   roomCode: '',
-  cat: 'sustantivos',
-  catNombre: 'Sustantivos',
+  cats: ['sustantivos'],
+  catsNombre: 'Sustantivos',
   nivel: 1,
   duracion: 60,
   words: [],

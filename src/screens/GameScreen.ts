@@ -29,9 +29,13 @@ export function initGameScreen(): void {
 }
 
 function toggleFS(): void {
-  if (!document.fullscreenElement) {
-    document.getElementById('gameScreen')!.requestFullscreen().catch(() => {})
+  const el = document.getElementById('gameScreen')!
+  const isFs = document.fullscreenElement || (document as any).webkitFullscreenElement
+  if (!isFs) {
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => {})
+    else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen()
   } else {
-    document.exitFullscreen()
+    if (document.exitFullscreen) document.exitFullscreen()
+    else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen()
   }
 }

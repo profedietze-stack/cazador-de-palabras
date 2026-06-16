@@ -35,7 +35,7 @@ class DuelService {
     if (this.socket?.connected) return
     this.socket = io(SERVER_URL, {
       path: SOCKET_PATH,
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
     })
     this.socket.onAny((event: string, ...args: unknown[]) => {
       this.handlers.get(event)?.forEach(h => h(...args))

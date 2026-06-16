@@ -400,7 +400,7 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .duel-hud{
   display:flex;align-items:center;justify-content:space-between;
   padding:.6rem 1rem;padding-top:calc(.6rem + env(safe-area-inset-top));
-  background:rgba(255,255,255,.08);backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid rgba(255,255,255,.12);color:#fff;flex-shrink:0;
 }
 .duel-hud-player{text-align:center;flex:1}
@@ -420,7 +420,7 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 }
 .duel-chip{
   padding:.45rem .9rem;border-radius:20px;cursor:pointer;
-  font-weight:700;font-size:.9rem;user-select:none;touch-action:none;
+  font-weight:700;font-size:.9rem;user-select:none;touch-action:manipulation;
   transition:all .15s;border:2px solid transparent;
   -webkit-tap-highlight-color:transparent;
 }

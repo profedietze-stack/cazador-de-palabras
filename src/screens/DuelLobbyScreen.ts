@@ -3,6 +3,8 @@ import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelGame } from './DuelGameScreen'
+import { CATS } from '../data/categories'
+import type { CategoryKey } from '../types'
 
 export function mostrarDuelLobby(): void {
   const mySlot = D.mySlot!
@@ -90,11 +92,17 @@ export function initDuelLobbyScreen(): void {
   })
 
   // Duel start → hand off to game screen
-  duelService.on('duel_start', ({ words, duracion }) => {
+  duelService.on('duel_start', ({ words, duracion, cat, nivel }) => {
     if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null }
     document.getElementById('duelCountdownOverlay')!.style.display = 'none'
     D.words = words
     D.duracion = duracion
+    // Joiner needs cat/nivel from server (creator already has them set)
+    if (cat) {
+      D.cat = cat as CategoryKey
+      D.nivel = nivel
+      D.catNombre = CATS[cat as CategoryKey]?.nombre ?? cat
+    }
     D.phase = 'playing'
     mostrarDuelGame()
   })

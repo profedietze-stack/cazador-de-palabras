@@ -133,14 +133,21 @@ async function handleUnirse(): Promise<void> {
 
 // ── Crear sala ────────────────────────────────────────────────────────────────
 
+function generarCodigoAleatorio(): string {
+  const letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
+  const nums = '23456789'
+  const parte1 = letras[Math.floor(Math.random() * letras.length)]
+  const parte2 = nums[Math.floor(Math.random() * nums.length)]
+  const parte3 = letras[Math.floor(Math.random() * letras.length)]
+  return parte1 + parte2 + parte3
+}
+
 async function handleCrear(): Promise<void> {
   const codeInput = document.getElementById('inputCrearCode') as HTMLInputElement
   const nameInput = document.getElementById('inputCrearNombre') as HTMLInputElement
-  const descInput = document.getElementById('inputCrearDesc') as HTMLInputElement
 
   const code = codeInput.value.trim().toUpperCase()
   const nombre = nameInput.value.trim()
-  const desc = descInput.value.trim()
 
   if (!code || code.length < 2) { await showAlert('El código debe tener al menos 2 caracteres.'); return }
   if (!nombre) { await showAlert('Ingresá un nombre para la sala.'); return }
@@ -149,7 +156,7 @@ async function handleCrear(): Promise<void> {
   btn.disabled = true
   btn.textContent = '⏳ Creando...'
 
-  const ok = await crearSala(code, nombre, desc || undefined)
+  const ok = await crearSala(code, nombre, undefined)
   btn.disabled = false
   btn.textContent = '🏫 Crear Sala'
 
@@ -162,7 +169,6 @@ async function handleCrear(): Promise<void> {
   lsSet(SALA_NOMBRE_KEY, nombre)
   codeInput.value = ''
   nameInput.value = ''
-  descInput.value = ''
   await showAlert(`¡Sala "${nombre}" creada!\n\nCódigo: ${code}\n\nCompartí este código con tus alumnos.`)
   renderEstado()
 }
@@ -267,4 +273,8 @@ export function initSalaScreen(): void {
     if (e.key === 'Enter') handleUnirse()
   })
   document.getElementById('btnCrearSala')!.addEventListener('click', handleCrear)
+  document.getElementById('btnGenerarCodigo')!.addEventListener('click', () => {
+    const input = document.getElementById('inputCrearCode') as HTMLInputElement
+    input.value = generarCodigoAleatorio()
+  })
 }

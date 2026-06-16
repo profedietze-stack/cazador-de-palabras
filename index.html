@@ -291,14 +291,14 @@
       <h3>Crear una nueva sala</h3>
       <p class="sala-hint">Elegí un código único para tu clase (ej: 3A, PROFE2025). Los alumnos lo usarán para unirse.</p>
       <div class="sala-form">
-        <input type="text" id="inputCrearCode" placeholder="Código (ej: 7B)" maxlength="12"
-          autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text"
-          class="sala-input">
+        <div class="sala-input-row">
+          <input type="text" id="inputCrearCode" placeholder="Código (ej: 7B)" maxlength="12"
+            autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text"
+            class="sala-input">
+          <button class="btn btn-outline btn-sm" id="btnGenerarCodigo" type="button">🎲 Generar</button>
+        </div>
         <input type="text" id="inputCrearNombre" placeholder="Nombre de la sala (ej: 7° Grado B)" maxlength="40"
           autocapitalize="words" autocorrect="off" spellcheck="false"
-          class="sala-input">
-        <input type="text" id="inputCrearDesc" placeholder="Descripción opcional" maxlength="80"
-          autocapitalize="sentences" autocorrect="on"
           class="sala-input">
         <button class="btn btn-primary" id="btnCrearSala">🏫 Crear Sala</button>
       </div>

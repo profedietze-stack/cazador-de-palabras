@@ -7,6 +7,7 @@ import {
   getScores, determineWinner, pruneExpiredEffects,
 } from './DuelRoom'
 import { registerSocket, unregisterSocket, usePower } from './PowerManager'
+import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 const ROOM_IDLE_TIMEOUT = 5 * 60 * 1000  // 5 min
@@ -119,6 +120,8 @@ io.on('connection', (socket: Socket) => {
           nivel: room.nivel,
         })
         room.timerHandle = setTimeout(() => endDuel(room, 'time'), room.duracion * 1000)
+        // Start bot play if a bot is in the room
+        startBotPlay(io, rooms, code, endDuel)
       }, 3000)
     }
   })
@@ -191,6 +194,11 @@ io.on('connection', (socket: Socket) => {
     }
   })
 
+  // ── Debug: spawn bot ─────────────────────────────────────────────────────
+  socket.on('debug_bot_join', ({ code }: { code: string }) => {
+    spawnBot(io, rooms, socketRoom, code)
+  })
+
   // ── Rematch ───────────────────────────────────────────────────────────────
   socket.on('request_rematch', () => {
     const code = socketRoom.get(socket.id)
@@ -219,6 +227,7 @@ io.on('connection', (socket: Socket) => {
 
   // ── Disconnect ────────────────────────────────────────────────────────────
   socket.on('disconnect', () => {
+    if (isBotSocket(socket.id)) return   // bots have no real socket
     unregisterSocket(socket.id)
     const code = socketRoom.get(socket.id)
     if (!code) return

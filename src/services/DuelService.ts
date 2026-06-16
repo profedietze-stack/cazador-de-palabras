@@ -83,6 +83,10 @@ class DuelService {
     this.socket?.emit('use_power', powerId)
   }
 
+  debugBotJoin(code: string): void {
+    this.socket?.emit('debug_bot_join', { code })
+  }
+
   requestRematch(): void {
     this.socket?.emit('request_rematch')
   }

@@ -6,25 +6,11 @@ import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelLobby } from './DuelLobbyScreen'
+import { BOT_MODE } from '../debug'
+import { buildDuelWords } from '../game/duelWords'
 
 export function mostrarDuelMenu(): void {
   mostrar('duelMenuScreen')
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - .5)
-}
-
-function buildDuelWords(cat: CategoryKey, nivel: number) {
-  const data = CATS[cat]
-  const nOk = nivel === 1 ? 12 : nivel === 2 ? 15 : 18
-  const nMal = nivel === 1 ? 8 : nivel === 2 ? 9 : 10
-  const ok = shuffle(data.ok).slice(0, nOk)
-  const mal = shuffle(data.mal).slice(0, nMal)
-  return shuffle([
-    ...ok.map((text, i) => ({ id: `ok${i}`, text, isCorrect: true })),
-    ...mal.map((text, i) => ({ id: `mal${i}`, text, isCorrect: false })),
-  ])
 }
 
 export function initDuelMenuScreen(): void {
@@ -98,6 +84,7 @@ export function initDuelMenuScreen(): void {
     D.mySlot = slot
     D.phase = 'lobby'
     resetCrearBtn()
+    if (BOT_MODE) duelService.debugBotJoin(code)
     mostrarDuelLobby()
   })
 

@@ -1,3 +1,5 @@
+import { initDebugMode } from './debug'
+import { initLogger } from './utils/logger'
 import './styles/base.css'
 import './styles/animations.css'
 import './styles/components.css'
@@ -22,6 +24,10 @@ import { initDuelMenuScreen } from './screens/DuelMenuScreen'
 import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
 import { initDuelGameScreen } from './screens/DuelGameScreen'
 import { initDuelResultScreen } from './screens/DuelResultScreen'
+
+// Debug + logging (must be first)
+initDebugMode()
+initLogger()
 
 // Init all screens
 initDialog()

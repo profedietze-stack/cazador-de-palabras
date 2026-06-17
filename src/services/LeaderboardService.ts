@@ -154,14 +154,43 @@ export async function limpiarScoresSala(code: string): Promise<boolean> {
 
 export async function desactivarSala(code: string): Promise<boolean> {
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('salas')
       .update({ activa: false })
+      .eq('code', code)
+      .eq('creator_device_id', getDeviceId())
+      .select('code')
+    if (error) return false
+    return Array.isArray(data) && data.length > 0
+  } catch (_) {
+    return false
+  }
+}
+
+export async function eliminarSala(code: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('salas')
+      .delete()
       .eq('code', code)
       .eq('creator_device_id', getDeviceId())
     return !error
   } catch (_) {
     return false
+  }
+}
+
+export async function contarSalasActivas(): Promise<number> {
+  try {
+    const { data, error } = await supabase
+      .from('salas')
+      .select('code')
+      .eq('creator_device_id', getDeviceId())
+      .eq('activa', true)
+    if (error || !data) return 0
+    return data.length
+  } catch (_) {
+    return 0
   }
 }
 

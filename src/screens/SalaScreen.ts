@@ -1,5 +1,5 @@
 import { mostrar } from './ScreenManager'
-import { crearSala, verificarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, type SalaInfo } from '../services/LeaderboardService'
+import { crearSala, verificarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, eliminarSala, contarSalasActivas, type SalaInfo } from '../services/LeaderboardService'
 import { showAlert, showConfirm } from '../ui/Dialog'
 import { mostrarRanking } from './RankingScreen'
 
@@ -42,6 +42,7 @@ function renderEstado(): void {
         <p class="sala-hint">Tus puntajes se suben a esta sala al terminar cada partida con medalla.</p>
         <button class="btn btn-outline btn-sm" id="btnVerRankingSala">🏆 Ver ranking de la sala</button>
         <button class="btn btn-outline btn-sm" style="margin-top:.4rem;color:#ef4444;border-color:#ef444455" id="btnSalirSala">✖ Salir de la sala</button>
+        <button class="btn btn-outline btn-sm" style="margin-top:.4rem" id="btnCrearOtraSala">➕ Crear otra sala</button>
       </div>`
     modosEl.style.display = 'none'
     joinSection.style.display = 'none'
@@ -53,6 +54,17 @@ function renderEstado(): void {
       modosEl.style.display = 'flex'
       resetModoTabs()
       renderEstado()
+    })
+    document.getElementById('btnCrearOtraSala')!.addEventListener('click', () => {
+      const modosEl2 = document.getElementById('salaModoTabs')!
+      const joinSection2 = document.getElementById('salaJoinSection')!
+      const createSection2 = document.getElementById('salaCreateSection')!
+      modosEl2.style.display = 'flex'
+      document.getElementById('btnModoCrear')?.classList.add('active')
+      document.getElementById('btnModoUnirse')?.classList.remove('active')
+      joinSection2.style.display = 'none'
+      createSection2.style.display = 'block'
+      loadMisSalas()
     })
     document.getElementById('btnVerRankingSala')!.addEventListener('click', () => {
       // Pre-fill ranking sala tab and navigate
@@ -152,6 +164,12 @@ async function handleCrear(): Promise<void> {
   if (!code || code.length < 2) { await showAlert('El código debe tener al menos 2 caracteres.'); return }
   if (!nombre) { await showAlert('Ingresá un nombre para la sala.'); return }
 
+  const activasCount = await contarSalasActivas()
+  if (activasCount >= 4) {
+    await showAlert('Llegaste al límite de 4 salas activas. Desactivá o eliminá una sala antes de crear una nueva.')
+    return
+  }
+
   const btn = document.getElementById('btnCrearSala') as HTMLButtonElement
   btn.disabled = true
   btn.textContent = '⏳ Creando...'
@@ -192,6 +210,7 @@ async function loadMisSalas(): Promise<void> {
     document.getElementById(`btnVerSala_${s.code}`)?.addEventListener('click', () => abrirRankingSala(s.code))
     document.getElementById(`btnLimpiarSala_${s.code}`)?.addEventListener('click', () => handleLimpiar(s.code, s.nombre))
     document.getElementById(`btnDesactivarSala_${s.code}`)?.addEventListener('click', () => handleDesactivar(s.code, s.nombre))
+    document.getElementById(`btnEliminarSala_${s.code}`)?.addEventListener('click', () => handleEliminar(s.code, s.nombre))
   })
 }
 
@@ -213,6 +232,7 @@ function renderSalaDocente(s: SalaInfo): string {
         <button class="btn btn-outline btn-xs" id="btnVerSala_${s.code}">🏆 Ver ranking</button>
         <button class="btn btn-outline btn-xs" id="btnLimpiarSala_${s.code}" style="color:#f59e0b;border-color:#f59e0b55">🗑 Limpiar scores</button>
         ${s.activa ? `<button class="btn btn-outline btn-xs" id="btnDesactivarSala_${s.code}" style="color:#ef4444;border-color:#ef444455">✖ Desactivar</button>` : ''}
+        <button class="btn btn-outline btn-xs" id="btnEliminarSala_${s.code}" style="color:#ef4444;border-color:#ef444455;margin-top:.25rem">🗑️ Eliminar sala</button>
       </div>
     </div>`
 }
@@ -255,6 +275,25 @@ async function handleDesactivar(code: string, nombre: string): Promise<void> {
     await loadMisSalas()
   } else {
     await showAlert('No se pudo desactivar. Verificá tu conexión.')
+  }
+}
+
+async function handleEliminar(code: string, nombre: string): Promise<void> {
+  const ok = await showConfirm(`¿Eliminar la sala "${nombre}" (${code}) y todos sus scores permanentemente?
+
+Esta acción no se puede deshacer.`)
+  if (!ok) return
+
+  const btn = document.getElementById(`btnEliminarSala_${code}`) as HTMLButtonElement
+  if (btn) { btn.disabled = true; btn.textContent = '⏳...' }
+
+  const exito = await eliminarSala(code)
+  if (exito) {
+    await showAlert(`Sala "${nombre}" eliminada.`)
+    await loadMisSalas()
+  } else {
+    await showAlert('No se pudo eliminar. Verificá tu conexión.')
+    if (btn) { btn.disabled = false; btn.textContent = '🗑️ Eliminar sala' }
   }
 }
 

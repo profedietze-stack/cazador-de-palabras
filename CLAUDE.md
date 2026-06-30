@@ -96,10 +96,18 @@ server/src/
 
 To redeploy server after changes:
 ```bash
-# Copy changed files and rebuild on VPS
-scp -r server/src server/package*.json server/tsconfig.json server/Dockerfile root@38.45.71.187:/opt/cazador-duelo/
-ssh root@38.45.71.187 "cd /opt/cazador-duelo && docker build -t cazador-duelo . && docker stop cazador-duelo && docker rm cazador-duelo && docker run -d --name cazador-duelo --restart unless-stopped -p 3001:3001 cazador-duelo"
+# 1. Compile locally
+cd server && npx tsc
+
+# 2. Copy compiled JS to VPS (use absolute key path — $env:USERPROFILE doesn't work in Bash)
+scp -i C:\Users\nicod\.ssh\id_ed25519 server/dist/*.js root@aulaplay.duckdns.org:/tmp/
+
+# 3. Inject into running container and restart
+ssh -i C:\Users\nicod\.ssh\id_ed25519 root@aulaplay.duckdns.org \
+  "for f in index DuelRoom DuelRoom PowerManager DebugBot types; do docker cp /tmp/\$f.js cazador-duelo:/app/dist/\$f.js; done && docker restart cazador-duelo"
 ```
+
+Notes: VPS has no git, no source files — only the Docker image with compiled `dist/`. The container name is `cazador-duelo`, port 3001.
 
 Client deploys automatically on push to `master` via Vercel.
 

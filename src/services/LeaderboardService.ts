@@ -134,14 +134,14 @@ export async function fetchMisSalas(): Promise<SalaInfo[]> {
     const result = await pb.collection('cdp_salas').getList(1, 200, {
       filter: pb.filter('creator_device_id = {:did}', { did: getDeviceId() }),
       sort: '-id',
-      fields: 'id,code,nombre,descripcion,activa',
+      fields: 'id,code,nombre,descripcion,activa,created',
     })
     return result.items.map(r => ({
       code:        r['code'],
       nombre:      r['nombre'],
       descripcion: r['descripcion'] ?? null,
       activa:      r['activa'] ?? null,
-      created_at:  null,
+      created_at:  r['created'] ?? null,
     }))
   } catch (_) {
     return []

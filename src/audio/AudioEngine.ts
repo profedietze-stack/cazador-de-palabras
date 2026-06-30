@@ -61,7 +61,7 @@ export function playComboSound(nivel: number): void {
       [880, 1100, 1320, 1568, 1760],
       [659, 880, 1100, 1320, 1568, 1760, 2093],
     ]
-    const notas = secs[Math.min(nivel - 1, secs.length - 1)]
+    const notas = secs[Math.min(nivel - 1, secs.length - 1)]!
     notas.forEach((f, i) => {
       const o = ctx.createOscillator(), g = ctx.createGain()
       o.connect(g); g.connect(ctx.destination)
@@ -113,8 +113,8 @@ export function iniciarMusica(tipo: 'menu' | 'juego'): void {
     if (!G.sonido) { musicaNode = setTimeout(tocarNota, beat); return }
     try {
       const ctx = getAC(), t = ctx.currentTime
-      const idx = patron[paso % patron.length]
-      const freq = notas[idx % notas.length]
+      const idx = patron[paso % patron.length]!
+      const freq = notas[idx % notas.length]!
       const vol = tipo === 'juego' ? 0.08 : 0.055
       const dur = tipo === 'juego' ? 0.16 : 0.32
       const o = ctx.createOscillator(), g = ctx.createGain()

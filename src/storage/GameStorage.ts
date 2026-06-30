@@ -10,7 +10,7 @@ export function cargarDatos(): PlayerData {
 }
 
 export function guardarDatos(d: PlayerData): void {
-  localStorage.setItem(storageKey(), JSON.stringify(d))
+  try { localStorage.setItem(storageKey(), JSON.stringify(d)) } catch { /* Safari private / quota */ }
 }
 
 export function getPartidas(): GameRecord[] {
@@ -36,15 +36,17 @@ export function setLogros(l: AchievementRecord[]): void {
 
 export function getRankingGlobal(): (GameRecord & { jugador: string })[] {
   const all: (GameRecord & { jugador: string })[] = []
-  for (const k in localStorage) {
-    if (k.startsWith('cdp_') && k !== 'cdp_nombre' && k !== 'cdp_sonido' && k !== 'cdp_tema' && !k.startsWith('cdp_stk_')) {
-      try {
-        const d: PlayerData = JSON.parse(localStorage.getItem(k) || '{}')
-        const jug = k.slice(4)
-        ;(d.partidas || []).forEach(p => all.push({ ...p, jugador: jug }))
-      } catch (e) {}
+  try {
+    for (const k in localStorage) {
+      if (k.startsWith('cdp_') && k !== 'cdp_nombre' && k !== 'cdp_sonido' && k !== 'cdp_tema' && !k.startsWith('cdp_stk_')) {
+        try {
+          const d: PlayerData = JSON.parse(localStorage.getItem(k) || '{}')
+          const jug = k.slice(4)
+          ;(d.partidas || []).forEach(p => all.push({ ...p, jugador: jug }))
+        } catch (e) {}
+      }
     }
-  }
+  } catch { /* Safari private / unavailable */ }
   return all.sort((a, b) => b.pts - a.pts).slice(0, 50)
 }
 

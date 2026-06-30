@@ -1,8 +1,9 @@
 import { mostrar } from './ScreenManager'
-import { D } from '../game/duelState'
+import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
 import { POWER_META } from '../types/duel'
 import type { PowerId, DuelScores } from '../types/duel'
+import { showAlert } from '../ui/Dialog'
 
 // Last duel end data — read by DuelResultScreen
 export let lastDuelEnd: { winner: 'A' | 'B' | 'draw'; scores: DuelScores; reason: string } | null = null
@@ -91,10 +92,10 @@ function resetSlots(): void {
 
 function renderSlot(i: number): void {
   const el = document.getElementById(`duelPowerSlot${i}`)!
-  const onCd = slotCdTimer[i] !== null || (slotCdEnd[i] > Date.now())
+  const onCd = slotCdTimer[i] !== null || (slotCdEnd[i]! > Date.now())
 
   if (onCd) {
-    const rem = Math.max(0, Math.ceil((slotCdEnd[i] - Date.now()) / 1000))
+    const rem = Math.max(0, Math.ceil((slotCdEnd[i]! - Date.now()) / 1000))
     const icon = slotCdPower[i] ? POWER_META[slotCdPower[i]!].icon : '⏳'
     el.className = 'duel-power-slot cooldown'
     el.innerHTML = `<span class="dps-icon">${icon}</span><span class="dps-cd">${rem}s</span>`
@@ -113,7 +114,7 @@ function renderSlots(): void { renderSlot(0); renderSlot(1) }
 function assignPower(powerId: PowerId): void {
   // Put in first non-occupied, non-cooldown slot
   for (let i = 0; i < 2; i++) {
-    if (!slotPower[i] && !slotCdTimer[i] && slotCdEnd[i] <= Date.now()) {
+    if (!slotPower[i] && !slotCdTimer[i] && slotCdEnd[i]! <= Date.now()) {
       slotPower[i] = powerId
       renderSlot(i)
       return
@@ -131,7 +132,7 @@ function consumePower(powerId: PowerId): void {
   slotPower[idx] = null
   slotCdEnd[idx] = Date.now() + POWER_META[powerId].cooldownMs
   slotCdTimer[idx] = setInterval(() => {
-    if (slotCdEnd[idx] <= Date.now()) {
+    if (slotCdEnd[idx]! <= Date.now()) {
       clearInterval(slotCdTimer[idx]!); slotCdTimer[idx] = null
       slotCdPower[idx] = null
     }
@@ -201,6 +202,14 @@ export function cleanupDuelGame(): void {
   decoyChips.forEach(c => c.remove()); decoyChips.length = 0
   document.getElementById('duelFreezeOverlay')!.style.display = 'none'
   document.getElementById('duelDecoyNotice')!.style.display = 'none'
+  document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
+}
+
+function volverAlMenuPorDesconexion(): void {
+  cleanupDuelGame()
+  resetDuelState()
+  duelService.disconnect()
+  mostrar('menuPrincipal')
 }
 
 // ── Show ──────────────────────────────────────────────────────────────────────
@@ -290,13 +299,31 @@ export function initDuelGameScreen(): void {
     import('./DuelResultScreen').then(m => m.mostrarDuelResult())
   })
 
+  // Own socket disconnected mid-duel — show recovery overlay instead of freezing
+  duelService.on('disconnect', () => {
+    if (D.phase !== 'playing') return
+    stopTimer()
+    D.phase = 'ended'
+    document.getElementById('duelDisconnectOverlay')!.style.display = 'flex'
+  })
+
+  // Rival disconnected mid-duel
+  duelService.on('rival_disconnected', () => {
+    if (D.phase !== 'playing') return
+    stopTimer()
+    D.phase = 'ended'
+    showAlert('Tu rival se desconectó. El duelo terminó.').then(volverAlMenuPorDesconexion)
+  })
+
+  document.getElementById('btnDuelDisconnectBack')!.addEventListener('click', volverAlMenuPorDesconexion)
+
   // Power slot click handlers
   for (let i = 0; i < 2; i++) {
     document.getElementById(`duelPowerSlot${i}`)!.addEventListener('click', () => {
       if (D.phase !== 'playing') return
       const pow = slotPower[i]
       if (!pow) return
-      if (slotCdTimer[i] !== null || slotCdEnd[i] > Date.now()) return
+      if (slotCdTimer[i] !== null || slotCdEnd[i]! > Date.now()) return
       duelService.usePower(pow)
     })
   }

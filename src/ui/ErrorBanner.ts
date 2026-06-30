@@ -36,7 +36,7 @@ function getBanner(): HTMLDivElement {
 function show(msg: string, full: string): void {
   const el = getBanner()
   el.dataset.full = full
-  el.childNodes[0].textContent = msg
+  el.childNodes[0]!.textContent = msg
   el.style.display = 'block'
 }
 

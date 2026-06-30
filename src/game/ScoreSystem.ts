@@ -58,7 +58,7 @@ export function checkLogros(p: GameRecord): typeof LOGROS_DEF {
 
 export function calcularTitulo(): string {
   const n = getLogros().length
-  let titulo = TITULOS[0].t
+  let titulo = TITULOS[0]!.t
   TITULOS.forEach(t => { if (n >= t.req) titulo = t.t })
   return titulo
 }

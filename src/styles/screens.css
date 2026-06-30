@@ -462,6 +462,13 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
   backdrop-filter:blur(4px);pointer-events:none;
 }
 .duel-freeze-msg{font-size:2rem;font-weight:800;color:#fff;text-shadow:0 2px 12px #60a5fa}
+.duel-disconnect-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.7);
+  z-index:60;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.duel-disconnect-content{display:flex;flex-direction:column;align-items:center;gap:1rem}
+.duel-disconnect-msg{font-size:1.5rem;font-weight:800;color:#fff;text-shadow:0 2px 12px #ef4444}
 .duel-decoy-notice{
   position:absolute;top:55px;left:50%;transform:translateX(-50%);
   background:#7c3aed;color:#fff;padding:.4rem 1rem;border-radius:20px;

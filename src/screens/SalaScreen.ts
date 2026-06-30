@@ -2,19 +2,10 @@ import { mostrar } from './ScreenManager'
 import { crearSala, verificarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, eliminarSala, contarSalasActivas, type SalaInfo } from '../services/LeaderboardService'
 import { showAlert, showConfirm } from '../ui/Dialog'
 import { mostrarRanking } from './RankingScreen'
+import { lsGet, lsSet, lsRemove } from '../utils/storage'
 
 const SALA_KEY = 'cdp_sala'
 const SALA_NOMBRE_KEY = 'cdp_sala_nombre'
-
-function lsGet(key: string): string | null {
-  try { return localStorage.getItem(key) } catch { return null }
-}
-function lsSet(key: string, val: string): void {
-  try { localStorage.setItem(key, val) } catch { /* Safari private / quota */ }
-}
-function lsRemove(key: string): void {
-  try { localStorage.removeItem(key) } catch { /* */ }
-}
 
 export function getSalaActual(): { code: string; nombre: string } | null {
   const code = lsGet(SALA_KEY)
@@ -148,9 +139,9 @@ async function handleUnirse(): Promise<void> {
 function generarCodigoAleatorio(): string {
   const letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
   const nums = '23456789'
-  const parte1 = letras[Math.floor(Math.random() * letras.length)]
-  const parte2 = nums[Math.floor(Math.random() * nums.length)]
-  const parte3 = letras[Math.floor(Math.random() * letras.length)]
+  const parte1 = letras[Math.floor(Math.random() * letras.length)]!
+  const parte2 = nums[Math.floor(Math.random() * nums.length)]!
+  const parte3 = letras[Math.floor(Math.random() * letras.length)]!
   return parte1 + parte2 + parte3
 }
 
@@ -174,12 +165,16 @@ async function handleCrear(): Promise<void> {
   btn.disabled = true
   btn.textContent = '⏳ Creando...'
 
-  const ok = await crearSala(code, nombre, undefined)
+  const resultado = await crearSala(code, nombre, undefined)
   btn.disabled = false
   btn.textContent = '🏫 Crear Sala'
 
-  if (!ok) {
-    await showAlert(`No se pudo crear la sala.\nEl código "${code}" ya está en uso.\n\nProbá con otro código.`)
+  if (resultado === 'duplicate') {
+    await showAlert(`El código "${code}" ya existe.\n\nGenerá uno nuevo o probá con otro.`)
+    return
+  }
+  if (resultado === 'error') {
+    await showAlert('No se pudo crear la sala. Verificá tu conexión e intentá de nuevo.')
     return
   }
 

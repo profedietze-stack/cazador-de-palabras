@@ -183,7 +183,7 @@ function soltarEmojisLiterarios(x: number, y: number, cantidad: number): void {
   for (let i = 0; i < cantidad; i++) {
     const e = document.createElement('div')
     e.className = 'emoji-literario'
-    e.textContent = EMOJIS_LITERARIOS[Math.floor(Math.random() * EMOJIS_LITERARIOS.length)]
+    e.textContent = EMOJIS_LITERARIOS[Math.floor(Math.random() * EMOJIS_LITERARIOS.length)]!
     const offsetX = (Math.random() - 0.5) * 50
     e.style.left = (x - 12 + offsetX) + 'px'
     e.style.top = y + 'px'
@@ -210,7 +210,7 @@ function mostrarStickersJuego(cx: number, cy: number, nivel: number): void {
       if (!G.activo) return
       const s = document.createElement('div')
       s.className = 'sticker-literario'
-      s.textContent = STICKERS_JUEGO[Math.floor(Math.random() * STICKERS_JUEGO.length)]
+      s.textContent = STICKERS_JUEGO[Math.floor(Math.random() * STICKERS_JUEGO.length)]!
       const ang = Math.random() * Math.PI * 2
       const dist = 40 + Math.random() * 120
       const sx = Math.max(10, Math.min(area.clientWidth - 50, cx + Math.cos(ang) * dist))

@@ -1,14 +1,11 @@
+import { ClientResponseError } from 'pocketbase'
 import { pb } from '../lib/pocketbase'
 import type { GameRecord } from '../types'
+import { withRetry } from '../utils/network'
+import { lsGet, lsSet } from '../utils/storage'
+import { showBanner } from '../ui/Banner'
 
 const DEVICE_KEY = 'cdp_device_id'
-
-function lsGet(key: string): string | null {
-  try { return localStorage.getItem(key) } catch { return null }
-}
-function lsSet(key: string, val: string): void {
-  try { localStorage.setItem(key, val) } catch { /* Safari private / quota */ }
-}
 
 export function getDeviceId(): string {
   let id = lsGet(DEVICE_KEY)
@@ -40,7 +37,7 @@ export interface SalaInfo {
 
 export async function postScore(p: GameRecord, jugador: string, salaCode?: string): Promise<void> {
   try {
-    await pb.collection('cdp_scores').create({
+    await withRetry(() => pb.collection('cdp_scores').create({
       device_id:    getDeviceId(),
       jugador,
       sala_code:    salaCode ?? null,
@@ -54,9 +51,10 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
       erradas:      p.erradas,
       tiempo_usado: p.tiempoUsado,
       combos:       p.combosHechos,
-    })
+    }), 3, 500)
   } catch (_) {
-    // best-effort — offline play still works
+    // offline play still works — score just won't appear on the global ranking
+    showBanner('⚠️ Sin conexión — puntaje no registrado en el ranking global')
   }
 }
 
@@ -77,6 +75,7 @@ export async function fetchGlobalRanking(limit = 50): Promise<GlobalScore[]> {
       fecha:      r['created'],
     }))
   } catch (_) {
+    showBanner('⚠️ Sin conexión — no se pudo cargar el ranking')
     return []
   }
 }
@@ -99,11 +98,14 @@ export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<Gl
       fecha:      r['created'],
     }))
   } catch (_) {
+    showBanner('⚠️ Sin conexión — no se pudo cargar el ranking')
     return []
   }
 }
 
-export async function crearSala(code: string, nombre: string, descripcion?: string): Promise<boolean> {
+export type CrearSalaResult = 'ok' | 'duplicate' | 'error'
+
+export async function crearSala(code: string, nombre: string, descripcion?: string): Promise<CrearSalaResult> {
   try {
     await pb.collection('cdp_salas').create({
       code:              code.toUpperCase(),
@@ -112,9 +114,13 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
       activa:            true,
       creator_device_id: getDeviceId(),
     })
-    return true
-  } catch (_) {
-    return false
+    return 'ok'
+  } catch (e) {
+    if (e instanceof ClientResponseError && e.status === 400) {
+      const data = e.response?.data as Record<string, unknown> | undefined
+      if (data?.['code']) return 'duplicate'
+    }
+    return 'error'
   }
 }
 
@@ -144,6 +150,7 @@ export async function fetchMisSalas(): Promise<SalaInfo[]> {
       created_at:  r['created'] ?? null,
     }))
   } catch (_) {
+    showBanner('⚠️ Sin conexión — no se pudieron cargar tus salas')
     return []
   }
 }
@@ -201,5 +208,3 @@ export async function contarSalasActivas(): Promise<number> {
     return 0
   }
 }
-
-export { lsGet, lsSet }

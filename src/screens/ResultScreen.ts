@@ -10,6 +10,7 @@ import { calcularTitulo } from '../game/ScoreSystem'
 import { cargarDatos, guardarDatos } from '../storage/GameStorage'
 import { showAlert } from '../ui/Dialog'
 import { postScore } from '../services/LeaderboardService'
+import { lsGet } from '../utils/storage'
 
 export function initResultScreen(): void {
   setOnGameEnd(mostrarResultado)
@@ -60,7 +61,7 @@ function animarPuntos(target: number, el: HTMLElement): void {
 function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void {
   // Post to global leaderboard (best-effort, fire and forget)
   if (G.jugador && p.medalla) {
-    const salaCode = localStorage.getItem('cdp_sala') ?? undefined
+    const salaCode = lsGet('cdp_sala') ?? undefined
     postScore(p, G.jugador, salaCode)
   }
 

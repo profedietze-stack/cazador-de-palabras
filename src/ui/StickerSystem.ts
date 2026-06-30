@@ -28,7 +28,7 @@ function generarLayoutLogros(): StickerItem[] {
       : (1 - margenPct) + Math.random() * margenPct
     const yPct = (i / MAX_STICKERS_LOGROS) + Math.random() * (1 / MAX_STICKERS_LOGROS)
     const rot = (Math.random() - 0.5) * 32
-    const emoji = STICKERS_LIT[Math.floor(Math.random() * STICKERS_LIT.length)]
+    const emoji = STICKERS_LIT[Math.floor(Math.random() * STICKERS_LIT.length)]!
     const size = 1.7 + Math.random() * 1.1
     const frase = (i % 3 === 0) ? FRASES_MOTIVADORAS[Math.floor(Math.random() * FRASES_MOTIVADORAS.length)] : null
     items.push({ xPct, yPct, rot, emoji, size, frase })
@@ -46,9 +46,9 @@ function generarLayoutMenu(): StickerItem[] {
     () => ({ x: 60 + Math.random() * (W - 120),       y: H - 80 + Math.random() * 50 }),
   ]
   for (let i = 0; i < MAX_STICKERS_MENU; i++) {
-    const pos = zonas[i % 4]()
+    const pos = zonas[i % 4]!()
     const rot = (Math.random() - 0.5) * 40
-    const emoji = STICKERS_LIT[Math.floor(Math.random() * STICKERS_LIT.length)]
+    const emoji = STICKERS_LIT[Math.floor(Math.random() * STICKERS_LIT.length)]!
     const size = 1.5 + Math.random() * 1.2
     items.push({ x: pos.x, y: pos.y, rot, emoji, size })
   }

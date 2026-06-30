@@ -25,6 +25,7 @@ import { initDuelMenuScreen } from './screens/DuelMenuScreen'
 import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
 import { initDuelGameScreen } from './screens/DuelGameScreen'
 import { initDuelResultScreen } from './screens/DuelResultScreen'
+import { lsGet, lsSet } from './utils/storage'
 
 // Error banner must be absolute first
 initErrorBanner()
@@ -57,7 +58,7 @@ document.addEventListener('click', (e) => {
 
 // Dark mode toggle
 ;(function initTheme() {
-  const saved = localStorage.getItem('cdp_tema')
+  const saved = lsGet('cdp_tema')
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   if (saved === 'dark' || (!saved && prefersDark)) {
     document.documentElement.dataset.theme = 'dark'
@@ -70,7 +71,7 @@ document.getElementById('themeBtn')!.addEventListener('click', function (this: H
   const isDark = document.documentElement.dataset.theme === 'dark'
   document.documentElement.dataset.theme = isDark ? '' : 'dark'
   this.textContent = isDark ? '🌙' : '☀️'
-  localStorage.setItem('cdp_tema', isDark ? 'light' : 'dark')
+  lsSet('cdp_tema', isDark ? 'light' : 'dark')
 })
 
 // Volume button
@@ -78,7 +79,7 @@ document.getElementById('volBtn')!.addEventListener('click', function (this: HTM
   G.sonido = !G.sonido
   this.textContent = G.sonido ? '🔊' : '🔇'
   this.classList.toggle('off', !G.sonido)
-  localStorage.setItem('cdp_sonido', G.sonido ? '1' : '0')
+  lsSet('cdp_sonido', G.sonido ? '1' : '0')
   const screen = document.querySelector('.screen.active')
   if (G.sonido && screen) {
     const id = screen.id
@@ -111,14 +112,14 @@ if ('serviceWorker' in navigator) {
 
 // Restore state from localStorage
 ;(function init() {
-  const son = localStorage.getItem('cdp_sonido')
+  const son = lsGet('cdp_sonido')
   if (son === '0') {
     G.sonido = false
     const btn = document.getElementById('volBtn') as HTMLButtonElement
     btn.textContent = '🔇'
     btn.classList.add('off')
   }
-  const nombreGuardado = localStorage.getItem('cdp_nombre')
+  const nombreGuardado = lsGet('cdp_nombre')
   if (nombreGuardado && nombreGuardado.length >= 2) {
     G.jugador = nombreGuardado
   }

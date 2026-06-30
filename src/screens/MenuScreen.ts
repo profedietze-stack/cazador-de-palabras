@@ -6,6 +6,7 @@ import { mostrarRanking } from './RankingScreen'
 import { mostrarSala, getSalaActual } from './SalaScreen'
 import { limpiarStickersMenu } from '../ui/StickerSystem'
 import { showAlert, showConfirm } from '../ui/Dialog'
+import { lsGet, lsSet, lsRemove } from '../utils/storage'
 
 export function showModal(): void {
   document.getElementById('modalNombre')!.classList.add('show')
@@ -23,7 +24,7 @@ export function initMenuScreen(): void {
       return
     }
     G.jugador = v
-    localStorage.setItem('cdp_nombre', v)
+    lsSet('cdp_nombre', v)
     hideModal()
     mostrarSeleccionCategoria()
   })
@@ -60,10 +61,11 @@ export function initMenuScreen(): void {
   document.getElementById('btnBorrar')!.addEventListener('click', async () => {
     const ok = await showConfirm('¿Borrar todo el progreso?\n\nSe eliminarán puntuaciones, medallas, logros y stickers.\nEsta acción no se puede deshacer.')
     if (!ok) return
-    const son = localStorage.getItem('cdp_sonido')
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('cdp_'))
-    keys.forEach(k => localStorage.removeItem(k))
-    if (son) localStorage.setItem('cdp_sonido', son)
+    const son = lsGet('cdp_sonido')
+    let keys: string[] = []
+    try { keys = Object.keys(localStorage).filter(k => k.startsWith('cdp_')) } catch { /* Safari private */ }
+    keys.forEach(k => lsRemove(k))
+    if (son) lsSet('cdp_sonido', son)
     G.jugador = ''
     G.racha = 0; G.comboNivel = 0; G.combosTotalesPartida = 0
     limpiarStickersMenu()

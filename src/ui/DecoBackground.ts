@@ -44,11 +44,11 @@ export function detenerDecoMenu(): void {
 function lanzarDecoWord(bg: HTMLElement, inicial: boolean, progreso: number): void {
   const el = document.createElement('div')
   el.className = 'deco-palabra'
-  el.textContent = DECO_PALABRAS[Math.floor(Math.random() * DECO_PALABRAS.length)]
+  el.textContent = DECO_PALABRAS[Math.floor(Math.random() * DECO_PALABRAS.length)]!
 
   const size = 11 + Math.random() * 23
   el.style.fontSize = size + 'px'
-  el.style.color = DECO_COLORES[Math.floor(Math.random() * DECO_COLORES.length)]
+  el.style.color = DECO_COLORES[Math.floor(Math.random() * DECO_COLORES.length)]!
 
   const W = window.innerWidth
   const x = Math.random() * (W - 120)

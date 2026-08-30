@@ -1,5 +1,7 @@
 const CACHE = 'cdp-v4'
-const ASSETS = ['/', '/index.html']
+// Relativas al scope: bajo GitHub Pages el SW vive en /cazador-de-palabras/,
+// no en la raiz, y '/' cachearia la pagina equivocada.
+const ASSETS = ['./', './index.html']
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)))
@@ -20,7 +22,8 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url)
 
   // Network-first for HTML — always get latest index.html on new deploy
-  if (url.pathname === '/' || url.pathname.endsWith('.html')) {
+  const ROOT = new URL('./', self.location).pathname
+  if (url.pathname === ROOT || url.pathname.endsWith('.html')) {
     e.respondWith(
       fetch(e.request)
         .then(r => {

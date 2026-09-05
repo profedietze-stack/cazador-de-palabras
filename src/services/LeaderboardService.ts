@@ -111,8 +111,9 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
       combos:       p.combosHechos,
     }), 3, 500)
   } catch (_) {
-    // offline play still works — score just won't appear on the global ranking
-    showBanner('⚠️ Sin conexión — puntaje no registrado en el ranking global')
+    // Se puede seguir jugando sin conexión: lo único que se pierde es que el
+    // puntaje aparezca en el ranking del aula.
+    showBanner('⚠️ Sin conexión — tu puntaje no se registró en el ranking del aula')
   }
 }
 

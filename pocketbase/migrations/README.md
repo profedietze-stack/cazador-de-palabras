@@ -12,8 +12,8 @@ viven en sus repos, y la numeración no se pisa.
 |---|---|---|
 | `1788600000_cdp_device_hashes.js` | ✅ 2026-09-05 | Agrega `creator_device_hash` y `device_hash`. Bloquea la mutación de identidad y `code` por UPDATE. Aditiva. |
 | `1788700000_cdp_drop_raw_device_id.js` | ✅ 2026-09-05 | Elimina `creator_device_id` y `device_id`. **Cierra la exposición.** |
-
 | `1789200000_cdp_clave_por_docente.js` | ✅ 2026-09-05 | Clave por docente y privacidad: cada uno maneja y ve sólo sus salas. Elimina el ranking global. |
+| `1790400000_limpieza_pruebas_cdp.js` | ✅ 2026-09-05 | Borra los registros usados para verificar esas reglas. |
 
 ## El problema
 

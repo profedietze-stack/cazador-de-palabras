@@ -59,7 +59,7 @@ function animarPuntos(target: number, el: HTMLElement): void {
 }
 
 function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void {
-  // Post to global leaderboard (best-effort, fire and forget)
+  // Publica el puntaje en el ranking del aula (best-effort, sin bloquear)
   if (G.jugador && p.medalla) {
     const salaCode = lsGet('cdp_sala') ?? undefined
     postScore(p, G.jugador, salaCode)

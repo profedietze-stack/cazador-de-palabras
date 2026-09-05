@@ -2,3 +2,12 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Secretos / credenciales - nunca commitear
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.json

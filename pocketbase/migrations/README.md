@@ -14,6 +14,7 @@ viven en sus repos, y la numeración no se pisa.
 | `1788700000_cdp_drop_raw_device_id.js` | ✅ 2026-09-05 | Elimina `creator_device_id` y `device_id`. **Cierra la exposición.** |
 | `1789200000_cdp_clave_por_docente.js` | ✅ 2026-09-05 | Clave por docente y privacidad: cada uno maneja y ve sólo sus salas. Elimina el ranking global. |
 | `1790400000_limpieza_pruebas_cdp.js` | ✅ 2026-09-05 | Borra los registros usados para verificar esas reglas. |
+| `1790600000_limpieza_xss.js` | ✅ 2026-09-05 | Borra la sala envenenada usada para verificar el arreglo del XSS. |
 
 ## El problema
 

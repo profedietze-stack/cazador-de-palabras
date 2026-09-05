@@ -7,6 +7,7 @@ import { mostrarSala, getSalaActual } from './SalaScreen'
 import { limpiarStickersMenu } from '../ui/StickerSystem'
 import { showAlert, showConfirm } from '../ui/Dialog'
 import { lsGet, lsSet, lsRemove } from '../utils/storage'
+import { sanitizeNickname } from '../utils'
 
 export function showModal(): void {
   document.getElementById('modalNombre')!.classList.add('show')
@@ -18,7 +19,10 @@ export function hideModal(): void {
 
 export function initMenuScreen(): void {
   document.getElementById('btnContinuar')!.addEventListener('click', async () => {
-    const v = (document.getElementById('inputNombre') as HTMLInputElement).value.trim()
+    // El apodo viaja al servidor y se muestra en la pantalla de todos los
+    // compañeros. Limpiarlo acá es defensa en profundidad; la defensa real es
+    // escapar al renderizar, porque la API se puede llamar sin este formulario.
+    const v = sanitizeNickname((document.getElementById('inputNombre') as HTMLInputElement).value)
     if (v.length < 2) {
       await showAlert('Por favor ingresá un nombre de al menos 2 caracteres.')
       return

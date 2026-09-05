@@ -1,7 +1,7 @@
 import { mostrar } from './ScreenManager'
 import { getRankingGlobal } from '../storage/GameStorage'
 import { fetchSalaRanking } from '../services/LeaderboardService'
-import { formatFecha } from '../utils'
+import { formatFecha, escapeHtml } from '../utils'
 
 type TabMode = 'local' | 'sala'
 
@@ -12,8 +12,8 @@ function renderPodio(scores: { jugador: string; pts: number }[]): void {
   document.getElementById('podioCont')!.innerHTML = scores.slice(0, 3).map((s, i) => `
     <div class="podio-item">
       <div class="podio-pos">${posEmoji[i] ?? i + 1}</div>
-      <div class="podio-nom">${s.jugador}</div>
-      <div class="podio-pts">${s.pts} pts</div>
+      <div class="podio-nom">${escapeHtml(s.jugador)}</div>
+      <div class="podio-pts">${escapeHtml(s.pts)} pts</div>
     </div>`).join('')
 }
 
@@ -22,10 +22,14 @@ function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string
     const cat = (s as any).cat_nombre || (s as any).catNombre || (s as any).cat || '—'
     const medallaEmoji: Record<string, string> = { ORO: '🥇', PLATA: '🥈', BRONCE: '🥉' }
     const med = s.medalla ? (medallaEmoji[s.medalla] ?? '') : ''
+    // Todo lo que sale de `scores` lo escribió alguien: el nombre lo elige el
+    // alumno y el resto llega del servidor, donde cualquiera puede publicar un
+    // puntaje con el contenido que quiera. `med` no se escapa porque no es
+    // dato: es un emoji elegido de una tabla fija.
     return `<tr>
-      <td>${i + 1}</td><td>${s.jugador}</td>
-      <td>${s.pts} ${med}</td>
-      <td>${cat}</td><td>${s.nivel}</td><td>${formatFecha(s.fecha)}</td>
+      <td>${i + 1}</td><td>${escapeHtml(s.jugador)}</td>
+      <td>${escapeHtml(s.pts)} ${med}</td>
+      <td>${escapeHtml(cat)}</td><td>${escapeHtml(s.nivel)}</td><td>${escapeHtml(formatFecha(s.fecha))}</td>
     </tr>`
   }).join('')
 }

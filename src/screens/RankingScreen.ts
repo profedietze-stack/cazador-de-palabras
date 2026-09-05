@@ -1,11 +1,11 @@
 import { mostrar } from './ScreenManager'
 import { getRankingGlobal } from '../storage/GameStorage'
-import { fetchGlobalRanking, fetchSalaRanking } from '../services/LeaderboardService'
+import { fetchSalaRanking } from '../services/LeaderboardService'
 import { formatFecha } from '../utils'
 
-type TabMode = 'global' | 'local' | 'sala'
+type TabMode = 'local' | 'sala'
 
-let _currentTab: TabMode = 'global'
+let _currentTab: TabMode = 'sala'
 
 function renderPodio(scores: { jugador: string; pts: number }[]): void {
   const posEmoji = ['🥇', '🥈', '🥉']
@@ -52,11 +52,7 @@ async function loadTab(mode: TabMode): Promise<void> {
 
   setLoading(true)
 
-  if (mode === 'global') {
-    const scores = await fetchGlobalRanking()
-    renderPodio(scores)
-    renderTabla(scores)
-  } else if (mode === 'sala') {
+  if (mode === 'sala') {
     const code = (document.getElementById('rkSalaInput') as HTMLInputElement).value.trim().toUpperCase()
     if (!code) { setLoading(false); return }
     const scores = await fetchSalaRanking(code)
@@ -67,7 +63,7 @@ async function loadTab(mode: TabMode): Promise<void> {
 
 export function mostrarRanking(): void {
   mostrar('rankingScreen')
-  loadTab('global')
+  loadTab('sala')
 }
 
 export function initRankingScreen(): void {

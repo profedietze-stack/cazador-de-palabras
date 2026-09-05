@@ -1,9 +1,11 @@
 import { mostrar } from './ScreenManager'
 import { crearSala, verificarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, eliminarSala, contarSalasActivas, type SalaInfo } from '../services/LeaderboardService'
 import { showAlert, showConfirm } from '../ui/Dialog'
+import { tieneClaveDocente, crearClaveDocente, guardarClaveDocente } from '../lib/pocketbase'
 import { mostrarRanking } from './RankingScreen'
 import { lsGet, lsSet, lsRemove } from '../utils/storage'
 
+const SALTO = String.fromCharCode(10)
 const SALA_KEY = 'cdp_sala'
 const SALA_NOMBRE_KEY = 'cdp_sala_nombre'
 
@@ -137,12 +139,17 @@ async function handleUnirse(): Promise<void> {
 // ── Crear sala ────────────────────────────────────────────────────────────────
 
 function generarCodigoAleatorio(): string {
+  // Alterna letra y digito para que se pueda dictar en voz alta, sin O/0 ni
+  // I/1. Antes eran 3 caracteres (~4.600 combinaciones): poco, ahora que el
+  // codigo es lo que da acceso a los puntajes de la sala. Con 6 pasa a ~7
+  // millones.
   const letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
   const nums = '23456789'
-  const parte1 = letras[Math.floor(Math.random() * letras.length)]!
-  const parte2 = nums[Math.floor(Math.random() * nums.length)]!
-  const parte3 = letras[Math.floor(Math.random() * letras.length)]!
-  return parte1 + parte2 + parte3
+  const bytes = new Uint8Array(6)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b, i) =>
+    i % 2 === 0 ? letras[b % letras.length]! : nums[b % nums.length]!
+  ).join('')
 }
 
 async function handleCrear(): Promise<void> {
@@ -152,8 +159,18 @@ async function handleCrear(): Promise<void> {
   const code = codeInput.value.trim().toUpperCase()
   const nombre = nameInput.value.trim()
 
-  if (!code || code.length < 2) { await showAlert('El código debe tener al menos 2 caracteres.'); return }
+  if (!code || code.length < 6) {
+    await showAlert([
+      'El codigo debe tener al menos 6 caracteres.',
+      '',
+      'Es lo que protege los puntajes de tu sala: uno corto lo puede adivinar',
+      'cualquiera. Usa el boton de generar si no queres pensarlo.',
+    ].join(SALTO))
+    return
+  }
   if (!nombre) { await showAlert('Ingresá un nombre para la sala.'); return }
+
+  if (!(await asegurarClaveDocente())) return
 
   const activasCount = await contarSalasActivas()
   if (activasCount >= 4) {
@@ -311,4 +328,67 @@ export function initSalaScreen(): void {
     const input = document.getElementById('inputCrearCode') as HTMLInputElement
     input.value = generarCodigoAleatorio()
   })
+}
+
+/**
+ * Se asegura de que este dispositivo tenga clave de docente antes de crear una
+ * sala. Devuelve false si el docente cancela o si no se pudo guardar.
+ *
+ * Se pide al crear la primera sala y no al borrarla: mejor enterarse ahora que
+ * cuando ya haya puntajes cargados.
+ */
+async function asegurarClaveDocente(): Promise<boolean> {
+  if (tieneClaveDocente()) return true
+
+  const existente = window.prompt([
+    'Clave de docente',
+    '',
+    'Sirve para manejar tus salas: desactivarlas, borrarlas y limpiar sus puntajes.',
+    'Se pide una sola vez en este dispositivo.',
+    '',
+    'Si ya tenes una de otro dispositivo, pegala aca.',
+    'Si es tu primera vez, dejalo VACIO y te genero una.',
+  ].join(SALTO))
+  if (existente === null) return false
+
+  if (existente.trim()) {
+    const id = window.prompt([
+      'Codigo de la clave',
+      '',
+      'Es el codigo corto que se mostro junto a la clave.',
+    ].join(SALTO))
+    if (!id || !id.trim()) return false
+    if (!guardarClaveDocente(existente.trim(), id.trim())) {
+      await showAlert([
+        'No se pudo guardar la clave en este navegador.',
+        '',
+        'Suele pasar en modo incognito. Proba en una ventana normal.',
+      ].join(SALTO))
+      return false
+    }
+    return true
+  }
+
+  let creada
+  try {
+    creada = await crearClaveDocente()
+  } catch {
+    await showAlert('No se pudo generar la clave. Verifica tu conexion.')
+    return false
+  }
+
+  await showAlert([
+    'Esta es tu clave de docente. GUARDALA.',
+    '',
+    'Clave:  ' + creada.clave,
+    'Codigo: ' + creada.id,
+    '',
+    'La vas a necesitar para manejar tus salas desde otro dispositivo.',
+    'No se puede recuperar: ni el servidor la puede volver a mostrar.',
+    '',
+    creada.guardada
+      ? 'Ya quedo guardada en este dispositivo.'
+      : 'ATENCION: no se pudo guardar en este navegador. Anotala si o si.',
+  ].join(SALTO))
+  return true
 }

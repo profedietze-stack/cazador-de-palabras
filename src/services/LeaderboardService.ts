@@ -1,5 +1,5 @@
 import { ClientResponseError } from 'pocketbase'
-import { pb } from '../lib/pocketbase'
+import { pb, getHostKeyId, setSalaContexto } from '../lib/pocketbase'
 import type { GameRecord } from '../types'
 import { withRetry } from '../utils/network'
 import { lsGet, lsSet } from '../utils/storage'
@@ -116,30 +116,11 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
   }
 }
 
-export async function fetchGlobalRanking(limit = 50): Promise<GlobalScore[]> {
-  try {
-    const result = await pb.collection('cdp_scores').getList(1, limit, {
-      sort: '-pts',
-      fields: 'jugador,sala_code,cat_nombre,nivel,pts,medalla,precision,created',
-    })
-    return result.items.map(r => ({
-      jugador:    r['jugador'],
-      sala_code:  r['sala_code'] ?? null,
-      cat_nombre: r['cat_nombre'],
-      nivel:      r['nivel'],
-      pts:        r['pts'],
-      medalla:    r['medalla'] ?? null,
-      precision:  r['precision'],
-      fecha:      r['created'],
-    }))
-  } catch (_) {
-    showBanner('⚠️ Sin conexión — no se pudo cargar el ranking')
-    return []
-  }
-}
-
 export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<GlobalScore[]> {
   try {
+    // Antes de leer: la regla del servidor exige la cabecera con el código de
+    // la sala, y sin ella no devuelve nada aunque los puntajes existan.
+    setSalaContexto(salaCode)
     const result = await pb.collection('cdp_scores').getList(1, limit, {
       filter: pb.filter('sala_code = {:code}', { code: salaCode }),
       sort: '-pts',
@@ -171,6 +152,7 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
       descripcion:       descripcion ?? null,
       activa:              true,
       creator_device_hash: await getDeviceHash(),
+      owner_key_id:        getHostKeyId(),
     })
     return 'ok'
   } catch (e) {
@@ -184,6 +166,7 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
 
 export async function verificarSala(code: string): Promise<boolean> {
   try {
+    setSalaContexto(code)
     await pb.collection('cdp_salas').getFirstListItem(
       pb.filter('code = {:code} && activa = true', { code: code.toUpperCase() })
     )

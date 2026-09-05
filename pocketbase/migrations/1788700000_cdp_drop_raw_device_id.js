@@ -39,6 +39,12 @@ migrate((app) => {
   app.save(salas);
 
   const scores = app.findCollectionByNameOrId('cdp_scores');
+  // El indice sobre device_id hay que sacarlo ANTES que la columna: SQLite
+  // rechaza borrar una columna que un indice todavia referencia.
+  // Se recrea sobre device_hash para no perder el proposito original.
+  scores.indexes = scores.indexes
+    .filter((sql) => !sql.includes('device_id'))
+    .concat(['CREATE INDEX idx_cdp_scores_device_hash ON cdp_scores (device_hash)']);
   const f2 = scores.fields.find((f) => f.name === 'device_id');
   if (f2) scores.fields.removeById(f2.id);
   app.save(scores);
@@ -61,5 +67,8 @@ migrate((app) => {
   if (!scores.fields.find((f) => f.name === 'device_id')) {
     scores.fields.add(new TextField(TEXT('device_id')));
   }
+  scores.indexes = scores.indexes
+    .filter((sql) => !sql.includes('device_hash'))
+    .concat(['CREATE INDEX idx_cdp_scores_device ON cdp_scores (device_id)']);
   app.save(scores);
 });

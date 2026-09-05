@@ -11,7 +11,7 @@ viven en sus repos, y la numeración no se pisa.
 | Migración | Aplicada | Qué hace |
 |---|---|---|
 | `1788600000_cdp_device_hashes.js` | ✅ 2026-09-05 | Agrega `creator_device_hash` y `device_hash`. Bloquea la mutación de identidad y `code` por UPDATE. Aditiva. |
-| `1788700000_cdp_drop_raw_device_id.js` | ❌ **pendiente** | Elimina `creator_device_id` y `device_id`. **Cierra la exposición.** |
+| `1788700000_cdp_drop_raw_device_id.js` | ✅ 2026-09-05 | Elimina `creator_device_id` y `device_id`. **Cierra la exposición.** |
 
 ## El problema
 

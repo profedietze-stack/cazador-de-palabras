@@ -62,10 +62,13 @@ export async function getDeviceHash(): Promise<string> {
  */
 async function filtroPropiedad(extra = ''): Promise<string> {
   const hash = await getDeviceHash()
-  const did = getDeviceId()
+  // Sin hash no hay forma de identificar al duenio: se devuelve un filtro que
+  // no matchea nada, para que la UI muestre "sin salas" en vez de romperse.
+  // Solo pasa si crypto.subtle no esta disponible (contexto no seguro).
+  // `id = ""` nunca matchea: los ids de PocketBase siempre tienen valor.
   const base = hash
-    ? pb.filter('(creator_device_hash = {:h} || creator_device_id = {:d})', { h: hash, d: did })
-    : pb.filter('creator_device_id = {:d}', { d: did })
+    ? pb.filter('creator_device_hash = {:h}', { h: hash })
+    : "id = ''"
   return extra ? `${base} && ${extra}` : base
 }
 
@@ -93,7 +96,6 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
     // Fuera del callback: `withRetry` lo reintenta, y el hash no cambia.
     const deviceHash = await getDeviceHash()
     await withRetry(() => pb.collection('cdp_scores').create({
-      device_id:    getDeviceId(),
       device_hash:  deviceHash,
       jugador,
       sala_code:    salaCode ?? null,
@@ -168,7 +170,6 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
       nombre,
       descripcion:       descripcion ?? null,
       activa:              true,
-      creator_device_id:   getDeviceId(),
       creator_device_hash: await getDeviceHash(),
     })
     return 'ok'

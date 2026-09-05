@@ -16,6 +16,59 @@ export function getDeviceId(): string {
   return id
 }
 
+// ── Identidad de dispositivo por hash ────────────────────────────────────────
+// `cdp_salas` y `cdp_scores` tienen lectura publica. Guardar el UUID del
+// dispositivo en crudo permitia que cualquiera lo copiara de la API a su propio
+// localStorage y quedara como duenio de las salas ajenas: verlas, desactivarlas
+// y borrarlas, sin escribir codigo.
+//
+// Ahora se guarda el SHA-256. El cliente conoce su UUID, calcula el hash y
+// consulta por hash; un atacante lee el hash pero no puede derivar el UUID.
+// El hash se cachea porque las consultas de salas son frecuentes.
+
+const DEVICE_HASH_KEY = 'cdp_device_hash'
+
+async function sha256Hex(input: string): Promise<string> {
+  // crypto.subtle solo existe en contextos seguros (https o localhost). Si no
+  // esta, devolvemos '' y el llamador cae al filtro por el id viejo.
+  if (!globalThis.crypto?.subtle) return ''
+  try {
+    const bytes = new TextEncoder().encode(input)
+    const digest = await crypto.subtle.digest('SHA-256', bytes)
+    return Array.from(new Uint8Array(digest))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+  } catch {
+    return ''
+  }
+}
+
+/** Hash del device id, cacheado en localStorage. Idempotente. */
+export async function getDeviceHash(): Promise<string> {
+  const cached = lsGet(DEVICE_HASH_KEY)
+  if (cached) return cached
+  const hash = await sha256Hex(getDeviceId())
+  if (hash) lsSet(DEVICE_HASH_KEY, hash)
+  return hash
+}
+
+/**
+ * Filtro de propiedad en modo dual.
+ *
+ * Empareja por hash y, mientras exista la columna vieja, tambien por el id en
+ * crudo, para que las salas creadas antes de la migracion sigan siendo
+ * administrables por su duenio. Cuando se elimine `creator_device_id`, la rama
+ * legacy queda muerta y se puede borrar.
+ */
+async function filtroPropiedad(extra = ''): Promise<string> {
+  const hash = await getDeviceHash()
+  const did = getDeviceId()
+  const base = hash
+    ? pb.filter('(creator_device_hash = {:h} || creator_device_id = {:d})', { h: hash, d: did })
+    : pb.filter('creator_device_id = {:d}', { d: did })
+  return extra ? `${base} && ${extra}` : base
+}
+
 export interface GlobalScore {
   jugador: string
   sala_code: string | null
@@ -37,8 +90,11 @@ export interface SalaInfo {
 
 export async function postScore(p: GameRecord, jugador: string, salaCode?: string): Promise<void> {
   try {
+    // Fuera del callback: `withRetry` lo reintenta, y el hash no cambia.
+    const deviceHash = await getDeviceHash()
     await withRetry(() => pb.collection('cdp_scores').create({
       device_id:    getDeviceId(),
+      device_hash:  deviceHash,
       jugador,
       sala_code:    salaCode ?? null,
       cat:          p.cat,
@@ -111,8 +167,9 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
       code:              code.toUpperCase(),
       nombre,
       descripcion:       descripcion ?? null,
-      activa:            true,
-      creator_device_id: getDeviceId(),
+      activa:              true,
+      creator_device_id:   getDeviceId(),
+      creator_device_hash: await getDeviceHash(),
     })
     return 'ok'
   } catch (e) {
@@ -138,7 +195,7 @@ export async function verificarSala(code: string): Promise<boolean> {
 export async function fetchMisSalas(): Promise<SalaInfo[]> {
   try {
     const result = await pb.collection('cdp_salas').getList(1, 200, {
-      filter: pb.filter('creator_device_id = {:did}', { did: getDeviceId() }),
+      filter: await filtroPropiedad(),
       sort: '-id',
       fields: 'id,code,nombre,descripcion,activa,created',
     })
@@ -159,7 +216,7 @@ export async function limpiarScoresSala(code: string): Promise<boolean> {
   try {
     // Verify ownership first
     await pb.collection('cdp_salas').getFirstListItem(
-      pb.filter('code = {:code} && creator_device_id = {:did}', { code, did: getDeviceId() })
+      await filtroPropiedad(pb.filter('code = {:code}', { code }))
     )
     // PocketBase has no bulk delete by filter — list IDs then delete each
     const scores = await pb.collection('cdp_scores').getFullList({
@@ -176,7 +233,7 @@ export async function limpiarScoresSala(code: string): Promise<boolean> {
 export async function desactivarSala(code: string): Promise<boolean> {
   try {
     const sala = await pb.collection('cdp_salas').getFirstListItem(
-      pb.filter('code = {:code} && creator_device_id = {:did}', { code, did: getDeviceId() })
+      await filtroPropiedad(pb.filter('code = {:code}', { code }))
     )
     await pb.collection('cdp_salas').update(sala.id, { activa: false })
     return true
@@ -188,7 +245,7 @@ export async function desactivarSala(code: string): Promise<boolean> {
 export async function eliminarSala(code: string): Promise<boolean> {
   try {
     const sala = await pb.collection('cdp_salas').getFirstListItem(
-      pb.filter('code = {:code} && creator_device_id = {:did}', { code, did: getDeviceId() })
+      await filtroPropiedad(pb.filter('code = {:code}', { code }))
     )
     await pb.collection('cdp_salas').delete(sala.id)
     return true
@@ -200,7 +257,7 @@ export async function eliminarSala(code: string): Promise<boolean> {
 export async function contarSalasActivas(): Promise<number> {
   try {
     const result = await pb.collection('cdp_salas').getList(1, 1, {
-      filter: pb.filter('creator_device_id = {:did} && activa = true', { did: getDeviceId() }),
+      filter: await filtroPropiedad('activa = true'),
       fields: 'id',
     })
     return result.totalItems

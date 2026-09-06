@@ -228,3 +228,49 @@ describe('ROBAR de punta a punta (usePower + catchWord)', () => {
     expect(room.players.get('B')!.score).toBe(10)    // Beto conserva lo suyo
   })
 })
+
+describe('DOBLE y ESCUDO de punta a punta (usePower + catchWord)', () => {
+  beforeEach(() => { registerSocket('sock-a'); registerSocket('sock-b') })
+
+  it('DOBLE: la siguiente captura correcta vale el doble', () => {
+    const room = sala([palabra('0', true)])
+    room.players.get('A')!.powerInventory = ['DOUBLE']
+
+    expect(usePower(room, 'sock-a', 'DOUBLE').ok).toBe(true)
+    const r = catchWord(room, 'sock-a', '0')
+    expect(r.pointsEarned).toBe(20)
+  })
+
+  it('DOBLE: sobrevive a una equivocada y se cobra en la siguiente correcta', () => {
+    const room = sala([palabra('0', false), palabra('1', true)])
+    room.players.get('A')!.powerInventory = ['DOUBLE']
+
+    usePower(room, 'sock-a', 'DOUBLE')
+    catchWord(room, 'sock-a', '0')                 // erra: no lo gasta
+    expect(catchWord(room, 'sock-a', '1').pointsEarned).toBe(20)
+  })
+
+  it('ESCUDO: bloquea el CONGELAR y el rival puede seguir capturando', () => {
+    const room = sala([palabra('0', true)])
+    room.players.get('B')!.powerInventory = ['SHIELD']
+    room.players.get('A')!.powerInventory = ['FREEZE']
+
+    expect(usePower(room, 'sock-b', 'SHIELD').ok).toBe(true)
+    const freeze = usePower(room, 'sock-a', 'FREEZE')
+    expect(freeze.ok && freeze.blocked).toBe(true)
+
+    // Si el escudo no hubiera bloqueado, esta captura fallaria por congelamiento.
+    expect(catchWord(room, 'sock-b', '0').success).toBe(true)
+  })
+
+  it('ESCUDO: se gasta al bloquear, y el segundo poder si entra', () => {
+    const room = sala([palabra('0', true)])
+    room.players.get('B')!.powerInventory = ['SHIELD']
+    room.players.get('A')!.powerInventory = ['FREEZE', 'DECOY']
+
+    usePower(room, 'sock-b', 'SHIELD')
+    usePower(room, 'sock-a', 'FREEZE')             // consume el escudo
+    const segundo = usePower(room, 'sock-a', 'DECOY')
+    expect(segundo.ok && segundo.blocked).toBe(false)   // ya no hay escudo
+  })
+})

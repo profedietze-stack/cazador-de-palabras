@@ -73,6 +73,9 @@ async function filtroPropiedad(extra = ''): Promise<string> {
 }
 
 export interface GlobalScore {
+  /** Lo marco el auditor del servidor: las cuentas del puntaje no cierran. */
+  sospechoso?: boolean
+  motivo?: string | null
   jugador: string
   sala_code: string | null
   cat_nombre: string
@@ -129,7 +132,7 @@ export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<Gl
     const result = await pb.collection('cdp_scores').getList(1, limit, {
       filter: pb.filter('sala_code = {:code}', { code: salaCode }),
       sort: '-pts',
-      fields: 'jugador,sala_code,cat_nombre,nivel,pts,medalla,precision,created',
+      fields: 'jugador,sala_code,cat_nombre,nivel,pts,medalla,precision,created,sospechoso,motivo_sospecha',
     })
     return result.items.map(r => ({
       jugador:    r['jugador'],
@@ -140,6 +143,9 @@ export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<Gl
       medalla:    r['medalla'] ?? null,
       precision:  r['precision'],
       fecha:      r['created'],
+      // Marca del auditor del servidor: el puntaje declara algo que no cierra.
+      sospechoso: r['sospechoso'] === true,
+      motivo:     r['motivo_sospecha'] ?? null,
     }))
   } catch (_) {
     showBanner('⚠️ Sin conexión — no se pudo cargar el ranking')

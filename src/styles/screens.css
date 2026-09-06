@@ -490,3 +490,9 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .duel-result-reason{color:var(--text-muted);font-size:.85rem;margin-bottom:1.2rem}
 .duel-result-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
 .duel-rematch-status{color:var(--text-muted);font-size:.85rem;margin-top:.8rem;font-style:italic}
+
+/* Marca del auditor de puntajes.
+   Discreta a proposito: señala una fila para que el docente la mire, no la
+   denuncia. El alumno conserva su puntaje y su lugar en la tabla. */
+.rk-fila-sospechosa{background:rgba(245,158,11,.08)}
+.rk-sospechoso{cursor:help;opacity:.85;font-size:.9em}

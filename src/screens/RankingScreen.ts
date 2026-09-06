@@ -17,17 +17,25 @@ function renderPodio(scores: { jugador: string; pts: number }[]): void {
     </div>`).join('')
 }
 
-function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string; catNombre?: string; cat?: string; nivel: number; medalla?: string | null; precision: number; fecha: string }[]): void {
+function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string; catNombre?: string; cat?: string; nivel: number; medalla?: string | null; precision: number; fecha: string; sospechoso?: boolean; motivo?: string | null }[]): void {
   document.getElementById('rankingBody')!.innerHTML = scores.map((s, i) => {
     const cat = (s as any).cat_nombre || (s as any).catNombre || (s as any).cat || '—'
     const medallaEmoji: Record<string, string> = { ORO: '🥇', PLATA: '🥈', BRONCE: '🥉' }
     const med = s.medalla ? (medallaEmoji[s.medalla] ?? '') : ''
+
+    // Marca del auditor del servidor. No se le resta nada al alumno ni se lo
+    // acusa de nada: se señala para que el docente lo mire. El motivo va en el
+    // tooltip, escapado como todo lo demás.
+    const aviso = s.sospechoso
+      ? ` <span class="rk-sospechoso" title="${escapeHtml(s.motivo ?? 'Las cuentas de este puntaje no cierran')}">⚠️</span>`
+      : ''
+
     // Todo lo que sale de `scores` lo escribió alguien: el nombre lo elige el
     // alumno y el resto llega del servidor, donde cualquiera puede publicar un
     // puntaje con el contenido que quiera. `med` no se escapa porque no es
     // dato: es un emoji elegido de una tabla fija.
-    return `<tr>
-      <td>${i + 1}</td><td>${escapeHtml(s.jugador)}</td>
+    return `<tr${s.sospechoso ? ' class="rk-fila-sospechosa"' : ''}>
+      <td>${i + 1}</td><td>${escapeHtml(s.jugador)}${aviso}</td>
       <td>${escapeHtml(s.pts)} ${med}</td>
       <td>${escapeHtml(cat)}</td><td>${escapeHtml(s.nivel)}</td><td>${escapeHtml(formatFecha(s.fecha))}</td>
     </tr>`

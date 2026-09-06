@@ -22,6 +22,27 @@ viven en sus repos, y la numeración no se pisa.
 | `1791300000_cdp_puntajes_de_duelo.js` | ✅ 2026-09-06 | El duelo publica al ranking; campo `modo` y regla por origen. |
 | `1791400000_cdp_fecha_puntaje.js` | ✅ 2026-09-06 | Agrega `created`: la columna Fecha nunca mostró nada. |
 | `1791500000_limpieza_pruebas_duelo.js` | ✅ 2026-09-06 | Borra los registros de esas pruebas. |
+| `1791600000_cdp_marca_sospecha.js` | ✅ 2026-09-06 | Campos `sospechoso` y `motivo_sospecha` para el auditor. |
+| `1791700000_limpieza_pruebas_auditor.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
+
+## Hooks (auditor de puntajes)
+
+El auditor vive en `pocketbase/hooks/auditor_puntajes.pb.js` y se despliega a
+`/opt/pocketbase/pb_hooks/`, que esta dentro del volumen montado, asi que el
+codigo **persiste**. Lo que no persiste es el enlace que PocketBase necesita
+para encontrarlo: busca los hooks en `/pb_hooks`, que no esta montado. Si se
+recrea el contenedor hay que reponerlo:
+
+```
+docker exec pocketbase ln -sfn /pb_data/pb_hooks /pb_hooks
+```
+
+PocketBase recarga los hooks solo al cambiar el archivo, asi que para
+actualizar el auditor alcanza con copiarlo; no hace falta reiniciar.
+
+**Ojo al editarlo:** los hooks corren en un contexto aislado. El callback no
+puede usar constantes ni funciones declaradas afuera —da `ReferenceError` en
+cada peticion— asi que todo tiene que vivir dentro del handler.
 
 ## Estado del servidor que hay que recrear a mano
 

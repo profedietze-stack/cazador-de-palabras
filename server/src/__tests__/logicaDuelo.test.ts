@@ -170,3 +170,22 @@ describe('señuelos del DECOY', () => {
     expect(generateDecoys(room)).toHaveLength(4)
   })
 })
+
+describe('señuelos: la lista de reserva tambien se filtra', () => {
+  it('no repite una palabra del tablero aunque venga de la reserva', () => {
+    // Lo encontro una prueba en un duelo real: sin mazo del cliente, salio
+    // "luna" como señuelo y "luna" estaba en el tablero. El filtro se aplicaba
+    // solo al mazo del cliente, no a la reserva.
+    const room = sala([palabra('0', true), palabra('1', true)])
+    room.words[0]!.text = 'luna'
+    room.words[1]!.text = 'agua'
+    room.decoyPool = []   // cliente viejo: se usa la reserva
+
+    for (let i = 0; i < 30; i++) {
+      const senuelos = generateDecoys(room)
+      expect(senuelos).not.toContain('luna')
+      expect(senuelos).not.toContain('agua')
+      expect(senuelos).toHaveLength(4)
+    }
+  })
+})

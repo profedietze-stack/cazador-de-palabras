@@ -145,7 +145,14 @@ function mezclar<T>(arr: readonly T[]): T[] {
 export function generateDecoys(room: RoomState): string[] {
   const enTablero = new Set(room.words.map(w => w.text))
   const propios = room.decoyPool.filter(t => !enTablero.has(t))
-  const fuente = propios.length >= CANTIDAD_SEÑUELOS ? propios : SEÑUELOS_DE_RESERVA
+
+  // El filtro contra el tablero va DESPUES de elegir la fuente, no sólo sobre
+  // el mazo del cliente: la lista de reserva tambien puede pisar una palabra
+  // visible. Con un tablero de sustantivos, "luna" y "agua" estan en las dos.
+  const fuente = propios.length >= CANTIDAD_SEÑUELOS
+    ? propios
+    : SEÑUELOS_DE_RESERVA.filter(t => !enTablero.has(t))
+
   return mezclar(fuente).slice(0, CANTIDAD_SEÑUELOS)
 }
 

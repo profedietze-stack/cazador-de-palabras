@@ -73,12 +73,21 @@ export function usePower(room: RoomState, socketId: string, powerId: PowerId): P
     return { ok: true, blocked: true }
   }
 
-  // Apply effect to rival
   consumeFromInventory(caster, powerId)
   recordCooldown(socketId, powerId)
 
   const duration = EFFECT_DURATION[powerId]
-  applyEffect(rival, {
+
+  // FREEZE y DECOY se le ponen al rival: es el que sufre el efecto.
+  //
+  // ROBAR va sobre el que lo activa, porque es quien va a cobrar. Aca estaba
+  // el fallo: se marcaba a la victima, pero `catchWord` busca la marca en el
+  // rival del que captura —o sea en el ladron—, asi que las dos mitades nunca
+  // se encontraban y ROBAR no hacia absolutamente nada. El ESCUDO se sigue
+  // comprobando contra el rival, arriba, porque el poder igual lo perjudica.
+  const objetivo = powerId === 'STEAL' ? caster : rival
+
+  applyEffect(objetivo, {
     type: powerId,
     expiresAt: duration !== null ? now + duration : null,
     capturesRemaining: powerId === 'STEAL' ? 1 : null,

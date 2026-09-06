@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createRoom, addPlayer, setBoard, catchWord } from '../DuelRoom'
-import { generateDecoys } from '../PowerManager'
+import { generateDecoys, usePower, registerSocket } from '../PowerManager'
 import type { RoomState, DuelWord } from '../types'
 
 // Reglas del juego, no seguridad. Cada test describe como deberia comportarse
@@ -187,5 +187,44 @@ describe('señuelos: la lista de reserva tambien se filtra', () => {
       expect(senuelos).not.toContain('agua')
       expect(senuelos).toHaveLength(4)
     }
+  })
+})
+
+describe('ROBAR de punta a punta (usePower + catchWord)', () => {
+  // Los cooldowns viven en un Map a nivel de modulo, por socket: sin esto el
+  // ROBAR de un test deja al siguiente en espera y falla por contagio.
+  beforeEach(() => { registerSocket('sock-a'); registerSocket('sock-b') })
+
+  it('el que lo activa se queda con la siguiente captura del rival', () => {
+    // Este test atraviesa las DOS mitades del poder. Los anteriores colocaban
+    // el efecto a mano y salteaban usePower, que era justo donde estaba el
+    // desacuerdo: usePower marcaba a la victima y catchWord buscaba la marca
+    // en el ladron, asi que ROBAR no hacia nada nunca.
+    const room = sala([palabra('0', true)])
+    const ana = room.players.get('A')!
+    ana.powerInventory = ['STEAL']
+
+    const r = usePower(room, 'sock-a', 'STEAL')
+    expect(r.ok).toBe(true)
+
+    const captura = catchWord(room, 'sock-b', '0')   // captura Beto
+    expect(captura.stolenByRival).toBe(true)
+    expect(room.players.get('A')!.score).toBe(10)    // se los lleva Ana
+    expect(room.players.get('B')!.score).toBe(0)     // Beto no suma
+  })
+
+  it('el ESCUDO del rival lo bloquea', () => {
+    const room = sala([palabra('0', true)])
+    const ana = room.players.get('A')!
+    const beto = room.players.get('B')!
+    ana.powerInventory = ['STEAL']
+    beto.activeEffects.push({ type: 'SHIELD', expiresAt: null, capturesRemaining: 1 })
+
+    const r = usePower(room, 'sock-a', 'STEAL')
+    expect(r.ok && r.blocked).toBe(true)
+
+    const captura = catchWord(room, 'sock-b', '0')
+    expect(captura.stolenByRival).toBe(false)
+    expect(room.players.get('B')!.score).toBe(10)    // Beto conserva lo suyo
   })
 })

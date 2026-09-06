@@ -110,10 +110,14 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
       tiempo_usado: p.tiempoUsado,
       combos:       p.combosHechos,
     }), 3, 500)
-  } catch (_) {
-    // Se puede seguir jugando sin conexión: lo único que se pierde es que el
-    // puntaje aparezca en el ranking del aula.
-    showBanner('⚠️ Sin conexión — tu puntaje no se registró en el ranking del aula')
+  } catch (e) {
+    // Antes todo fallo decía "sin conexión", incluso cuando el servidor había
+    // rechazado el puntaje. Un rechazo de validación no es un problema de red,
+    // y decir que sí lo es manda a buscar el problema donde no está.
+    const rechazado = e instanceof ClientResponseError && e.status === 400
+    showBanner(rechazado
+      ? '⚠️ El servidor no aceptó este puntaje. Avisale a tu docente.'
+      : '⚠️ Sin conexión — tu puntaje no se registró en el ranking del aula')
   }
 }
 

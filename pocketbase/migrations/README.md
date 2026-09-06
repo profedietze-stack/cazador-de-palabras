@@ -15,6 +15,10 @@ viven en sus repos, y la numeración no se pisa.
 | `1789200000_cdp_clave_por_docente.js` | ✅ 2026-09-05 | Clave por docente y privacidad: cada uno maneja y ve sólo sus salas. Elimina el ranking global. |
 | `1790400000_limpieza_pruebas_cdp.js` | ✅ 2026-09-05 | Borra los registros usados para verificar esas reglas. |
 | `1790600000_limpieza_xss.js` | ✅ 2026-09-05 | Borra la sala envenenada usada para verificar el arreglo del XSS. |
+| `1790900000_cdp_puntajes_plausibles.js` | ✅ 2026-09-06 | El ranking rechaza puntajes imposibles (topes por nivel). |
+| `1791000000_cdp_permitir_cero.js` | ✅ 2026-09-06 | Los campos numéricos aceptan 0: la partida perfecta se rechazaba. |
+| `1791100000_limpieza_pruebas_plausibles.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
+| `1791200000_limpieza_por_jugador.js` | ✅ 2026-09-06 | Los que quedaron sin sala, marcados por apodo. |
 
 ## El problema
 

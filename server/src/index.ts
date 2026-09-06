@@ -8,22 +8,66 @@ import {
 } from './DuelRoom'
 import { registerSocket, unregisterSocket, usePower } from './PowerManager'
 import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
+import { randomInt } from 'crypto'
+import {
+  codigoSala, nombreJugador, tableroDePalabras, categorias,
+  numeroEnRango, MIN_DURACION, MAX_DURACION,
+} from './validate'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 const ROOM_IDLE_TIMEOUT = 5 * 60 * 1000  // 5 min
 
+// Sin salas no hay memoria que llenar: tope global para que nadie tumbe el
+// servidor creando duelos en masa.
+const MAX_ROOMS = 500
+
+// El modo bot es para desarrollo. En producción no se expone.
+const DEBUG_BOT = process.env.DEBUG_BOT === '1'
+
 const httpServer = createServer()
 const io = new Server(httpServer, {
-  cors: { origin: '*', methods: ['GET', 'POST'] },
+  // Sólo los orígenes donde corre el juego. Con `*` cualquier página de
+  // internet podía abrir duelos contra este servidor.
+  cors: {
+    origin: (process.env.CORS_ORIGINS ?? 'https://cazador-de-palabras.vercel.app,http://localhost:5173,http://localhost:5174')
+      .split(',').map(s => s.trim()).filter(Boolean),
+    methods: ['GET', 'POST'],
+  },
 })
 
 const rooms = new Map<string, RoomState>()
 const socketRoom = new Map<string, string>()
 
+/**
+ * Corre un handler sin que una excepción tumbe el proceso.
+ *
+ * Antes no había ninguno: `join_duel` con un `code` que no fuera texto hacía
+ * `data.code.toUpperCase()`, tiraba TypeError y **mataba el servidor**. Un
+ * paquete desde cualquier navegador cortaba los duelos de todos, y se podía
+ * repetir. Reproducido antes de escribir esto.
+ *
+ * La validación de cada handler es la defensa; esto es la red por si algo se
+ * escapa.
+ */
+function seguro<T extends unknown[]>(
+  socket: Socket, nombre: string, fn: (...args: T) => void,
+): (...args: T) => void {
+  return (...args: T) => {
+    try {
+      fn(...args)
+    } catch (e) {
+      console.error(`[duelo] error en "${nombre}" (socket ${socket.id}):`, e)
+      socket.emit('error', 'Petición inválida')
+    }
+  }
+}
+
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   let code = ''
-  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)]
+  // randomInt y no Math.random: el código es lo único que protege una sala,
+  // así que no conviene que sea predecible. 5 caracteres = ~33 millones.
+  for (let i = 0; i < 5; i++) code += chars[randomInt(chars.length)]
   return code
 }
 
@@ -50,20 +94,31 @@ io.on('connection', (socket: Socket) => {
   registerSocket(socket.id)
 
   // ── Create duel ──────────────────────────────────────────────────────────
-  socket.on('create_duel', (data: {
-    nombre: string
-    cats: string[]
-    nivel: number
-    duracion: number
-    words: Array<{ id: string; text: string; isCorrect: boolean }>
-  }) => {
+  // Nada de lo que llega acá se usa sin comprobar: las palabras las manda el
+  // cliente y después se reenvían al rival.
+  socket.on('create_duel', seguro(socket, 'create_duel', (data: unknown) => {
+    const d = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>
+
+    if (rooms.size >= MAX_ROOMS) {
+      socket.emit('error', 'El servidor está lleno, probá en un rato')
+      return
+    }
+
+    const duelWords: DuelWord[] | null = tableroDePalabras(d['words'])
+    if (!duelWords) { socket.emit('error', 'El tablero llegó vacío'); return }
+
     const code = getUniqueCode()
     const room = createRoom(code)
 
-    const duelWords: DuelWord[] = data.words.map(w => ({ ...w, takenBy: null }))
-    setBoard(room, duelWords, data.duracion, data.cats, data.nivel)
+    setBoard(
+      room,
+      duelWords,
+      numeroEnRango(d['duracion'], MIN_DURACION, MAX_DURACION, 60),
+      categorias(d['cats'], d['cat']),
+      numeroEnRango(d['nivel'], 1, 10, 1),
+    )
 
-    const slot = addPlayer(room, socket.id, data.nombre)
+    const slot = addPlayer(room, socket.id, nombreJugador(d['nombre']))
     if (!slot) { socket.emit('error', 'No se pudo crear la sala'); return }
 
     rooms.set(code, room)
@@ -75,29 +130,36 @@ io.on('connection', (socket: Socket) => {
     room.timerHandle = setTimeout(() => {
       if (room.phase === 'waiting') rooms.delete(code)
     }, ROOM_IDLE_TIMEOUT)
-  })
+  }))
 
   // ── Join duel ─────────────────────────────────────────────────────────────
-  socket.on('join_duel', (data: { code: string; nombre: string }) => {
-    const code = data.code.toUpperCase()
+  socket.on('join_duel', seguro(socket, 'join_duel', (data: unknown) => {
+    const d = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>
+
+    // Antes esto era `data.code.toUpperCase()`: con un número, tiraba y mataba
+    // el proceso.
+    const code = codigoSala(d['code'])
+    if (!code) { socket.emit('error', 'Sala no encontrada'); return }
+
     const room = rooms.get(code)
     if (!room) { socket.emit('error', 'Sala no encontrada'); return }
     if (room.phase !== 'waiting') { socket.emit('error', 'La partida ya comenzó'); return }
     if (room.players.size >= 2) { socket.emit('error', 'Sala llena'); return }
 
-    const slot = addPlayer(room, socket.id, data.nombre)
+    const nombre = nombreJugador(d['nombre'])
+    const slot = addPlayer(room, socket.id, nombre)
     if (!slot) { socket.emit('error', 'No se pudo unir'); return }
 
     socketRoom.set(socket.id, code)
     socket.join(code)
 
-    const rival = getRival(room, slot)!
-    socket.emit('duel_joined', { slot, rivalNombre: rival.nombre })
-    socket.to(code).emit('rival_joined', { nombre: data.nombre })
-  })
+    const rival = getRival(room, slot)
+    socket.emit('duel_joined', { slot, rivalNombre: rival ? rival.nombre : '' })
+    socket.to(code).emit('rival_joined', { nombre })
+  }))
 
   // ── Player ready ──────────────────────────────────────────────────────────
-  socket.on('player_ready', () => {
+  socket.on('player_ready', seguro(socket, 'player_ready', () => {
     const code = socketRoom.get(socket.id)
     if (!code) return
     const room = rooms.get(code)
@@ -124,10 +186,13 @@ io.on('connection', (socket: Socket) => {
         startBotPlay(io, rooms, code, endDuel)
       }, 3000)
     }
-  })
+  }))
 
   // ── Word caught ───────────────────────────────────────────────────────────
-  socket.on('word_caught', (wordId: string) => {
+  socket.on('word_caught', seguro(socket, 'word_caught', (wordIdCrudo: unknown) => {
+    if (typeof wordIdCrudo !== 'string') return
+    const wordId = wordIdCrudo
+
     const code = socketRoom.get(socket.id)
     if (!code) return
     const room = rooms.get(code)
@@ -157,19 +222,21 @@ io.on('connection', (socket: Socket) => {
     if (room.words.every(w => w.takenBy !== null)) {
       endDuel(room, 'all_words')
     }
-  })
+  }))
 
   // ── Use power ─────────────────────────────────────────────────────────────
-  socket.on('use_power', (powerId: string) => {
+  socket.on('use_power', seguro(socket, 'use_power', (powerIdCrudo: unknown) => {
+    const validPowers: PowerId[] = ['FREEZE', 'STEAL', 'DECOY', 'SHIELD', 'DOUBLE']
+    if (typeof powerIdCrudo !== 'string') return
+    if (!validPowers.includes(powerIdCrudo as PowerId)) return
+    const powerId = powerIdCrudo as PowerId
+
     const code = socketRoom.get(socket.id)
     if (!code) return
     const room = rooms.get(code)
     if (!room || room.phase !== 'playing') return
 
-    const validPowers: PowerId[] = ['FREEZE', 'STEAL', 'DECOY', 'SHIELD', 'DOUBLE']
-    if (!validPowers.includes(powerId as PowerId)) return
-
-    const result = usePower(room, socket.id, powerId as PowerId)
+    const result = usePower(room, socket.id, powerId)
 
     if (!result.ok) {
       socket.emit('power_failed', { powerId, reason: result.reason })
@@ -192,21 +259,29 @@ io.on('connection', (socket: Socket) => {
         })
       }
     }
-  })
+  }))
 
   // ── Debug: spawn bot ─────────────────────────────────────────────────────
-  socket.on('debug_bot_join', ({ code }: { code: string }) => {
-    spawnBot(io, rooms, socketRoom, code)
-  })
+  // Sólo con DEBUG_BOT=1. Es una herramienta de desarrollo: en producción
+  // sería un evento que cualquiera puede disparar para meter un jugador
+  // fantasma en una sala ajena.
+  if (DEBUG_BOT) {
+    socket.on('debug_bot_join', seguro(socket, 'debug_bot_join', (data: unknown) => {
+      const d = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>
+      const code = codigoSala(d['code'])
+      if (!code) return
+      spawnBot(io, rooms, socketRoom, code)
+    }))
+  }
 
   // ── Rematch ───────────────────────────────────────────────────────────────
-  socket.on('request_rematch', () => {
+  socket.on('request_rematch', seguro(socket, 'request_rematch', () => {
     const code = socketRoom.get(socket.id)
     if (!code) return
     socket.to(code).emit('rematch_requested')
-  })
+  }))
 
-  socket.on('accept_rematch', () => {
+  socket.on('accept_rematch', seguro(socket, 'accept_rematch', () => {
     const code = socketRoom.get(socket.id)
     if (!code) return
     const room = rooms.get(code)
@@ -223,10 +298,10 @@ io.on('connection', (socket: Socket) => {
       p.ready = false
     }
     io.to(code).emit('rematch_start')
-  })
+  }))
 
   // ── Disconnect ────────────────────────────────────────────────────────────
-  socket.on('disconnect', () => {
+  socket.on('disconnect', seguro(socket, 'disconnect', () => {
     if (isBotSocket(socket.id)) return   // bots have no real socket
     unregisterSocket(socket.id)
     const code = socketRoom.get(socket.id)
@@ -244,7 +319,18 @@ io.on('connection', (socket: Socket) => {
     } else if (room.players.size === 0) {
       rooms.delete(code)
     }
-  })
+  }))
+})
+
+// Último recurso. La defensa son la validación y el envoltorio `seguro`; esto
+// existe para que un descuido futuro degrade en un log y no en el servidor
+// caído para todos. Se registra fuerte porque un error acá es un bug a mirar,
+// no algo normal.
+process.on('uncaughtException', (e) => {
+  console.error('[duelo] EXCEPCION NO CAPTURADA (revisar, no deberia pasar):', e)
+})
+process.on('unhandledRejection', (e) => {
+  console.error('[duelo] PROMESA RECHAZADA SIN MANEJAR (revisar):', e)
 })
 
 httpServer.listen(PORT, () => {

@@ -10,9 +10,12 @@ import { registerSocket, unregisterSocket, usePower } from './PowerManager'
 import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
 import { randomInt } from 'crypto'
 import {
-  codigoSala, nombreJugador, tableroDePalabras, categorias, mazoDeSeñuelos,
+  codigoSala, nombreJugador, categorias,
   numeroEnRango, MIN_DURACION, MAX_DURACION,
 } from './validate'
+import {
+  construirTablero, construirMazoSeñuelos, categoriasConocidas, nivelValido,
+} from './tablero'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 const ROOM_IDLE_TIMEOUT = 5 * 60 * 1000  // 5 min
@@ -112,8 +115,18 @@ io.on('connection', (socket: Socket) => {
   registerSocket(socket.id)
 
   // ── Create duel ──────────────────────────────────────────────────────────
-  // Nada de lo que llega acá se usa sin comprobar: las palabras las manda el
-  // cliente y después se reenvían al rival.
+  // El cliente elige categorías, nivel y duración. El TABLERO lo arma el
+  // servidor.
+  //
+  // Antes venía del cliente, con la marca de qué palabra era correcta incluida.
+  // Sin tocar el código del juego, mandando otros datos por la API, se podía
+  // crear un duelo con todo marcado como correcto y nivel 10, y cobrar 100
+  // puntos por tocar un verbo en una partida de sustantivos. Si el cliente
+  // decide qué vale puntos, no hay defensa posible.
+  //
+  // `words` y `decoyPool` que manden los clientes viejos se ignoran. No hace
+  // falta que se actualicen: el tablero que dibujan es el que llega en
+  // `duel_start`, que siempre fue el del servidor.
   socket.on('create_duel', seguro(socket, 'create_duel', (data: unknown) => {
     const d = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>
 
@@ -122,8 +135,11 @@ io.on('connection', (socket: Socket) => {
       return
     }
 
-    const duelWords: DuelWord[] | null = tableroDePalabras(d['words'])
-    if (!duelWords) { socket.emit('error', 'El tablero llegó vacío'); return }
+    const cats = categorias(d['cats'], d['cat'])
+    const nivel = nivelValido(d['nivel'])
+
+    const duelWords = construirTablero(cats, nivel)
+    if (!duelWords) { socket.emit('error', 'Elegí al menos una categoría válida'); return }
 
     const code = getUniqueCode()
     const room = createRoom(code)
@@ -132,14 +148,12 @@ io.on('connection', (socket: Socket) => {
       room,
       duelWords,
       numeroEnRango(d['duracion'], MIN_DURACION, MAX_DURACION, 60),
-      categorias(d['cats'], d['cat']),
-      numeroEnRango(d['nivel'], 1, 10, 1),
+      categoriasConocidas(cats),
+      nivel,
     )
 
-    // Palabras de la misma categoria que no estan en el tablero: de ahi salen
-    // los señuelos del DECOY. Si el cliente es viejo y no lo manda, queda
-    // vacio y el servidor usa su lista de reserva.
-    room.decoyPool = mazoDeSeñuelos(d['decoyPool'])
+    // Señuelos del DECOY: palabras de las mismas categorías fuera del tablero.
+    room.decoyPool = construirMazoSeñuelos(cats, duelWords.map(w => w.text))
 
     const slot = addPlayer(room, socket.id, nombreJugador(d['nombre']))
     if (!slot) { socket.emit('error', 'No se pudo crear la sala'); return }

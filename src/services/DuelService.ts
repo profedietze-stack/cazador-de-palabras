@@ -62,10 +62,6 @@ class DuelService {
     cats: string[]
     nivel: number
     duracion: number
-    words: Array<{ id: string; text: string; isCorrect: boolean }>
-    // Candidatas para los señuelos del DECOY, de las mismas categorías pero
-    // fuera del tablero. Opcional: sin esto el servidor usa su lista de reserva.
-    decoyPool?: string[]
   }): void {
     this.socket?.emit('create_duel', data)
   }

@@ -7,7 +7,6 @@ import { duelService } from '../services/DuelService'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelLobby } from './DuelLobbyScreen'
 import { BOT_MODE } from '../debug'
-import { buildDuelWords, buildDecoyPool } from '../game/duelWords'
 
 export function mostrarDuelMenu(): void {
   mostrar('duelMenuScreen')
@@ -125,12 +124,11 @@ export function initDuelMenuScreen(): void {
     crearBtn().textContent = '⏳ Conectando...'
     D.myNombre = G.jugador
     D.phase = 'creating'
-    const words = buildDuelWords(D.cats, D.nivel)
-    // Palabras de las mismas categorías que no entraron al tablero: de ahí
-    // salen los señuelos del DECOY, para que parezcan de esta partida.
-    const decoyPool = buildDecoyPool(D.cats, words.map(w => w.text))
+    // El tablero lo arma el servidor: acá sólo se le dice qué partida se
+    // quiere. Antes se mandaban las palabras con la marca de cuál era correcta,
+    // y eso permitía crear duelos arreglados desde la consola del navegador.
     duelService.connect()
-    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion, words, decoyPool })
+    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion })
   })
 
   // Unirse

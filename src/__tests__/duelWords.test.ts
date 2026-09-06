@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildDuelWords, shuffle } from '../game/duelWords'
+import { buildDuelWords, buildDecoyPool, shuffle, MAX_SEÑUELOS } from '../game/duelWords'
 
 describe('shuffle', () => {
   it('preserves all elements', () => {
@@ -63,5 +63,37 @@ describe('buildDuelWords', () => {
     expect(words).toHaveLength(20)
     expect(words.filter(w => w.isCorrect)).toHaveLength(12)
     expect(words.filter(w => !w.isCorrect)).toHaveLength(8)
+  })
+})
+
+describe('buildDecoyPool', () => {
+  it('no repite palabras que ya estan en el tablero', () => {
+    const tablero = buildDuelWords(['sustantivos'], 1)
+    const enTablero = tablero.map(w => w.text)
+    const senuelos = buildDecoyPool(['sustantivos'], enTablero)
+    for (const s of senuelos) {
+      expect(enTablero).not.toContain(s)
+    }
+  })
+
+  it('saca las palabras de las categorias del duelo', () => {
+    // El punto del cambio: antes eran 12 palabras fijas, iguales siempre y sin
+    // relacion con la categoria. Ahora tienen que salir del mismo mazo.
+    const soloSust = buildDecoyPool(['sustantivos'], [])
+    const soloVerbo = buildDecoyPool(['verbos'], [])
+    expect(soloSust.length).toBeGreaterThan(0)
+    expect(soloVerbo.length).toBeGreaterThan(0)
+    // Dos categorias distintas no pueden dar exactamente el mismo mazo.
+    expect(soloSust.sort()).not.toEqual(soloVerbo.sort())
+  })
+
+  it('no devuelve duplicados', () => {
+    const senuelos = buildDecoyPool(['sustantivos', 'verbos'], [])
+    expect(new Set(senuelos).size).toBe(senuelos.length)
+  })
+
+  it('respeta el tope', () => {
+    const senuelos = buildDecoyPool(['sustantivos', 'verbos', 'adjetivos'], [])
+    expect(senuelos.length).toBeLessThanOrEqual(MAX_SEÑUELOS)
   })
 })

@@ -85,7 +85,7 @@ export function usePower(room: RoomState, socketId: string, powerId: PowerId): P
   })
 
   if (powerId === 'DECOY') {
-    const decoyWords = generateDecoys()
+    const decoyWords = generateDecoys(room)
     return { ok: true, blocked: false, decoyWords }
   }
 
@@ -108,9 +108,45 @@ function applyEffect(player: PlayerState, effect: ActiveEffect): void {
   player.activeEffects.push(effect)
 }
 
-function generateDecoys(): string[] {
-  const pool = ['correr','grande','rápido','hermoso','cielo','luna','agua','fuego','siempre','nunca','brillar','oscuro']
-  return pool.sort(() => Math.random() - 0.5).slice(0, 4)
+const CANTIDAD_SEÑUELOS = 4
+
+// Ultimo recurso, sólo si el cliente no mandó mazo de señuelos (versión vieja).
+// Antes esta lista era la única fuente: 12 palabras fijas, iguales en todas las
+// partidas y sin relación con la categoría del duelo. En una partida de
+// sustantivos aparecían "correr" y "siempre", y cualquiera las reconocía a la
+// segunda vez.
+const SEÑUELOS_DE_RESERVA = [
+  'correr', 'grande', 'rápido', 'hermoso', 'cielo', 'luna',
+  'agua', 'fuego', 'siempre', 'nunca', 'brillar', 'oscuro',
+]
+
+/** Fisher-Yates. `sort(() => Math.random() - 0.5)` no reparte parejo. */
+function mezclar<T>(arr: readonly T[]): T[] {
+  const copia = [...arr]
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = copia[i]!
+    copia[i] = copia[j]!
+    copia[j] = tmp
+  }
+  return copia
+}
+
+/**
+ * Señuelos para el tablero del rival.
+ *
+ * Salen del mazo que mandó el cliente: palabras de las mismas categorías y
+ * nivel del duelo que NO están en el tablero. Así parecen de la partida y hay
+ * que leerlas para descartarlas, que es el punto del poder.
+ *
+ * Se filtra contra el tablero por si el mazo trae algo repetido: un señuelo
+ * que duplica una palabra visible se nota enseguida.
+ */
+export function generateDecoys(room: RoomState): string[] {
+  const enTablero = new Set(room.words.map(w => w.text))
+  const propios = room.decoyPool.filter(t => !enTablero.has(t))
+  const fuente = propios.length >= CANTIDAD_SEÑUELOS ? propios : SEÑUELOS_DE_RESERVA
+  return mezclar(fuente).slice(0, CANTIDAD_SEÑUELOS)
 }
 
 export function getCooldownRemaining(socketId: string, powerId: PowerId): number {

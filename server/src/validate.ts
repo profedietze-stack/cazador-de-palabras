@@ -83,6 +83,24 @@ export function tableroDePalabras(v: unknown): DuelWord[] | null {
   return palabras.length > 0 ? palabras : null
 }
 
+// Mazo de señuelos: palabras sueltas, no objetos. Tope generoso pero acotado.
+export const MAX_SEÑUELOS = 60
+
+/**
+ * Palabras candidatas a señuelo que manda el cliente. Se muestran en la
+ * pantalla del rival, así que pasan por la misma limpieza que todo lo demás.
+ * Devuelve [] ante cualquier cosa rara: sin mazo, el servidor usa su reserva.
+ */
+export function mazoDeSeñuelos(v: unknown): string[] {
+  if (!Array.isArray(v)) return []
+  const vistas = new Set<string>()
+  for (const w of v.slice(0, MAX_SEÑUELOS)) {
+    const t = textoLimpio(w, MAX_TEXTO_PALABRA)
+    if (t) vistas.add(t)
+  }
+  return [...vistas]
+}
+
 /** Categorías. Acepta el formato viejo (`cat` string) y el nuevo (`cats`). */
 export function categorias(cats: unknown, cat: unknown): string[] {
   if (Array.isArray(cats)) {

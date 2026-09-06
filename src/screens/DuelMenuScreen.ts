@@ -7,7 +7,7 @@ import { duelService } from '../services/DuelService'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelLobby } from './DuelLobbyScreen'
 import { BOT_MODE } from '../debug'
-import { buildDuelWords } from '../game/duelWords'
+import { buildDuelWords, buildDecoyPool } from '../game/duelWords'
 
 export function mostrarDuelMenu(): void {
   mostrar('duelMenuScreen')
@@ -126,8 +126,11 @@ export function initDuelMenuScreen(): void {
     D.myNombre = G.jugador
     D.phase = 'creating'
     const words = buildDuelWords(D.cats, D.nivel)
+    // Palabras de las mismas categorías que no entraron al tablero: de ahí
+    // salen los señuelos del DECOY, para que parezcan de esta partida.
+    const decoyPool = buildDecoyPool(D.cats, words.map(w => w.text))
     duelService.connect()
-    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion, words })
+    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion, words, decoyPool })
   })
 
   // Unirse

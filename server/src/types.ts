@@ -32,6 +32,9 @@ export interface RoomState {
   duracion: number              // seconds
   cats: string[]
   nivel: number
+  // Palabras de las mismas categorias que NO estan en el tablero, para que los
+  // señuelos del DECOY parezcan de la partida y no salgan de una lista fija.
+  decoyPool: string[]
   startedAt: number | null
   timerHandle: ReturnType<typeof setTimeout> | null
   phase: 'waiting' | 'countdown' | 'playing' | 'ended'

@@ -10,7 +10,7 @@ import { registerSocket, unregisterSocket, usePower } from './PowerManager'
 import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
 import { randomInt } from 'crypto'
 import {
-  codigoSala, nombreJugador, tableroDePalabras, categorias,
+  codigoSala, nombreJugador, tableroDePalabras, categorias, mazoDeSeñuelos,
   numeroEnRango, MIN_DURACION, MAX_DURACION,
 } from './validate'
 
@@ -135,6 +135,11 @@ io.on('connection', (socket: Socket) => {
       categorias(d['cats'], d['cat']),
       numeroEnRango(d['nivel'], 1, 10, 1),
     )
+
+    // Palabras de la misma categoria que no estan en el tablero: de ahi salen
+    // los señuelos del DECOY. Si el cliente es viejo y no lo manda, queda
+    // vacio y el servidor usa su lista de reserva.
+    room.decoyPool = mazoDeSeñuelos(d['decoyPool'])
 
     const slot = addPlayer(room, socket.id, nombreJugador(d['nombre']))
     if (!slot) { socket.emit('error', 'No se pudo crear la sala'); return }

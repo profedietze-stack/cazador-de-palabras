@@ -17,6 +17,7 @@ export function createRoom(code: string): RoomState {
     duracion: 180,
     cats: [],
     nivel: 1,
+    decoyPool: [],
     startedAt: null,
     timerHandle: null,
     phase: 'waiting',
@@ -105,18 +106,22 @@ export function catchWord(room: RoomState, socketId: string, wordId: string): Ca
 
   word.takenBy = catcher.slot
 
-  const basePoints = word.isCorrect ? (10 * room.nivel) : 0
+  const basePoints = 10 * room.nivel
 
-  // Los poderes de "proxima captura" solo se gastan si esa captura vale
-  // puntos. Antes se consumian igual con una palabra equivocada: el DOBLE se
-  // perdia duplicando cero, y al rival se le quemaba el ROBAR sin robar nada
-  // —algo que ademas se podia provocar a proposito, porque tocar palabras
-  // incorrectas no cuesta nada.
-  let points = basePoints
+  // Errar resta. Es la misma regla que el modo de un jugador
+  // (`GameEngine.ts`): la mitad de los puntos base, minimo 1, y el puntaje no
+  // baja de cero. Sin esto tocar palabras al azar era gratis: se llegaba a las
+  // correctas por descarte, sin riesgo.
+  const penalizacion = Math.max(1, Math.floor(basePoints / 2))
+
+  let points = word.isCorrect ? basePoints : -penalizacion
   let stolenByRival = false
   const rival = getRival(room, catcher.slot)
 
-  if (basePoints > 0) {
+  if (word.isCorrect) {
+    // Los poderes de "proxima captura" solo se gastan si esa captura suma.
+    // Antes se consumian igual con una palabra equivocada: el DOBLE se perdia
+    // duplicando cero y al rival se le quemaba el ROBAR sin robar nada.
     if (consumeEventEffect(catcher, 'DOUBLE')) points = basePoints * 2
 
     if (rival && consumeEventEffect(rival, 'STEAL')) {
@@ -125,6 +130,10 @@ export function catchWord(room: RoomState, socketId: string, wordId: string): Ca
     } else {
       catcher.score += points
     }
+  } else {
+    // El error es tuyo y no se transfiere: ni el rival lo cobra con ROBAR, ni
+    // tu DOBLE lo agranda.
+    catcher.score = Math.max(0, catcher.score + points)
   }
 
   // El poder se gana acertando. Si contaran las equivocadas, alcanzaba con

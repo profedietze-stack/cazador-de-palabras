@@ -102,6 +102,10 @@ export async function postScore(p: GameRecord, jugador: string, salaCode?: strin
       device_hash:  deviceHash,
       jugador,
       sala_code:    salaCode ?? null,
+      // Deja explicito que es una partida de un jugador. Los de duelo los
+      // escribe el servidor con `modo: 'duelo'`, y el auditor solo revisa
+      // estos: los del duelo los calculo el servidor.
+      modo:         'solo',
       cat:          p.cat,
       cat_nombre:   p.catNombre,
       nivel:        p.nivel,

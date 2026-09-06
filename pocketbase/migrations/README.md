@@ -24,6 +24,7 @@ viven en sus repos, y la numeración no se pisa.
 | `1791500000_limpieza_pruebas_duelo.js` | ✅ 2026-09-06 | Borra los registros de esas pruebas. |
 | `1791600000_cdp_marca_sospecha.js` | ✅ 2026-09-06 | Campos `sospechoso` y `motivo_sospecha` para el auditor. |
 | `1791700000_limpieza_pruebas_auditor.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
+| `1791800000_limpieza_partidas_reales.js` | ✅ 2026-09-06 | Borra las tres partidas jugadas de verdad para probarlo. |
 
 ## Hooks (auditor de puntajes)
 

@@ -86,8 +86,26 @@ function endDuel(room: RoomState, reason: 'time' | 'all_words' | 'disconnect'): 
   const scores = getScores(room)
   io.to(room.code).emit('duel_end', { winner, scores, reason })
 
-  // Cleanup room after 30s
-  setTimeout(() => rooms.delete(room.code), 30000)
+  // Se guarda la referencia para poder cancelarla: sin esto la sala se
+  // borraba 30 s despues de terminar el duelo AUNQUE los jugadores hubieran
+  // aceptado una revancha, y la partida nueva se congelaba a mitad de camino
+  // sin ningun mensaje —las capturas dejaban de registrarse porque la sala ya
+  // no existia en el mapa.
+  limpiezaPendiente.set(room.code, setTimeout(() => {
+    limpiezaPendiente.delete(room.code)
+    rooms.delete(room.code)
+  }, 30000))
+}
+
+// Borrados de sala programados tras terminar un duelo, por codigo de sala.
+const limpiezaPendiente = new Map<string, ReturnType<typeof setTimeout>>()
+
+function cancelarLimpieza(code: string): void {
+  const t = limpiezaPendiente.get(code)
+  if (t) {
+    clearTimeout(t)
+    limpiezaPendiente.delete(code)
+  }
 }
 
 io.on('connection', (socket: Socket) => {
@@ -173,6 +191,16 @@ io.on('connection', (socket: Socket) => {
       io.to(code).emit('countdown_start')
 
       setTimeout(() => {
+        // Si el rival se fue durante el 3-2-1, no se arranca: antes el duelo
+        // empezaba igual y el que quedaba jugaba solo contra nadie hasta que
+        // se acababa el tiempo, sin entender que habia pasado.
+        if (!rooms.has(code) || room.players.size < 2) {
+          room.phase = 'waiting'
+          for (const p of room.players.values()) p.ready = false
+          io.to(code).emit('rival_disconnected')
+          return
+        }
+
         room.phase = 'playing'
         room.startedAt = Date.now()
         io.to(code).emit('duel_start', {
@@ -287,6 +315,10 @@ io.on('connection', (socket: Socket) => {
     const room = rooms.get(code)
     if (!room || room.phase !== 'ended') return
 
+    // La sala tenia programado su propio borrado desde que termino el duelo
+    // anterior. Si no se cancela, la revancha muere a los 30 s.
+    cancelarLimpieza(code)
+
     room.phase = 'waiting'
     room.startedAt = null
     room.words.forEach(w => { w.takenBy = null })
@@ -296,6 +328,10 @@ io.on('connection', (socket: Socket) => {
       p.activeEffects = []
       p.catchCount = 0
       p.ready = false
+      // Los cooldowns viven aparte, por socket, y no se limpiaban: un poder
+      // usado al final del duelo anterior seguia en espera en el nuevo, que
+      // empieza con el inventario vacio igual para los dos.
+      registerSocket(p.socketId)
     }
     io.to(code).emit('rematch_start')
   }))

@@ -106,29 +106,42 @@ export function catchWord(room: RoomState, socketId: string, wordId: string): Ca
   word.takenBy = catcher.slot
 
   const basePoints = word.isCorrect ? (10 * room.nivel) : 0
-  const hasDouble = consumeEventEffect(catcher, 'DOUBLE')
-  const points = basePoints * (hasDouble ? 2 : 1)
 
-  // Check rival STEAL effect
-  const rival = getRival(room, catcher.slot)
+  // Los poderes de "proxima captura" solo se gastan si esa captura vale
+  // puntos. Antes se consumian igual con una palabra equivocada: el DOBLE se
+  // perdia duplicando cero, y al rival se le quemaba el ROBAR sin robar nada
+  // —algo que ademas se podia provocar a proposito, porque tocar palabras
+  // incorrectas no cuesta nada.
+  let points = basePoints
   let stolenByRival = false
-  if (rival) {
-    const rivalHasSteal = consumeEventEffect(rival, 'STEAL')
-    if (rivalHasSteal) {
+  const rival = getRival(room, catcher.slot)
+
+  if (basePoints > 0) {
+    if (consumeEventEffect(catcher, 'DOUBLE')) points = basePoints * 2
+
+    if (rival && consumeEventEffect(rival, 'STEAL')) {
       rival.score += points
       stolenByRival = true
     } else {
       catcher.score += points
     }
-  } else {
-    catcher.score += points
   }
 
-  catcher.catchCount++
+  // El poder se gana acertando. Si contaran las equivocadas, alcanzaba con
+  // tocar palabras incorrectas —gratis y sin penalizacion— para cosechar
+  // poderes sin jugar bien.
   let powerEarned: PowerId | null = null
-  if (catcher.catchCount % POWER_UNLOCK_EVERY === 0 && catcher.powerInventory.length < MAX_INVENTORY) {
-    powerEarned = randomPower()
-    catcher.powerInventory.push(powerEarned)
+  if (word.isCorrect) {
+    catcher.catchCount++
+    // No es `% N`: con el inventario lleno el poder se descartaba en silencio
+    // y habia que esperar otras 3 capturas, asi que acumular poderes te hacia
+    // recibir menos. Ahora el credito queda pendiente y se cobra en la primera
+    // captura que encuentre lugar.
+    if (catcher.catchCount >= POWER_UNLOCK_EVERY && catcher.powerInventory.length < MAX_INVENTORY) {
+      powerEarned = randomPower()
+      catcher.powerInventory.push(powerEarned)
+      catcher.catchCount -= POWER_UNLOCK_EVERY
+    }
   }
 
   return { success: true, alreadyTaken: false, pointsEarned: points, stolenByRival, powerEarned }

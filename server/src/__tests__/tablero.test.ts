@@ -97,7 +97,9 @@ describe('el diccionario del servidor no se desincroniza del cliente', () => {
     let src = readFileSync(origen, 'utf8')
     src = src.replace(/^import[^\n]*\n/m, '')
     src = src.replace('export const CATS: Record<CategoryKey, Category> =', 'module.exports.CATS =')
-    const tmp = join(tmpdir(), 'cats-sync-test.cjs')
+    // Nombre unico: con un nombre fijo, dos corridas simultaneas escriben y
+    // leen el mismo archivo y una puede ver el contenido a medias.
+    const tmp = join(tmpdir(), `cats-sync-${process.pid}-${Date.now()}.cjs`)
     writeFileSync(tmp, src)
     const require2 = createRequire(__filename)
     delete require2.cache[require2.resolve(tmp)]

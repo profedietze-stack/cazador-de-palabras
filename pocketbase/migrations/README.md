@@ -19,6 +19,31 @@ viven en sus repos, y la numeración no se pisa.
 | `1791000000_cdp_permitir_cero.js` | ✅ 2026-09-06 | Los campos numéricos aceptan 0: la partida perfecta se rechazaba. |
 | `1791100000_limpieza_pruebas_plausibles.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
 | `1791200000_limpieza_por_jugador.js` | ✅ 2026-09-06 | Los que quedaron sin sala, marcados por apodo. |
+| `1791300000_cdp_puntajes_de_duelo.js` | ✅ 2026-09-06 | El duelo publica al ranking; campo `modo` y regla por origen. |
+| `1791400000_cdp_fecha_puntaje.js` | ✅ 2026-09-06 | Agrega `created`: la columna Fecha nunca mostró nada. |
+| `1791500000_limpieza_pruebas_duelo.js` | ✅ 2026-09-06 | Borra los registros de esas pruebas. |
+
+## Estado del servidor que hay que recrear a mano
+
+El servidor de duelos escribe en PocketBase por la **red interna de Docker**.
+Esa red se creó con `docker network create` y se conectó con
+`docker network connect`, que es estado del runtime: **sobrevive a
+`docker restart` pero NO a recrear un contenedor**. Si alguna vez se recrea
+`cazador-duelo` o `pocketbase`, hay que volver a correr:
+
+```
+docker network create aulaplay
+docker network connect aulaplay pocketbase
+docker network connect aulaplay cazador-duelo
+```
+
+Sin eso, los duelos siguen funcionando pero dejan de publicar al ranking (queda
+un error en el log del contenedor, no se rompe la partida).
+
+La otra pieza es que **nginx vacía la cabecera `X-Origen-Duelo`** en las dos
+ubicaciones de `/etc/nginx/sites-available/pocketbase`. Eso es lo que impide
+que un cliente se haga pasar por el servidor de duelos. Si se rehace esa
+configuración, hay que reponerlo.
 
 ## El problema
 

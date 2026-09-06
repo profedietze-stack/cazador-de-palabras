@@ -62,6 +62,7 @@ class DuelService {
     cats: string[]
     nivel: number
     duracion: number
+    salaCode?: string
   }): void {
     this.socket?.emit('create_duel', data)
   }

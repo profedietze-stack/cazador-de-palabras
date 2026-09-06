@@ -4,6 +4,7 @@ import type { CategoryKey } from '../types'
 import { G } from '../game/state'
 import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
+import { lsGet } from '../utils/storage'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelLobby } from './DuelLobbyScreen'
 import { BOT_MODE } from '../debug'
@@ -128,7 +129,12 @@ export function initDuelMenuScreen(): void {
     // quiere. Antes se mandaban las palabras con la marca de cuál era correcta,
     // y eso permitía crear duelos arreglados desde la consola del navegador.
     duelService.connect()
-    duelService.createDuel({ nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion })
+    duelService.createDuel({
+      nombre: G.jugador, cats: D.cats, nivel: D.nivel, duracion: D.duracion,
+      // Aula a la que va el resultado. El puntaje del duelo lo calcula y lo
+      // publica el servidor, no este dispositivo.
+      salaCode: lsGet('cdp_sala') ?? undefined,
+    })
   })
 
   // Unirse

@@ -101,6 +101,15 @@ export function mazoDeSeñuelos(v: unknown): string[] {
   return [...vistas]
 }
 
+/**
+ * Codigo del aula a la que publicar el resultado. Lo elige el docente, asi que
+ * no tiene un formato fijo: se limpia y se acota, nada mas. Vacio es valido y
+ * significa "duelo suelto, sin ranking".
+ */
+export function codigoDeAula(v: unknown): string {
+  return textoLimpio(v, 12).toUpperCase()
+}
+
 /** Categorías. Acepta el formato viejo (`cat` string) y el nuevo (`cats`). */
 export function categorias(cats: unknown, cat: unknown): string[] {
   if (Array.isArray(cats)) {

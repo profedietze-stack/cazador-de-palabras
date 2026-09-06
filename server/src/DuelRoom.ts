@@ -18,6 +18,7 @@ export function createRoom(code: string): RoomState {
     cats: [],
     nivel: 1,
     decoyPool: [],
+    salaCode: '',
     startedAt: null,
     timerHandle: null,
     phase: 'waiting',

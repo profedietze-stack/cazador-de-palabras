@@ -10,9 +10,10 @@ import { registerSocket, unregisterSocket, usePower } from './PowerManager'
 import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
 import { randomInt } from 'crypto'
 import {
-  codigoSala, nombreJugador, categorias,
+  codigoSala, nombreJugador, categorias, codigoDeAula,
   numeroEnRango, MIN_DURACION, MAX_DURACION,
 } from './validate'
+import { publicarResultado } from './ranking'
 import {
   construirTablero, construirMazoSeñuelos, categoriasConocidas, nivelValido,
 } from './tablero'
@@ -89,6 +90,10 @@ function endDuel(room: RoomState, reason: 'time' | 'all_words' | 'disconnect'): 
   const scores = getScores(room)
   io.to(room.code).emit('duel_end', { winner, scores, reason })
 
+  // El ranking se avisa aparte y sin esperar: que falle no puede demorar ni
+  // romper el final de la partida, que ya se le mostro a los jugadores.
+  void publicarResultado(room)
+
   // Se guarda la referencia para poder cancelarla: sin esto la sala se
   // borraba 30 s despues de terminar el duelo AUNQUE los jugadores hubieran
   // aceptado una revancha, y la partida nueva se congelaba a mitad de camino
@@ -154,6 +159,10 @@ io.on('connection', (socket: Socket) => {
 
     // Señuelos del DECOY: palabras de las mismas categorías fuera del tablero.
     room.decoyPool = construirMazoSeñuelos(cats, duelWords.map(w => w.text))
+
+    // Aula a la que se publica el resultado. La elige el cliente igual que en
+    // el modo de un jugador: es el codigo que el docente le dio al curso.
+    room.salaCode = codigoDeAula(d['salaCode'])
 
     const slot = addPlayer(room, socket.id, nombreJugador(d['nombre']))
     if (!slot) { socket.emit('error', 'No se pudo crear la sala'); return }

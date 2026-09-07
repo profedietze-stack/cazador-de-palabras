@@ -96,3 +96,43 @@ reabrir el navegador y confirmar que sigue apareciendo en "mis salas".
 **Ojo con las salas viejas:** las creadas antes del paso 1 sólo tienen el UUID,
 sin hash. Al eliminar la columna quedan huérfanas y nadie va a poder
 administrarlas. Si hay salas activas que importen, conviene recrearlas antes.
+
+## 2026-09-07 — el agujero de la cadena vacía (arreglado)
+
+`cdp_scores.listRule` y `viewRule` eran:
+
+```
+sala_code = @request.headers.x_sala_code
+```
+
+`postScore` guarda `sala_code: salaCode ?? null`, así que **los puntajes de un
+jugador quedan con `sala_code` vacío**. Una petición sin la cabecera manda `""`,
+y `"" = ""` da verdadero: cualquiera con la URL listaba todos los puntajes
+solitarios, con el nombre del alumno y el `device_hash`.
+
+Medido contra producción antes del arreglo:
+
+```
+LEER SIN NINGUNA CABECERA:   200, filas 1   jugador='ZZ-Sonda' sala_code=''
+LEER CON x-sala-code=ABCDEF: 200, filas 0
+```
+
+Arreglado exigiendo que la cabecera no esté vacía antes de compararla:
+
+```
+@request.headers.x_sala_code != "" && sala_code = @request.headers.x_sala_code
+```
+
+No rompe al cliente: `fetchSalaRanking` siempre lee por un código real, nunca
+lista los puntajes de un jugador.
+
+**La migración es `1794100000_cerrar_cadena_vacia.js` y vive en el repo de
+Choque** (`choque-civilizaciones/pocketbase/migrations/`), junto con las demás
+que cruzan proyectos — en el servidor hay una sola carpeta `pb_migrations`.
+Arregla lo mismo en Ubicate.
+
+Se comprueba con `choque-civilizaciones/pocketbase/verificacion/cadena_vacia.py`.
+
+**Regla general: antes de comparar contra una cabecera o contra
+`@request.auth.id`, comprobar que no esté vacío.** Lo que no se manda llega
+vacío, y coincide con cualquier campo vacío.

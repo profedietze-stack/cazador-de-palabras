@@ -4,7 +4,7 @@ import { CATS } from '../data/categories'
 import { sonidoOk, sonidoMal, sonidoNivel, detenerMusica } from '../audio/AudioEngine'
 import { addPartida, cargarDatos, guardarDatos } from '../storage/GameStorage'
 import { COMBOS, actualizarCombo, resetCombo } from './ComboSystem'
-import { programarPalabras, detenerWordSpawner, setWordClickHandler } from './WordSpawner'
+import { programarPalabras, detenerWordSpawner, setWordClickHandler, esPalabraCorrecta } from './WordSpawner'
 import { checkLogros } from './ScoreSystem'
 import { showBanner } from '../ui/Banner'
 import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
@@ -121,9 +121,8 @@ function cazarPalabra(el: HTMLElement): void {
   if (!G.activo || el.dataset.cazada === '1') return
   el.dataset.cazada = '1'
   if ((el as any)._rafId) cancelAnimationFrame((el as any)._rafId)
-  if ((el as any)._glowTimer) clearTimeout((el as any)._glowTimer)
 
-  const esOk = el.dataset.ok === '1'
+  const esOk = esPalabraCorrecta(el)
   const ptsBase = parseInt(el.dataset.pts || '1') || 1
   const rect = el.getBoundingClientRect()
   const area = document.getElementById('gameArea')!

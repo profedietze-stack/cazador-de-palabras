@@ -1,4 +1,5 @@
 import { mostrar } from './ScreenManager'
+import { textoVisible } from '../game/distractores'
 import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
 import { POWER_META } from '../types/duel'
@@ -51,7 +52,7 @@ function buildBoard(): void {
     const chip = document.createElement('button')
     chip.className = 'duel-chip free'
     chip.dataset.wordId = w.id
-    chip.textContent = w.text
+    chip.textContent = textoVisible(w.text)
     chip.addEventListener('click', () => {
       if (frozen || D.phase !== 'playing') return
       if (!chip.classList.contains('free')) return
@@ -172,7 +173,7 @@ function showDecoy(words: string[]): void {
     const chip = document.createElement('button')
     chip.className = 'duel-chip free decoy'
     chip.dataset.wordId = `decoy_${text}`
-    chip.textContent = text
+    chip.textContent = textoVisible(text)
     chip.addEventListener('click', () => {
       // Server ignores unknown IDs — no harm done
       duelService.catchWord(`decoy_${text}`)

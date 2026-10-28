@@ -3,6 +3,7 @@ import { CATS } from '../data/categories'
 import { shuffleArr } from '../utils'
 import { animarCaida } from './WordPhysics'
 import { puntosPorAcierto } from './reglas'
+import { distractoresParaNivel, textoVisible } from './distractores'
 
 type OnClickFn = (el: HTMLElement) => void
 let _onClick: OnClickFn = () => {}
@@ -11,16 +12,11 @@ export function setWordClickHandler(fn: OnClickFn): void {
   _onClick = fn
 }
 
-const CAT_COLORS: Record<string, string> = {
-  sustantivos:  '#3b82f6',
-  adjetivos:    '#ef4444',
-  verbos:       '#10b981',
-  adverbios:    '#f59e0b',
-  articulos:    '#8b5cf6',
-  pronombres:   '#ec4899',
-  preposiciones:'#06b6d4',
-  conjunciones: '#84cc16',
-  interjecciones:'#fb923c',
+// La respuesta no viaja en el DOM (antes `data-ok`, legible desde el inspector):
+// un bot de diez líneas ganaba el nivel 1 en 32 s leyéndolo.
+const correctas = new WeakSet<HTMLElement>()
+export function esPalabraCorrecta(el: HTMLElement): boolean {
+  return correctas.has(el)
 }
 
 let generadorTimeout: ReturnType<typeof setTimeout> | null = null
@@ -44,8 +40,8 @@ function generarOlaPalabras(): void {
   const cantidad = nivel === 1 ? 3 : nivel === 2 ? 5 : 7
 
   const okPool = cat.ok.slice()
-  const malPool = cat.mal.slice()
-  shuffleArr(okPool); shuffleArr(malPool)
+  const malPool = distractoresParaNivel(cat.mal, cat.malCerca, nivel)
+  shuffleArr(okPool)
 
   const numCorr = Math.round(cantidad * pcCorr)
   const numMal = cantidad - numCorr
@@ -71,7 +67,9 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   const area = document.getElementById('gameArea')!
   const el = document.createElement('div')
   el.className = 'palabra'
-  el.textContent = texto
+  // Sin ¡ ni !: todas las interjecciones los llevaban y ninguna otra palabra,
+  // así que se acertaba por la forma sin entender la categoría.
+  el.textContent = textoVisible(texto)
 
   const size = 12 + Math.random() * 20
   el.style.fontSize = size + 'px'
@@ -81,14 +79,7 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   el.style.left = startX + 'px'
   el.style.top = '-60px'
 
-  if (esCorrecta && Math.random() < 0.3) {
-    el.style.setProperty('--glow-color', CAT_COLORS[G.cat!] || '#fff')
-    el.classList.add('glow-anim')
-    const glowTimer = setTimeout(() => el.classList.remove('glow-anim'), 2500 + Math.random() * 1500)
-    ;(el as any)._glowTimer = glowTimer
-  }
-
-  el.dataset.ok = esCorrecta ? '1' : '0'
+  if (esCorrecta) correctas.add(el)
   el.dataset.pts = String(puntosPorAcierto(G.nivel))
   el.dataset.size = String(size)
 

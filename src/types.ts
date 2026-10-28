@@ -9,6 +9,8 @@ export interface Category {
   ejem: string[]
   ok: string[]
   mal: string[]
+  /** Subconjunto de `mal` que se confunde de verdad con la categoría (el nivel 3 tira de acá). */
+  malCerca?: string[]
 }
 
 export type Medal = 'ORO' | 'PLATA' | 'BRONCE'

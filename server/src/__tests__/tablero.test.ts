@@ -140,12 +140,13 @@ describe('el diccionario del servidor no se desincroniza del cliente', () => {
     writeFileSync(tmp, src)
     const require2 = createRequire(__filename)
     delete require2.cache[require2.resolve(tmp)]
-    const { CATS } = require2(tmp) as { CATS: Record<string, { ok: string[]; mal: string[] }> }
+    const { CATS } = require2(tmp) as { CATS: Record<string, { ok: string[]; mal: string[]; malCerca?: string[] }> }
 
     expect(Object.keys(CATS).sort()).toEqual([...CATEGORIAS_VALIDAS].sort())
     for (const k of Object.keys(CATS)) {
       expect(PALABRAS[k]!.ok).toEqual(CATS[k]!.ok)
       expect(PALABRAS[k]!.mal).toEqual(CATS[k]!.mal)
+      expect(PALABRAS[k]!.malCerca ?? []).toEqual(CATS[k]!.malCerca ?? [])
     }
   })
 })

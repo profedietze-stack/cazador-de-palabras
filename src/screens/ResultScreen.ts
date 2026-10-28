@@ -9,7 +9,7 @@ import { iniciarJuego, setOnGameEnd, setOnPracticaEnd } from '../game/GameEngine
 import { calcularTitulo } from '../game/ScoreSystem'
 import { cargarDatos, guardarDatos } from '../storage/GameStorage'
 import { showAlert } from '../ui/Dialog'
-import { postScore } from '../services/LeaderboardService'
+import { postScore, postErrores } from '../services/LeaderboardService'
 import { lsGet } from '../utils/storage'
 import { motivoSinMedalla, calcularPrecision } from '../game/reglas'
 import { explicarError } from '../game/porQue'
@@ -93,9 +93,14 @@ function mostrarResumenPractica(): void {
 function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void {
   document.getElementById('btnResSiguiente')!.style.display = ''
   // Publica el puntaje en el ranking del aula (best-effort, sin bloquear)
+  const salaCode = lsGet('cdp_sala') ?? undefined
   if (G.jugador && p.medalla) {
-    const salaCode = lsGet('cdp_sala') ?? undefined
     postScore(p, G.jugador, salaCode)
+  }
+  // Los errores se publican también sin medalla: esos intentos son los que le
+  // dicen al docente quién se atascó y en qué.
+  if (G.jugador && salaCode) {
+    void postErrores(p, G.fallosPartida, G.jugador, salaCode)
   }
 
   mostrar('resultadoScreen')

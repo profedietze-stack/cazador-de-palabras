@@ -501,3 +501,8 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .por-que.visible{opacity:1;transform:translate(-50%,0)}
 .rep-lista{margin:.4rem 0 .6rem;text-align:left;font-size:.85rem;line-height:1.35}
 .rep-lista li{margin:.25rem 0}
+.rs-barra{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;font-size:.85rem}
+.rs-etq{min-width:7.5rem}
+.rs-pista{flex:1;height:.7rem;border-radius:6px;background:var(--border,#e5e7eb);overflow:hidden}
+.rs-relleno{display:block;height:100%;background:#667eea}
+.rs-ayuda td{background:rgba(245,158,11,.12)}

@@ -4,10 +4,13 @@ import { mostrar } from './ScreenManager'
 import { iniciarJuego } from '../game/GameEngine'
 import { showAlert } from '../ui/Dialog'
 import { showModal } from './MenuScreen'
+import { lsGet } from '../utils/storage'
 
 export function mostrarPreNivel(): void {
   mostrar('preNivel')
   const cat = CATS[G.cat!]
+  // El alumno sabe que su docente ve en qué se equivoca (privacidad: consentimiento informado).
+  document.getElementById('avisoDocente')!.style.display = lsGet('cdp_sala') ? 'block' : 'none'
   document.getElementById('preTitle')!.textContent = `${cat.icon} ${cat.nombre} — Nivel ${G.nivel}`
   document.getElementById('preDef')!.innerHTML = `<strong>Definición:</strong> ${cat.def}`
   document.getElementById('preEjs')!.innerHTML =

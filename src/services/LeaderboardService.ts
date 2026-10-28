@@ -1,5 +1,6 @@
 import { ClientResponseError } from 'pocketbase'
 import { pb, getHostKeyId, setSalaContexto } from '../lib/pocketbase'
+import type { RegistroErrores } from '../game/panelDocente'
 import type { GameRecord } from '../types'
 import { withRetry } from '../utils/network'
 import { lsGet, lsSet } from '../utils/storage'
@@ -215,21 +216,95 @@ export async function fetchMisSalas(): Promise<SalaInfo[]> {
   }
 }
 
+/**
+ * Borra los puntajes y los errores de una sala y VERIFICA que no quedó nada.
+ *
+ * Antes listaba con la cabecera `x-sala-code` del último ranking que se había
+ * mirado, no la de esta sala: la regla de lectura devolvía una lista vacía, el
+ * `Promise.all([])` daba `true` y el cartel decía «Scores eliminados» con los
+ * datos de los chicos todavía en el servidor. Ahora se fija el contexto de esta
+ * sala y se vuelve a contar.
+ */
+async function borrarContenidoDeSala(code: string): Promise<boolean> {
+  setSalaContexto(code)
+  const filtro = pb.filter('sala_code = {:code}', { code })
+  const borrarColeccion = async (col: string, tolerarAusente: boolean): Promise<number> => {
+    try {
+      const filas = await pb.collection(col).getFullList({ filter: filtro, fields: 'id' })
+      await Promise.all(filas.map(f => pb.collection(col).delete(f.id)))
+      const quedan = await pb.collection(col).getList(1, 1, { filter: filtro, fields: 'id' })
+      return quedan.totalItems
+    } catch (e) {
+      // cdp_errores puede no existir todavía en el servidor (migración sin aplicar).
+      if (tolerarAusente && e instanceof ClientResponseError && e.status === 404) return 0
+      throw e
+    }
+  }
+  const quedanScores = await borrarColeccion('cdp_scores', false)
+  const quedanErrores = await borrarColeccion('cdp_errores', true)
+  return quedanScores === 0 && quedanErrores === 0
+}
+
 export async function limpiarScoresSala(code: string): Promise<boolean> {
   try {
     // Verify ownership first
     await pb.collection('cdp_salas').getFirstListItem(
       await filtroPropiedad(pb.filter('code = {:code}', { code }))
     )
-    // PocketBase has no bulk delete by filter — list IDs then delete each
-    const scores = await pb.collection('cdp_scores').getFullList({
-      filter: pb.filter('sala_code = {:code}', { code }),
-      fields: 'id',
-    })
-    await Promise.all(scores.map(s => pb.collection('cdp_scores').delete(s.id)))
-    return true
+    return await borrarContenidoDeSala(code)
   } catch (_) {
     return false
+  }
+}
+
+/**
+ * Publica qué palabras le salieron mal al alumno en esta partida, para el panel
+ * del docente. Solo con sala, y también cuando no hubo medalla: justo esos
+ * intentos son los que dicen quién se atascó. Nunca molesta al alumno: si falla
+ * (o la colección todavía no existe), calla.
+ */
+export async function postErrores(
+  p: { cat: string; nivel: number; cazadas: number; erradas: number },
+  fallos: Record<string, number>, jugador: string, salaCode: string,
+): Promise<void> {
+  if (!salaCode) return
+  const limpio: Record<string, number> = {}
+  for (const [w, n] of Object.entries(fallos).slice(0, 40)) {
+    if (w.length > 0 && w.length <= 24) limpio[w] = Math.max(1, Math.min(99, Math.floor(n)))
+  }
+  try {
+    await pb.collection('cdp_errores').create({
+      sala_code: salaCode.toUpperCase(),
+      jugador,
+      cat: p.cat,
+      nivel: p.nivel,
+      cazadas: p.cazadas,
+      erradas: p.erradas,
+      fallos: limpio,
+    })
+  } catch (_) { /* best-effort */ }
+}
+
+/** Solo el dueño de la sala puede leerlos (lo exige la regla del servidor). */
+export async function fetchErroresSala(salaCode: string): Promise<RegistroErrores[] | null> {
+  try {
+    setSalaContexto(salaCode)
+    const res = await pb.collection('cdp_errores').getList(1, 500, {
+      filter: pb.filter('sala_code = {:code}', { code: salaCode }),
+      sort: '-created',
+      fields: 'jugador,cat,nivel,cazadas,erradas,fallos',
+    })
+    return res.items.map(r => ({
+      jugador: String(r['jugador'] ?? ''),
+      cat: String(r['cat'] ?? ''),
+      nivel: Number(r['nivel']) || 0,
+      cazadas: Number(r['cazadas']) || 0,
+      erradas: Number(r['erradas']) || 0,
+      fallos: (typeof r['fallos'] === 'object' && r['fallos'] !== null && !Array.isArray(r['fallos']))
+        ? r['fallos'] as Record<string, number> : {},
+    }))
+  } catch (_) {
+    return null   // sin conexión, sin permiso o la colección no existe
   }
 }
 
@@ -250,6 +325,9 @@ export async function eliminarSala(code: string): Promise<boolean> {
     const sala = await pb.collection('cdp_salas').getFirstListItem(
       await filtroPropiedad(pb.filter('code = {:code}', { code }))
     )
+    // Primero el contenido: con la sala borrada, las reglas ya no dejan al
+    // docente tocar los puntajes y quedan huérfanos para siempre (SEG-13).
+    if (!(await borrarContenidoDeSala(code))) return false
     await pb.collection('cdp_salas').delete(sala.id)
     return true
   } catch (_) {

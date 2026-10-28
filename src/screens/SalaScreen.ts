@@ -5,6 +5,7 @@ import { tieneClaveDocente, crearClaveDocente, guardarClaveDocente } from '../li
 import { mostrarRanking } from './RankingScreen'
 import { lsGet, lsSet, lsRemove } from '../utils/storage'
 import { escapeHtml } from '../utils'
+import { mostrarResultadosSala } from './ResultadosSalaScreen'
 
 const SALTO = String.fromCharCode(10)
 const SALA_KEY = 'cdp_sala'
@@ -221,6 +222,7 @@ async function loadMisSalas(): Promise<void> {
   // Wire up buttons
   salas.forEach(s => {
     document.getElementById(`btnVerSala_${s.code}`)?.addEventListener('click', () => abrirRankingSala(s.code))
+    document.getElementById(`btnResultadosSala_${s.code}`)?.addEventListener('click', () => mostrarResultadosSala(s.code, s.nombre))
     document.getElementById(`btnLimpiarSala_${s.code}`)?.addEventListener('click', () => handleLimpiar(s.code, s.nombre))
     document.getElementById(`btnDesactivarSala_${s.code}`)?.addEventListener('click', () => handleDesactivar(s.code, s.nombre))
     document.getElementById(`btnEliminarSala_${s.code}`)?.addEventListener('click', () => handleEliminar(s.code, s.nombre))
@@ -243,6 +245,7 @@ function renderSalaDocente(s: SalaInfo): string {
       <div class="sala-docente-fecha">Creada: ${fecha}</div>
       <div class="sala-docente-btns">
         <button class="btn btn-outline btn-xs" id="btnVerSala_${escapeHtml(s.code)}">🏆 Ver ranking</button>
+        <button class="btn btn-outline btn-xs" id="btnResultadosSala_${escapeHtml(s.code)}">📊 Resultados</button>
         <button class="btn btn-outline btn-xs" id="btnLimpiarSala_${escapeHtml(s.code)}" style="color:#f59e0b;border-color:#f59e0b55">🗑 Limpiar scores</button>
         ${s.activa ? `<button class="btn btn-outline btn-xs" id="btnDesactivarSala_${escapeHtml(s.code)}" style="color:#ef4444;border-color:#ef444455">✖ Desactivar</button>` : ''}
         <button class="btn btn-outline btn-xs" id="btnEliminarSala_${escapeHtml(s.code)}" style="color:#ef4444;border-color:#ef444455;margin-top:.25rem">🗑️ Eliminar sala</button>

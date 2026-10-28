@@ -21,6 +21,7 @@ import { sonidoBtn } from './audio/AudioEngine'
 import { initDialog } from './ui/Dialog'
 import { initInfoScreen } from './screens/InfoScreen'
 import { initSalaScreen } from './screens/SalaScreen'
+import { initResultadosSalaScreen } from './screens/ResultadosSalaScreen'
 import { initDuelMenuScreen } from './screens/DuelMenuScreen'
 import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
 import { initDuelGameScreen } from './screens/DuelGameScreen'
@@ -45,6 +46,7 @@ initResultScreen()
 initAchievementsScreen()
 initRankingScreen()
 initSalaScreen()
+initResultadosSalaScreen()
 initDuelMenuScreen()
 initDuelLobbyScreen()
 initDuelGameScreen()

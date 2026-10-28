@@ -61,6 +61,9 @@
     <h2 id="preTitle">Sustantivos — Nivel 1</h2>
     <div class="definicion" id="preDef"></div>
     <div class="ejemplos-lista" id="preEjs"></div>
+    <p id="avisoDocente" class="sala-hint" style="display:none;margin:.2rem 0 .6rem">
+      👀 Tu docente ve en qué palabras te equivocás, para ayudarte.
+    </p>
     <div class="distractor-warn">
       ⚠️ <strong>¡Cuidado!</strong> Caerán también palabras de otras categorías.
       Si las cazás, ¡perdés puntos! Leé bien cada palabra antes de hacer clic.
@@ -165,6 +168,16 @@
     </table></div>
   </div>
   <button class="back-btn" id="backFromRanking">← Volver al Menú</button>
+</div>
+
+<!-- ═══════════════════════════════ RESULTADOS DE LA SALA (docente) ═══════════════════════════════ -->
+<div id="resultadosSalaScreen" class="screen">
+  <h1 class="screen-title">📊 Resultados de la sala</h1>
+  <div class="card" style="max-width:720px;width:100%">
+    <p class="sala-hint" id="rsSub"></p>
+    <div id="rsContenido"></div>
+  </div>
+  <button class="back-btn" id="backFromResultadosSala">← Volver a Mi Sala</button>
 </div>
 
 <!-- ═══════════════════════════════ INFO DIDÁCTICA ═══════════════════════════════ -->

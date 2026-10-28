@@ -4,7 +4,7 @@ import { iniciarMusica, detenerMusica } from '../audio/AudioEngine'
 export type ScreenId =
   | 'menuPrincipal' | 'seleccionCategoria' | 'preNivel'
   | 'gameScreen' | 'resultadoScreen' | 'medallasScreen'
-  | 'rankingScreen' | 'infoScreen' | 'salaScreen'
+  | 'rankingScreen' | 'infoScreen' | 'salaScreen' | 'resultadosSalaScreen'
   | 'duelMenuScreen' | 'duelLobbyScreen' | 'duelGameScreen' | 'duelResultScreen'
 
 let _pending: ScreenId | null = null

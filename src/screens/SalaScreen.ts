@@ -162,10 +162,10 @@ async function handleCrear(): Promise<void> {
 
   if (!code || code.length < 6) {
     await showAlert([
-      'El codigo debe tener al menos 6 caracteres.',
+      'El código debe tener al menos 6 caracteres.',
       '',
       'Es lo que protege los puntajes de tu sala: uno corto lo puede adivinar',
-      'cualquiera. Usa el boton de generar si no queres pensarlo.',
+      'cualquiera. Usá el botón de generar si no querés pensarlo.',
     ].join(SALTO))
     return
   }
@@ -347,23 +347,23 @@ async function asegurarClaveDocente(): Promise<boolean> {
     'Sirve para manejar tus salas: desactivarlas, borrarlas y limpiar sus puntajes.',
     'Se pide una sola vez en este dispositivo.',
     '',
-    'Si ya tenes una de otro dispositivo, pegala aca.',
-    'Si es tu primera vez, dejalo VACIO y te genero una.',
+    'Si ya tenés una de otro dispositivo, pegala acá.',
+    'Si es tu primera vez, dejalo VACÍO y te genero una.',
   ].join(SALTO))
   if (existente === null) return false
 
   if (existente.trim()) {
     const id = window.prompt([
-      'Codigo de la clave',
+      'Código de la clave',
       '',
-      'Es el codigo corto que se mostro junto a la clave.',
+      'Es el código corto que se mostró junto a la clave.',
     ].join(SALTO))
     if (!id || !id.trim()) return false
     if (!guardarClaveDocente(existente.trim(), id.trim())) {
       await showAlert([
         'No se pudo guardar la clave en este navegador.',
         '',
-        'Suele pasar en modo incognito. Proba en una ventana normal.',
+        'Suele pasar en modo incógnito. Probá en una ventana normal.',
       ].join(SALTO))
       return false
     }
@@ -374,7 +374,7 @@ async function asegurarClaveDocente(): Promise<boolean> {
   try {
     creada = await crearClaveDocente()
   } catch {
-    await showAlert('No se pudo generar la clave. Verifica tu conexion.')
+    await showAlert('No se pudo generar la clave. Verificá tu conexión.')
     return false
   }
 
@@ -382,14 +382,14 @@ async function asegurarClaveDocente(): Promise<boolean> {
     'Esta es tu clave de docente. GUARDALA.',
     '',
     'Clave:  ' + creada.clave,
-    'Codigo: ' + creada.id,
+    'Código: ' + creada.id,
     '',
     'La vas a necesitar para manejar tus salas desde otro dispositivo.',
     'No se puede recuperar: ni el servidor la puede volver a mostrar.',
     '',
     creada.guardada
-      ? 'Ya quedo guardada en este dispositivo.'
-      : 'ATENCION: no se pudo guardar en este navegador. Anotala si o si.',
+      ? 'Ya quedó guardada en este dispositivo.'
+      : 'ATENCIÓN: no se pudo guardar en este navegador. Anotala sí o sí.',
   ].join(SALTO))
   return true
 }

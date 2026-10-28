@@ -2,7 +2,7 @@ import { cargarLayoutStickers, guardarLayoutStickers } from '../storage/GameStor
 
 const STICKERS_LIT = ['📖','✏️','📝','🖊️','📚','🔤','📜','🖋️','🎭','📕','📗','📘','💡','🌟','⭐','🎓','🏅','🔡','💬','🗣️','🖍️','🔖','📃','🃏','🎪']
 const FRASES_MOTIVADORAS = [
-  '¡Sos un crack!','¡Sigue así!','¡Imparable!','¡Gran cazador!',
+  '¡Sos un crack!','¡Seguí así!','¡Imparable!','¡Gran cazador!',
   '¡Maestro en acción!','¡Lingüista nato!','¡Combo poder!','¡Palabras al poder!',
   '¡Leyenda viva!','¡100% cazador!','¡Sin parar!','¡El mejor!',
   '¡Imbatible!','¡Top cazador!','¡Genio gramatical!',

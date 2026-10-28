@@ -3,9 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY src ./src
-COPY tsconfig.json ./
-# Los tests viven en src/__tests__ y no viajan a la imagen.
-RUN npx tsc && rm -rf dist/__tests__
+COPY tsconfig*.json ./
+# Los tests viven en src/__tests__ y no se compilan en la imagen (tsconfig.build.json).
+RUN npx tsc -p tsconfig.build.json
 
 FROM node:20-alpine
 WORKDIR /app

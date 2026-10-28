@@ -19,4 +19,6 @@ export const G: GameState = {
   racha: 0,
   comboNivel: 0,
   combosTotalesPartida: 0,
+  practica: false,
+  fallosPartida: {},
 }

@@ -11,6 +11,7 @@ export const LOGROS_DEF: Achievement[] = [
   { id: 8,  e: '🌟', n: 'Todas las Letras',        d: 'Completar todos los niveles disponibles' },
   { id: 9,  e: '✨', n: 'Sin Errores',             d: '3 niveles seguidos con ≥95% de precisión' },
   { id: 10, e: '🎯', n: 'Campeón',                 d: 'Obtener ORO en todos los niveles' },
+  { id: 11, e: '🔁', n: 'Repasador',               d: 'Dominar 10 palabras que habías fallado (dejarlas pasar 3 veces seguidas)' },
 ]
 
 export const TITULOS: TitleDef[] = [

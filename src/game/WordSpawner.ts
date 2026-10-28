@@ -4,6 +4,7 @@ import { shuffleArr } from '../utils'
 import { animarCaida } from './WordPhysics'
 import { puntosPorAcierto } from './reglas'
 import { distractoresParaNivel, textoVisible } from './distractores'
+import { priorizarDistractores } from './sesionRepaso'
 
 type OnClickFn = (el: HTMLElement) => void
 let _onClick: OnClickFn = () => {}
@@ -40,7 +41,9 @@ function generarOlaPalabras(): void {
   const cantidad = nivel === 1 ? 3 : nivel === 2 ? 5 : 7
 
   const okPool = cat.ok.slice()
-  const malPool = distractoresParaNivel(cat.mal, cat.malCerca, nivel)
+  const numMalPrevisto = cantidad - Math.round(cantidad * pcCorr)
+  // Los que el alumno tocó mal antes vuelven primero (repaso espaciado).
+  const malPool = priorizarDistractores(G.cat!, distractoresParaNivel(cat.mal, cat.malCerca, nivel), Math.max(1, Math.ceil(numMalPrevisto * 0.5)))
   shuffleArr(okPool)
 
   const numCorr = Math.round(cantidad * pcCorr)
@@ -70,6 +73,7 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   // Sin ¡ ni !: todas las interjecciones los llevaban y ninguna otra palabra,
   // así que se acertaba por la forma sin entender la categoría.
   el.textContent = textoVisible(texto)
+  el.dataset.palabra = texto
 
   const size = 12 + Math.random() * 20
   el.style.fontSize = size + 'px'

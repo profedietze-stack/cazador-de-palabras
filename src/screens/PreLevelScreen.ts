@@ -16,13 +16,18 @@ export function mostrarPreNivel(): void {
 }
 
 export function initPreLevelScreen(): void {
-  document.getElementById('btnEntendido')!.addEventListener('click', async () => {
+  const empezar = async (practica: boolean): Promise<void> => {
     if (G.jugador.trim().length < 2) {
       await showAlert('Ingresá tu nombre (mínimo 2 caracteres) antes de jugar.')
       showModal()
       return
     }
+    G.practica = practica
     mostrar('gameScreen')
     iniciarJuego()
-  })
+  }
+  document.getElementById('btnEntendido')!.addEventListener('click', () => empezar(false))
+  // Práctica: sin reloj, sin objetivo, sin medalla y con la caída lenta. Para
+  // quien lee despacio o quiere entender antes de competir.
+  document.getElementById('btnPractica')!.addEventListener('click', () => empezar(true))
 }

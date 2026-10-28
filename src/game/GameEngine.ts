@@ -8,12 +8,31 @@ import { programarPalabras, detenerWordSpawner, setWordClickHandler, esPalabraCo
 import { checkLogros } from './ScoreSystem'
 import { showBanner } from '../ui/Banner'
 import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
+import { explicarError } from './porQue'
+import { cargarRepasoJugador, guardarRepaso, falloEnRepaso, aciertoEnRepaso } from './sesionRepaso'
+import { setAlSalirSinTocar } from './WordPhysics'
 
 // callbacks set by screens
 let _onGameEnd: ((record: GameRecord, logros: ReturnType<typeof checkLogros>) => void) | null = null
 
 export function setOnGameEnd(fn: typeof _onGameEnd): void {
   _onGameEnd = fn
+}
+
+let _onPracticaEnd: (() => void) | null = null
+export function setOnPracticaEnd(fn: typeof _onPracticaEnd): void {
+  _onPracticaEnd = fn
+}
+
+let porQueTimer: ReturnType<typeof setTimeout> | null = null
+/** Explicación no bloqueante de por qué la palabra tocada no era de la categoría. */
+function mostrarPorQue(texto: string): void {
+  const el = document.getElementById('porQue')
+  if (!el) return
+  el.textContent = texto
+  el.classList.add('visible')
+  if (porQueTimer) clearTimeout(porQueTimer)
+  porQueTimer = setTimeout(() => el.classList.remove('visible'), 4500)
 }
 
 const EMOJIS_LITERARIOS = ['📖','✏️','📝','🖊️','📚','🔤','🅰️','💬','🗣️','📜','🖋️','🎭','📕','📗','📘','🔡','💡','🌟','⭐','✨']
@@ -34,12 +53,22 @@ export function iniciarJuego(): void {
   G.cazadas = 0; G.erradas = 0; G.activo = true; G.pausado = false
   G.racha = 0; G.comboNivel = 0; G.combosTotalesPartida = 0
   G.tiempoInicioNivel = Date.now()
+  G.fallosPartida = {}
+  // La velocidad se calcula acá y no solo al elegir el nivel: la práctica la
+  // baja y al volver a una partida normal tiene que recuperarse sola.
+  G.velocidadBase = G.practica ? 0.6 : 1 + (G.nivel - 1) * 0.5
+  cargarRepasoJugador()
+  setAlSalirSinTocar(el => {
+    // Un distractor que cayó sin que lo tocaran es un acierto de repaso.
+    if (G.activo && !esPalabraCorrecta(el) && el.dataset.palabra && G.cat) aciertoEnRepaso(G.cat, el.dataset.palabra)
+  })
+  document.getElementById('porQue')?.classList.remove('visible')
 
   const cat = CATS[G.cat!]
   document.getElementById('hudPts')!.textContent = '0'
-  document.getElementById('hudObj')!.textContent = String(G.obj)
-  document.getElementById('hudCat')!.textContent = cat.nombre
-  document.getElementById('hudTime')!.textContent = '3:00'
+  document.getElementById('hudObj')!.textContent = G.practica ? '—' : String(G.obj)
+  document.getElementById('hudCat')!.textContent = cat.nombre + (G.practica ? ' · práctica' : '')
+  document.getElementById('hudTime')!.textContent = G.practica ? '∞' : '3:00'
   document.getElementById('tiempoBarFill')!.style.width = '100%'
 
   document.getElementById('gameArea')!.querySelectorAll('.palabra').forEach(p => p.remove())
@@ -56,6 +85,7 @@ export function terminarJuego(): void {
   if (G.intervaloTiempo) clearInterval(G.intervaloTiempo)
   detenerWordSpawner()
   document.getElementById('gameArea')!.querySelectorAll('.palabra').forEach(p => p.remove())
+  guardarRepaso()
 
   const precision = calcularPrecision(G.cazadas, G.erradas)
   const tiempoUsado = Math.round((Date.now() - G.tiempoInicioNivel!) / 1000)
@@ -91,11 +121,21 @@ export function detenerJuego(): void {
   if (G.intervaloTiempo) clearInterval(G.intervaloTiempo)
   detenerWordSpawner()
   document.getElementById('gameArea')!.querySelectorAll('.palabra').forEach(p => p.remove())
+  // Se guarda también al salir a mitad de partida: en el aula cerrar antes de la
+  // meta es lo normal, no lo raro.
+  guardarRepaso()
   if (document.fullscreenElement) document.exitFullscreen()
+}
+
+/** Fin de una práctica: no hay medalla ni ranking, solo el resumen de lo que hay que repasar. */
+export function terminarPractica(): void {
+  detenerJuego()
+  _onPracticaEnd?.()
 }
 
 function iniciarTimer(): void {
   if (G.intervaloTiempo) clearInterval(G.intervaloTiempo)
+  if (G.practica) return   // sin reloj: sin presión para quien lee despacio
   const totalInicial = 180
   G.intervaloTiempo = setInterval(() => {
     if (G.pausado || !G.activo) return
@@ -144,13 +184,19 @@ function cazarPalabra(el: HTMLElement): void {
       mostrarStickersJuego(cx, cy, G.comboNivel)
     }
     document.getElementById('hudPts')!.textContent = String(G.pts)
-    if (G.pts >= G.obj) terminarJuego()
+    if (!G.practica && G.pts >= G.obj) terminarJuego()
   } else {
     const resta = restaPorError(G.nivel)
     G.pts = Math.max(0, G.pts - resta); G.erradas++
     sonidoMal()
     el.classList.add('hit-mal')
     mostrarPuntosFlotantes('-' + resta, cx, cy, '#ef4444')
+    const palabra = el.dataset.palabra
+    if (palabra && G.cat) {
+      G.fallosPartida[palabra] = (G.fallosPartida[palabra] ?? 0) + 1
+      falloEnRepaso(G.cat, palabra)
+      mostrarPorQue(explicarError(palabra, G.cat))
+    }
     actualizarCombo(false)
     document.getElementById('hudPts')!.textContent = String(G.pts)
   }

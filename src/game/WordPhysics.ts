@@ -1,5 +1,10 @@
 import { G } from './state'
 
+let _alSalirSinTocar: ((el: HTMLElement) => void) | null = null
+export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
+  _alSalirSinTocar = fn
+}
+
 export function animarCaida(el: HTMLElement, size: number): void {
   const area = document.getElementById('gameArea')!
   const areaHeight = area.clientHeight
@@ -25,7 +30,11 @@ export function animarCaida(el: HTMLElement, size: number): void {
       el.style.transform = `rotate(${osc * rotDir}deg)`
     }
 
-    if (y > areaHeight + 20) { el.remove(); return }
+    if (y > areaHeight + 20) {
+      if (el.dataset.cazada !== '1') _alSalirSinTocar?.(el)
+      el.remove()
+      return
+    }
     ;(el as any)._rafId = requestAnimationFrame(raf)
   }
   ;(el as any)._rafId = requestAnimationFrame(raf)

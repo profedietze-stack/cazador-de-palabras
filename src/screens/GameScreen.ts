@@ -1,13 +1,15 @@
 import { G } from '../game/state'
 import { mostrar } from './ScreenManager'
 import { mostrarSeleccionCategoria } from './CategoryScreen'
-import { detenerJuego } from '../game/GameEngine'
+import { detenerJuego, terminarPractica } from '../game/GameEngine'
 import { iniciarMusica, detenerMusica } from '../audio/AudioEngine'
 import { resetCombo } from '../game/ComboSystem'
 import { showConfirm } from '../ui/Dialog'
 
 export function initGameScreen(): void {
   document.getElementById('btnVolver')!.addEventListener('click', async () => {
+    // Terminar una práctica no pierde nada: se llega al resumen de repaso.
+    if (G.practica) { terminarPractica(); return }
     const ok = await showConfirm('¿Salir del nivel? El progreso actual no se guardará.')
     if (!ok) return
     detenerJuego()

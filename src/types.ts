@@ -79,4 +79,8 @@ export interface GameState {
   racha: number
   comboNivel: number
   combosTotalesPartida: number
+  /** Modo práctica: sin reloj, sin objetivo, sin medalla, caída lenta. */
+  practica: boolean
+  /** Palabras que se tocaron mal en esta partida y cuántas veces. */
+  fallosPartida: Record<string, number>
 }

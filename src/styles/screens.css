@@ -497,3 +497,7 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .rk-fila-sospechosa{background:rgba(245,158,11,.08)}
 .rk-sospechoso{cursor:help;opacity:.85;font-size:.9em}
 .sg-aviso{margin-top:.6rem;font-size:.85rem;line-height:1.35;color:var(--text-soft)}
+.por-que{position:absolute;left:50%;bottom:.8rem;transform:translate(-50%,10px);max-width:min(92%,34rem);padding:.6rem .9rem;border-radius:12px;background:#1f2937;color:#fff;font-size:.9rem;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+.por-que.visible{opacity:1;transform:translate(-50%,0)}
+.rep-lista{margin:.4rem 0 .6rem;text-align:left;font-size:.85rem;line-height:1.35}
+.rep-lista li{margin:.25rem 0}

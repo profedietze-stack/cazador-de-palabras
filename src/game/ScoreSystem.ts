@@ -2,6 +2,8 @@ import type { GameRecord, AchievementRecord } from '../types'
 import { LOGROS_DEF, TITULOS } from '../data/achievements'
 import { CATS } from '../data/categories'
 import { cargarDatos, getLogros, setLogros } from '../storage/GameStorage'
+import { repasoActual } from './sesionRepaso'
+import { cantidadDominadas } from './repaso'
 
 export function checkLogros(p: GameRecord): typeof LOGROS_DEF {
   const data = cargarDatos()
@@ -52,6 +54,8 @@ export function checkLogros(p: GameRecord): typeof LOGROS_DEF {
     [1, 2, 3].every(nv => partidas.find(x => x.cat === cat && x.nivel === nv && x.medalla === 'ORO'))
   )
   if (todosOro) add(10)
+
+  if (cantidadDominadas(repasoActual()) >= 10) add(11)
 
   setLogros(logros)
   return nuevos

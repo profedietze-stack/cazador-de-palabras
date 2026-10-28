@@ -5,16 +5,19 @@ import { CATS } from '../data/categories'
 import { mostrar } from './ScreenManager'
 import { mostrarSeleccionCategoria, seleccionarNivel } from './CategoryScreen'
 import { mostrarPreNivel } from './PreLevelScreen'
-import { iniciarJuego, setOnGameEnd } from '../game/GameEngine'
+import { iniciarJuego, setOnGameEnd, setOnPracticaEnd } from '../game/GameEngine'
 import { calcularTitulo } from '../game/ScoreSystem'
 import { cargarDatos, guardarDatos } from '../storage/GameStorage'
 import { showAlert } from '../ui/Dialog'
 import { postScore } from '../services/LeaderboardService'
 import { lsGet } from '../utils/storage'
-import { motivoSinMedalla } from '../game/reglas'
+import { motivoSinMedalla, calcularPrecision } from '../game/reglas'
+import { explicarError } from '../game/porQue'
+import { escapeHtml } from '../utils'
 
 export function initResultScreen(): void {
   setOnGameEnd(mostrarResultado)
+  setOnPracticaEnd(mostrarResumenPractica)
 
   document.getElementById('btnResMenu')!.addEventListener('click', () => mostrar('menuPrincipal'))
 
@@ -22,6 +25,7 @@ export function initResultScreen(): void {
     G.pts = 0; G.tiempo = 180; G.tiempoExtra = false
     G.cazadas = 0; G.erradas = 0
     G.racha = 0; G.comboNivel = 0; G.combosTotalesPartida = 0
+    // Reintentar conserva el modo: una práctica vuelve a ser práctica.
     mostrar('gameScreen')
     iniciarJuego()
   })
@@ -59,7 +63,35 @@ function animarPuntos(target: number, el: HTMLElement): void {
   requestAnimationFrame(tick)
 }
 
+/** «Palabras para repasar»: las que más se tocaron mal en esta partida, con el porqué. */
+function pintarRepaso(): void {
+  const cont = document.getElementById('resRepaso')!
+  const fallos = Object.entries(G.fallosPartida).sort((a, b) => b[1] - a[1]).slice(0, 5)
+  if (fallos.length === 0 || !G.cat) { cont.style.display = 'none'; cont.innerHTML = ''; return }
+  cont.style.display = 'block'
+  cont.innerHTML = '<strong>📝 Palabras para repasar</strong><ul class="rep-lista">' +
+    fallos.map(([w]) => `<li>${escapeHtml(explicarError(w, G.cat!))}</li>`).join('') +
+    '</ul><small>Van a volver en tus próximas partidas de esta categoría hasta que las dejes pasar bien.</small>'
+}
+
+function mostrarResumenPractica(): void {
+  mostrar('resultadoScreen')
+  document.getElementById('resMedalla')!.textContent = '🧘'
+  document.getElementById('resTitle')!.textContent = 'Práctica terminada'
+  document.getElementById('resPts')!.textContent = `${G.cazadas} correctas`
+  document.getElementById('resStats')!.innerHTML = `
+    <div class="sg-row"><span>Palabras correctas:</span><strong>${G.cazadas}</strong></div>
+    <div class="sg-row"><span>Palabras incorrectas:</span><strong>${G.erradas}</strong></div>
+    <div class="sg-row"><span>Precisión:</span><strong>${calcularPrecision(G.cazadas, G.erradas)}%</strong></div>
+    <p class="sg-aviso">La práctica no da medallas ni sube al ranking: es para entender sin apuro.</p>`
+  pintarRepaso()
+  document.getElementById('resLogros')!.style.display = 'none'
+  document.getElementById('resTitulo')!.style.display = 'none'
+  document.getElementById('btnResSiguiente')!.style.display = 'none'
+}
+
 function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void {
+  document.getElementById('btnResSiguiente')!.style.display = ''
   // Publica el puntaje en el ranking del aula (best-effort, sin bloquear)
   if (G.jugador && p.medalla) {
     const salaCode = lsGet('cdp_sala') ?? undefined
@@ -84,6 +116,8 @@ function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void 
     <div class="sg-row"><span>Tiempo:</span><strong>${m}:${s.toString().padStart(2, '0')}</strong></div>
     ${sinPrecision ? `<p class="sg-aviso">${sinPrecision}</p>` : ''}
   `
+
+  pintarRepaso()
 
   const lr = document.getElementById('resLogros')!
   if (logrosNuevos.length > 0) {

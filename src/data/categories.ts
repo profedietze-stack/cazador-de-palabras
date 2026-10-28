@@ -6,7 +6,7 @@ export const CATS: Record<CategoryKey, Category> = {
     def: 'Palabras que nombran personas, animales, cosas o conceptos abstractos.',
     ejem: ['casa', 'gato', 'libertad', 'niño', 'planeta', 'música', 'ciudad', 'río'],
     ok: ['casa','gato','libertad','niño','planeta','música','árbol','mar','libro','amor','tiempo','escuela','perro','puerta','ventana','mesa','silla','cama','ciudad','río','montaña','flor','cielo','nube','viento','fuego','agua','tierra','sol','luna','camino','jardín','piedra','barco','puente','pájaro','mariposa','estrella','serpiente','tigre','elefante','ballena','delfín','hormiga','abeja','bosque','desierto','volcán','tormenta','lluvia','nieve','hoja','semilla','raíz','fruto','sombra','luz','color','sonido','silencio','memoria','sueño','esperanza','verdad','miedo','alegría','tristeza'],
-    mal: ['grande','pequeño','rojo','correr','rápido','aquí','y','pero','hermoso','lentamente','el','mi','tu','donde','como','porque','siendo','aunque','feliz','azul','correr','saltar','brillante','oscuro','siempre','nunca'],
+    mal: ['grande','pequeño','correr','rápido','aquí','y','pero','hermoso','lentamente','el','mi','tu','donde','como','porque','siendo','aunque','feliz','saltar','siempre','nunca'],
   },
   adjetivos: {
     nombre: 'Adjetivos', icon: '🎨',
@@ -19,8 +19,8 @@ export const CATS: Record<CategoryKey, Category> = {
     nombre: 'Verbos', icon: '⚡',
     def: 'Palabras que expresan acciones, estados o procesos en el tiempo.',
     ejem: ['correr', 'comer', 'ser', 'pensar', 'saltar', 'leer'],
-    ok: ['correr','comer','ser','pensar','saltar','leer','escribir','hablar','escuchar','mirar','jugar','dormir','vivir','morir','nacer','existir','parecer','entrar','salir','comprar','vender','amar','odiar','crear','destruir','abrir','cerrar','seguir','volar','nadar','cantar','bailar','reír','llorar','gritar','susurrar','caminar','trepar','caer','subir','bajar','empujar','jalar','romper','construir','pintar','dibujar','cocinar','limpiar','estudiar','enseñar','aprender','recordar','olvidar','imaginar','soñar','sentir','tocar','oler','probar','ver','elegir','decidir','comenzar','terminar','ayudar','luchar'],
-    mal: ['casa','grande','rápido','rápidamente','el','mi','y','pero','aquí','cuando','hermoso','triste','libertad','yo','tú','en','de','con','aunque','porque'],
+    ok: ['correr','comer','ser','pensar','saltar','leer','escribir','hablar','escuchar','mirar','jugar','dormir','vivir','morir','nacer','existir','parecer','entrar','salir','comprar','vender','amar','odiar','crear','destruir','abrir','cerrar','seguir','volar','nadar','cantar','bailar','reír','llorar','gritar','susurrar','caminar','trepar','caer','subir','bajar','empujar','tirar','romper','construir','pintar','dibujar','cocinar','limpiar','estudiar','enseñar','aprender','recordar','olvidar','imaginar','soñar','sentir','tocar','oler','probar','ver','elegir','decidir','comenzar','terminar','ayudar','luchar'],
+    mal: ['grande','rápido','rápidamente','el','mi','y','pero','aquí','cuando','hermoso','triste','libertad','yo','tú','en','de','con','aunque','porque'],
   },
   adverbios: {
     nombre: 'Adverbios', icon: '📍',
@@ -34,14 +34,14 @@ export const CATS: Record<CategoryKey, Category> = {
     def: 'Palabras que preceden al sustantivo e indican si es definido/indefinido, género y número.',
     ejem: ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     ok: ['el','la','los','las','un','una','unos','unas'],
-    mal: ['casa','gato','grande','correr','rápidamente','aquí','y','pero','mi','tu','su','porque','hermoso','yo','tú','él','en','de','con','aunque','siendo','este','ese','aquel','siempre','nunca','correr','escribir','feliz','triste'],
+    mal: ['casa','gato','grande','correr','rápidamente','aquí','y','pero','mi','tu','su','porque','hermoso','yo','tú','él','en','de','con','aunque','siendo','este','ese','aquel','siempre','nunca','escribir','feliz','triste'],
   },
   pronombres: {
     nombre: 'Pronombres', icon: '👤',
     def: 'Palabras que reemplazan al sustantivo para evitar repeticiones en la oración.',
     ejem: ['yo', 'tú', 'él', 'ella', 'nosotros', 'ellos'],
-    ok: ['yo','tú','él','ella','ello','nosotros','vosotros','ellos','ellas','me','te','se','nos','os','les','mi','tu','su','nuestro','vuestro','quien','que','cual','esto','eso','aquello','alguien','nadie','algo','nada','cualquiera','mismo','propio','otro','todo','ambos','cada','varios','pocos','muchos','ninguno','alguno'],
-    mal: ['casa','gato','grande','correr','rápidamente','el','la','y','pero','aquí','hermoso','música','en','de','con','aunque','porque','siendo','feliz','árbol'],
+    ok: ['yo','tú','él','ella','ello','nosotros','vosotros','ellos','ellas','me','te','se','nos','os','les','quien','que','cual','esto','eso','aquello','alguien','nadie','algo','nada','cualquiera','mismo','otro','todo','ambos','varios','pocos','muchos','ninguno','alguno','vos','usted','ustedes','lo','le'],
+    mal: ['casa','gato','grande','correr','rápidamente','el','y','pero','aquí','hermoso','música','en','de','con','aunque','porque','siendo','feliz','árbol','mi','tu','su','cada'],
   },
   preposiciones: {
     nombre: 'Preposiciones', icon: '🔗',
@@ -54,7 +54,7 @@ export const CATS: Record<CategoryKey, Category> = {
     nombre: 'Conjunciones', icon: '🔀',
     def: 'Palabras que unen palabras, frases u oraciones entre sí.',
     ejem: ['y', 'o', 'pero', 'si', 'aunque', 'porque', 'sino'],
-    ok: ['y','o','pero','sino','si','aunque','porque','pues','luego','mientras','cuando','donde','como','entonces','además','tampoco','ni','ya','tanto','bien','sea','mas','que','ora','ya que','así que','con que','de modo que','a menos que','a fin de que','siempre que','a pesar de que','dado que'],
+    ok: ['y','o','pero','sino','si','aunque','porque','pues','luego','mientras','cuando','como','entonces','ni','ya','bien','mas','que','ya que','así que','conque','de modo que','a menos que','a fin de que','siempre que','a pesar de que','dado que'],
     mal: ['casa','gato','grande','correr','rápidamente','yo','el','la','en','de','hermoso','árbol','siempre','nunca','rojo','azul','siendo','libertad'],
   },
   interjecciones: {

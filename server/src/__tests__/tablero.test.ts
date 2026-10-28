@@ -87,6 +87,43 @@ describe('categoriasConocidas', () => {
   })
 })
 
+describe('ningun distractor es correcto en una categoria elegida', () => {
+  // Con varias categorias, la `mal` de una puede ser la `ok` de otra: `casa`
+  // es distractor de adjetivos y correcta en sustantivos. Si entraba como
+  // distractor, el chico la tocaba bien y el servidor le restaba puntos.
+  const pares: string[][] = []
+  for (const a of CATEGORIAS_VALIDAS) for (const b of CATEGORIAS_VALIDAS) if (a < b) pares.push([a, b])
+  const grupos = [...pares, ['sustantivos', 'adjetivos', 'verbos'], [...CATEGORIAS_VALIDAS]]
+
+  for (const cats of grupos) {
+    it(`${cats.length > 3 ? 'las 9 categorias' : cats.join(' + ')}`, () => {
+      const okTodas = new Set(cats.flatMap(c => PALABRAS[c]!.ok))
+      for (let i = 0; i < 200; i++) {
+        for (const nivel of [1, 2, 3]) {
+          const t = construirTablero(cats, nivel)!
+          const malas = t.filter(w => !w.isCorrect).map(w => w.text)
+          expect(malas.filter(w => okTodas.has(w)), `${cats.join(',')} n${nivel}`).toEqual([])
+          expect(new Set(t.map(w => w.text)).size).toBe(t.length)
+        }
+      }
+    })
+  }
+
+  it('sigue habiendo tantos distractores como pide el nivel', () => {
+    for (const cats of grupos) {
+      for (const nivel of [1, 2, 3]) {
+        const t = construirTablero(cats, nivel)!
+        // Con muchas categorias casi todo es correcto en alguna: solo quedan
+        // como distractores las palabras que no son de ninguna elegida.
+        const okTodas = new Set(cats.flatMap(c => PALABRAS[c]!.ok))
+        const disponibles = new Set(cats.flatMap(c => PALABRAS[c]!.mal).filter(w => !okTodas.has(w))).size
+        const esperado = Math.min({ 1: 8, 2: 9, 3: 10 }[nivel as 1 | 2 | 3], disponibles)
+        expect(t.filter(w => !w.isCorrect), `${cats.join(',')} n${nivel}`).toHaveLength(esperado)
+      }
+    }
+  })
+})
+
 describe('el diccionario del servidor no se desincroniza del cliente', () => {
   it('tiene las mismas categorias y las mismas palabras', () => {
     // `palabras.ts` es una copia generada de `src/data/categories.ts`. El

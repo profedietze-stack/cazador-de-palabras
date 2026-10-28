@@ -76,18 +76,32 @@ export function construirTablero(cats: readonly string[], nivel: number): DuelWo
   const porCatOk = Math.ceil(tam.ok / validas.length)
   const porCatMal = Math.ceil(tam.mal / validas.length)
 
+  // Lo que es correcto en CUALQUIER categoría elegida no puede ser distractor:
+  // `casa` está en la `mal` de adjetivos y es correcta en sustantivos, y en un
+  // duelo de sustantivos + adjetivos el chico la toca bien y el servidor le
+  // resta puntos. Se filtra contra la unión, no contra el tablero armado.
+  const okTodas = new Set(validas.flatMap(cat => PALABRAS[cat]!.ok))
+
   const todasOk: string[] = []
   const todasMal: string[] = []
   for (const cat of validas) {
     const p = PALABRAS[cat]!
     todasOk.push(...mezclar(p.ok).slice(0, porCatOk))
-    todasMal.push(...mezclar(p.mal).slice(0, porCatMal))
+    todasMal.push(...mezclar(p.mal.filter(w => !okTodas.has(w))).slice(0, porCatMal))
   }
 
   // Sin repetidos: dos categorías pueden compartir una palabra en su lista de
   // incorrectas, y dos fichas iguales en el tablero se ven como un error.
   const ok = [...new Set(mezclar(todasOk))].slice(0, tam.ok)
-  const mal = [...new Set(mezclar(todasMal))].filter(w => !ok.includes(w)).slice(0, tam.mal)
+  const malUnicas = [...new Set(todasMal)]
+  // Si los repetidos o el filtro dejaron corto el cupo, se completa con lo que
+  // sobró de las listas: el tablero conserva el tamaño que pide el nivel.
+  if (malUnicas.length < tam.mal) {
+    const resto = validas.flatMap(cat => PALABRAS[cat]!.mal)
+      .filter(w => !okTodas.has(w) && !malUnicas.includes(w))
+    malUnicas.push(...mezclar([...new Set(resto)]).slice(0, tam.mal - malUnicas.length))
+  }
+  const mal = mezclar(malUnicas).slice(0, tam.mal)
 
   const palabras = mezclar([
     ...ok.map(text => ({ text, isCorrect: true })),

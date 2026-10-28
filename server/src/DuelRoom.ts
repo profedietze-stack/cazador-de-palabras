@@ -113,7 +113,7 @@ export function catchWord(room: RoomState, socketId: string, wordId: string): Ca
   // (`GameEngine.ts`): la mitad de los puntos base, minimo 1, y el puntaje no
   // baja de cero. Sin esto tocar palabras al azar era gratis: se llegaba a las
   // correctas por descarte, sin riesgo.
-  const penalizacion = Math.max(1, Math.floor(basePoints / 2))
+  const penalizacion = basePoints
 
   let points = word.isCorrect ? basePoints : -penalizacion
   let stolenByRival = false

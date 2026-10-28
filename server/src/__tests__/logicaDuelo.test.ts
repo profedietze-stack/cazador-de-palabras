@@ -97,18 +97,18 @@ describe('poder ganado con el inventario lleno', () => {
 })
 
 describe('penalizacion por errar', () => {
-  it('errar resta la mitad de los puntos base, igual que en el juego de un jugador', () => {
+  it('errar resta lo mismo que vale acertar, igual que en el juego de un jugador', () => {
     const room = sala([palabra('0', true), palabra('1', false)])
     catchWord(room, 'sock-a', '0')                 // +10
-    const mala = catchWord(room, 'sock-a', '1')    // -5
-    expect(mala.pointsEarned).toBe(-5)
-    expect(room.players.get('A')!.score).toBe(5)
+    const mala = catchWord(room, 'sock-a', '1')    // -10
+    expect(mala.pointsEarned).toBe(-10)
+    expect(room.players.get('A')!.score).toBe(0)
   })
 
   it('en nivel 2 la resta acompaña al puntaje', () => {
-    const room = sala([palabra('0', false)], 2)    // base 20 -> resta 10
+    const room = sala([palabra('0', false)], 2)    // base 20 -> resta 20
     const mala = catchWord(room, 'sock-a', '0')
-    expect(mala.pointsEarned).toBe(-10)
+    expect(mala.pointsEarned).toBe(-20)
   })
 
   it('el puntaje nunca baja de cero', () => {
@@ -128,7 +128,7 @@ describe('penalizacion por errar', () => {
     beto.activeEffects.push({ type: 'STEAL', expiresAt: null, capturesRemaining: 1 })
 
     const mala = catchWord(room, 'sock-a', '0')
-    expect(mala.pointsEarned).toBe(-5)
+    expect(mala.pointsEarned).toBe(-10)
     expect(mala.stolenByRival).toBe(false)
     expect(beto.score).toBe(0)
     // Los dos poderes siguen intactos para la proxima captura que valga.
@@ -272,5 +272,29 @@ describe('DOBLE y ESCUDO de punta a punta (usePower + catchWord)', () => {
     usePower(room, 'sock-a', 'FREEZE')             // consume el escudo
     const segundo = usePower(room, 'sock-a', 'DECOY')
     expect(segundo.ok && segundo.blocked).toBe(false)   // ya no hay escudo
+  })
+})
+
+describe('tocar todo no es una estrategia (auditoría DID-20)', () => {
+  // Antes el tablero era 12 correctas / 8 incorrectas con resta a la mitad: tocar
+  // todo rendía 80 de 120 posibles y el duelo se ganaba por velocidad de dedo.
+  it('tocar todo el tablero rinde bastante menos que jugarlo bien, en los tres niveles', async () => {
+    const { construirTablero } = await import('../tablero')
+    for (const nivel of [1, 2, 3]) {
+      let tocarTodo = 0, perfecto = 0
+      const N = 200
+      for (let i = 0; i < N; i++) {
+        const tablero = construirTablero(['sustantivos'], nivel)!
+        const room = sala(tablero.map(w => ({ ...w, takenBy: null })), nivel)
+        for (const w of room.words) catchWord(room, 'sock-a', w.id)
+        tocarTodo += room.players.get('A')!.score
+
+        const room2 = sala(tablero.map(w => ({ ...w, takenBy: null })), nivel)
+        for (const w of room2.words.filter(x => x.isCorrect)) catchWord(room2, 'sock-a', w.id)
+        perfecto += room2.players.get('A')!.score
+      }
+      const media = tocarTodo / N, optimo = perfecto / N
+      expect(media, `nivel ${nivel}: tocar todo ${media.toFixed(0)} vs perfecto ${optimo}`).toBeLessThan(optimo * 0.4)
+    }
   })
 })

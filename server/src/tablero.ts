@@ -12,11 +12,13 @@ import { PALABRAS, CATEGORIAS_VALIDAS } from './palabras'
 // La regla general: si el cliente decide qué vale puntos, no hay defensa
 // posible. Lo único que cierra el agujero es que lo decida el servidor.
 
-// Mismos tamaños que usaba el cliente, para que la partida se sienta igual.
+// Tantas incorrectas como correctas: con la resta completa por error, tocar todo
+// el tablero rinde cero en promedio (con 12/8 rendía 80 de 120 posibles en el
+// nivel 1 y el duelo se ganaba por velocidad de dedo, no por saber).
 const TAMAÑOS: Record<number, { ok: number; mal: number }> = {
-  1: { ok: 12, mal: 8 },
-  2: { ok: 15, mal: 9 },
-  3: { ok: 18, mal: 10 },
+  1: { ok: 10, mal: 10 },
+  2: { ok: 12, mal: 12 },
+  3: { ok: 14, mal: 14 },
 }
 
 export const NIVEL_MIN = 1

@@ -7,10 +7,10 @@ import { construirTablero, construirMazoSeñuelos, categoriasConocidas, nivelVal
 import { PALABRAS, CATEGORIAS_VALIDAS } from '../palabras'
 
 describe('construirTablero', () => {
-  it('nivel 1 da 12 correctas y 8 incorrectas', () => {
+  it('nivel 1 da 10 correctas y 10 incorrectas', () => {
     const t = construirTablero(['sustantivos'], 1)!
-    expect(t.filter(w => w.isCorrect)).toHaveLength(12)
-    expect(t.filter(w => !w.isCorrect)).toHaveLength(8)
+    expect(t.filter(w => w.isCorrect)).toHaveLength(10)
+    expect(t.filter(w => !w.isCorrect)).toHaveLength(10)
   })
 
   it('el nivel 3 trae mas palabras que el 1', () => {
@@ -61,7 +61,7 @@ describe('construirTablero', () => {
 
   it('un nivel fuera de tabla no rompe: cae en el 1', () => {
     const t = construirTablero(['sustantivos'], 99)!
-    expect(t.filter(w => w.isCorrect)).toHaveLength(12)
+    expect(t.filter(w => w.isCorrect)).toHaveLength(10)
   })
 })
 
@@ -117,7 +117,7 @@ describe('ningun distractor es correcto en una categoria elegida', () => {
         // como distractores las palabras que no son de ninguna elegida.
         const okTodas = new Set(cats.flatMap(c => PALABRAS[c]!.ok))
         const disponibles = new Set(cats.flatMap(c => PALABRAS[c]!.mal).filter(w => !okTodas.has(w))).size
-        const esperado = Math.min({ 1: 8, 2: 9, 3: 10 }[nivel as 1 | 2 | 3], disponibles)
+        const esperado = Math.min({ 1: 10, 2: 12, 3: 14 }[nivel as 1 | 2 | 3], disponibles)
         expect(t.filter(w => !w.isCorrect), `${cats.join(',')} n${nivel}`).toHaveLength(esperado)
       }
     }

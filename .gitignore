@@ -11,3 +11,4 @@ dist
 *.key
 *.p12
 secrets.json
+docs-privado/

@@ -5,6 +5,7 @@ import { G } from '../game/state'
 import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
 import { lsGet } from '../utils/storage'
+import { esCodigoDuelo } from '../utils'
 import { showAlert } from '../ui/Dialog'
 import { mostrarDuelLobby } from './DuelLobbyScreen'
 import { BOT_MODE } from '../debug'
@@ -142,7 +143,7 @@ export function initDuelMenuScreen(): void {
     if (!G.jugador) { await showAlert('Ingresá tu nombre primero en el Menú principal.'); return }
     const codeInput = document.getElementById('duelCodeInput') as HTMLInputElement
     const code = codeInput.value.trim().toUpperCase()
-    if (code.length !== 4) { await showAlert('El código debe tener 4 caracteres.'); return }
+    if (!esCodigoDuelo(code)) { await showAlert('El código debe tener entre 4 y 8 letras o números (sin 0, O, 1 ni I).'); return }
     unirseBtn().disabled = true
     unirseBtn().textContent = '⏳ Conectando...'
     D.myNombre = G.jugador

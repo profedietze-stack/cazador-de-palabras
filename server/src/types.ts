@@ -37,6 +37,8 @@ export interface RoomState {
   decoyPool: string[]
   // Aula a la que se publica el resultado. Vacio = duelo suelto, sin ranking.
   salaCode: string
+  // IP de quien creo la sala (X-Real-IP), solo para limitar salas por origen.
+  creatorIp?: string
   startedAt: number | null
   timerHandle: ReturnType<typeof setTimeout> | null
   phase: 'waiting' | 'countdown' | 'playing' | 'ended'

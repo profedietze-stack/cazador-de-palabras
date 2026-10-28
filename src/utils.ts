@@ -43,3 +43,12 @@ export function shuffleArr<T>(a: T[]): void {
     a[j] = tmp
   }
 }
+
+/**
+ * ¿Tiene forma de código de duelo? Misma regla que `codigoSala` del servidor
+ * (4 a 8 caracteres del alfabeto sin 0/O/1/I). Antes el cliente exigía
+ * exactamente 4 y el servidor generaba 5: nadie podía unirse a un duelo.
+ */
+export function esCodigoDuelo(v: string): boolean {
+  return /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4,8}$/.test(v)
+}

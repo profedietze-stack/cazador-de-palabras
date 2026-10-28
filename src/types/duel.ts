@@ -4,7 +4,6 @@ export type PlayerSlot = 'A' | 'B'
 export interface DuelWord {
   id: string
   text: string
-  isCorrect: boolean
   takenBy: PlayerSlot | null
 }
 
@@ -19,7 +18,7 @@ export interface DuelConfig {
   nivel: number
   duracion: number
   nombre: string
-  words: Array<{ id: string; text: string; isCorrect: boolean }>
+  words: Array<{ id: string; text: string }>
 }
 
 export type DuelPhase = 'idle' | 'creating' | 'joining' | 'lobby' | 'countdown' | 'playing' | 'ended'

@@ -8,12 +8,14 @@ import {
 } from './DuelRoom'
 import { registerSocket, unregisterSocket, usePower } from './PowerManager'
 import { spawnBot, startBotPlay, isBotSocket } from './DebugBot'
-import { randomInt } from 'crypto'
 import {
   codigoSala, nombreJugador, categorias, codigoDeAula,
-  numeroEnRango, MIN_DURACION, MAX_DURACION,
+  numeroEnRango, MIN_DURACION, MAX_DURACION, generateCode,
 } from './validate'
 import { publicarResultado } from './ranking'
+import {
+  crearLimitadorCaptura, ipDelCliente, MAX_SALAS_POR_IP,
+} from './ritmo'
 import {
   construirTablero, construirMazoSeñuelos, categoriasConocidas, nivelValido,
 } from './tablero'
@@ -37,10 +39,37 @@ const io = new Server(httpServer, {
       .split(',').map(s => s.trim()).filter(Boolean),
     methods: ['GET', 'POST'],
   },
+  // Los mensajes legitimos pesan unos cientos de bytes. El tope por defecto
+  // (1 MB) dejaba procesar paquetes de cientos de KB.
+  maxHttpBufferSize: 16 * 1024,
 })
 
 const rooms = new Map<string, RoomState>()
 const socketRoom = new Map<string, string>()
+const limiteCaptura = crearLimitadorCaptura()
+
+/**
+ * Saca al socket de la sala en la que ya estaba, para que un mismo cliente no
+ * acumule salas (`create_duel` en bucle dejaba una sala fantasma por llamada
+ * durante 5 minutos, y con el tope global de 500 se podia dejar sin duelos a
+ * todas las aulas). Devuelve false si esta jugando: de una partida en curso no
+ * se sale creando otra.
+ */
+function liberarSalaPrevia(socket: Socket): boolean {
+  const code = socketRoom.get(socket.id)
+  if (!code) return true
+  const room = rooms.get(code)
+  if (!room) { socketRoom.delete(socket.id); return true }
+  if (room.phase === 'playing' || room.phase === 'countdown') return false
+  removePlayer(room, socket.id)
+  socket.leave(code)
+  socketRoom.delete(socket.id)
+  if (room.players.size === 0) {
+    if (room.timerHandle) clearTimeout(room.timerHandle)
+    rooms.delete(code)
+  }
+  return true
+}
 
 /**
  * Corre un handler sin que una excepción tumbe el proceso.
@@ -64,15 +93,6 @@ function seguro<T extends unknown[]>(
       socket.emit('error', 'Petición inválida')
     }
   }
-}
-
-function generateCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = ''
-  // randomInt y no Math.random: el código es lo único que protege una sala,
-  // así que no conviene que sea predecible. 5 caracteres = ~33 millones.
-  for (let i = 0; i < 5; i++) code += chars[randomInt(chars.length)]
-  return code
 }
 
 function getUniqueCode(): string {
@@ -139,6 +159,14 @@ io.on('connection', (socket: Socket) => {
       socket.emit('error', 'El servidor está lleno, probá en un rato')
       return
     }
+    if (!liberarSalaPrevia(socket)) { socket.emit('error', 'Ya estás en un duelo en curso'); return }
+    const ip = ipDelCliente(socket.handshake.headers, socket.handshake.address)
+    let delMismoOrigen = 0
+    for (const r of rooms.values()) if (r.creatorIp === ip) delMismoOrigen++
+    if (delMismoOrigen >= MAX_SALAS_POR_IP) {
+      socket.emit('error', 'Hay demasiados duelos abiertos desde esta red, probá en un rato')
+      return
+    }
 
     const cats = categorias(d['cats'], d['cat'])
     const nivel = nivelValido(d['nivel'])
@@ -148,6 +176,7 @@ io.on('connection', (socket: Socket) => {
 
     const code = getUniqueCode()
     const room = createRoom(code)
+    room.creatorIp = ip
 
     setBoard(
       room,
@@ -186,6 +215,10 @@ io.on('connection', (socket: Socket) => {
     // el proceso.
     const code = codigoSala(d['code'])
     if (!code) { socket.emit('error', 'Sala no encontrada'); return }
+
+    // Antes de buscar la sala: si el socket ya estaba en esta misma, se lo saca
+    // (no puede unirse a su propia sala como rival) y la busqueda no la encuentra.
+    if (!liberarSalaPrevia(socket)) { socket.emit('error', 'Ya estás en un duelo en curso'); return }
 
     const room = rooms.get(code)
     if (!room) { socket.emit('error', 'Sala no encontrada'); return }
@@ -232,7 +265,10 @@ io.on('connection', (socket: Socket) => {
         room.phase = 'playing'
         room.startedAt = Date.now()
         io.to(code).emit('duel_start', {
-          words: room.words,
+          // Sin `isCorrect`: antes viajaba la respuesta de cada ficha a los dos
+          // jugadores y un alumno con DevTools las tocaba todas bien. El
+          // servidor dice si acerto en `word_taken`, despues de capturar.
+          words: room.words.map(({ id, text, takenBy }) => ({ id, text, takenBy })),
           duracion: room.duracion,
           cats: room.cats,
           nivel: room.nivel,
@@ -254,6 +290,9 @@ io.on('connection', (socket: Socket) => {
     const room = rooms.get(code)
     if (!room || room.phase !== 'playing') return
 
+    // Ritmo humano: mas rapido que esto es un script, no se procesa.
+    if (!limiteCaptura.permitir(socket.id)) return
+
     pruneExpiredEffects(room)
     const result = catchWord(room, socket.id, wordId)
 
@@ -267,6 +306,7 @@ io.on('connection', (socket: Socket) => {
     io.to(code).emit('word_taken', {
       wordId,
       bySlot: catcher.slot,
+      correct: result.pointsEarned > 0,
       stolenByRival: result.stolenByRival,
       scores: getScores(room),
     })
@@ -368,6 +408,7 @@ io.on('connection', (socket: Socket) => {
   socket.on('disconnect', seguro(socket, 'disconnect', () => {
     if (isBotSocket(socket.id)) return   // bots have no real socket
     unregisterSocket(socket.id)
+    limiteCaptura.olvidar(socket.id)
     const code = socketRoom.get(socket.id)
     if (!code) return
     socketRoom.delete(socket.id)

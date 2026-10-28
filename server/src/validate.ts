@@ -10,7 +10,23 @@
 // cliente propio manda datos bien formados; el que no lo hace, no es el
 // cliente propio.
 
+import { randomInt } from 'crypto'
 import type { DuelWord } from './types'
+
+/** Alfabeto de los códigos de duelo: sin 0/O/1/I para que se lean bien. */
+export const ALFABETO_CODIGO = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+export const LARGO_CODIGO = 5
+
+/**
+ * Código de duelo nuevo. randomInt y no Math.random: el código es lo único que
+ * protege una sala, así que no conviene que sea predecible. 5 caracteres =
+ * ~33 millones.
+ */
+export function generateCode(): string {
+  let code = ''
+  for (let i = 0; i < LARGO_CODIGO; i++) code += ALFABETO_CODIGO[randomInt(ALFABETO_CODIGO.length)]
+  return code
+}
 
 // Un tablero de duelo real tiene unas decenas de palabras. El tope existe para
 // que nadie mande un millón y llene la memoria del servidor.

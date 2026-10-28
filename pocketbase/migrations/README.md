@@ -25,6 +25,7 @@ viven en sus repos, y la numeración no se pisa.
 | `1791600000_cdp_marca_sospecha.js` | ✅ 2026-09-06 | Campos `sospechoso` y `motivo_sospecha` para el auditor. |
 | `1791700000_limpieza_pruebas_auditor.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
 | `1791800000_limpieza_partidas_reales.js` | ✅ 2026-09-06 | Borra las tres partidas jugadas de verdad para probarlo. |
+| `1795000000_cdp_cierre_auditoria_2026_10_28.js` | ⏳ NO aplicada | Cierra SEG-1/4/8/11 de la auditoría: `createRule` de salas exige la clave del dueño, puntajes solo a sala activa o vacía, `sospechoso` bloqueado, topes de largo y formato del código. Extiende la regla viva de `cdp_scores`, no la reemplaza. Probar en copia de `data.db` y hacer backup antes. |
 
 ## Hooks (auditor de puntajes)
 

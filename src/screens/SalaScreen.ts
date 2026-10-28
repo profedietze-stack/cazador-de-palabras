@@ -4,6 +4,7 @@ import { showAlert, showConfirm } from '../ui/Dialog'
 import { tieneClaveDocente, crearClaveDocente, guardarClaveDocente } from '../lib/pocketbase'
 import { mostrarRanking } from './RankingScreen'
 import { lsGet, lsSet, lsRemove } from '../utils/storage'
+import { escapeHtml } from '../utils'
 
 const SALTO = String.fromCharCode(10)
 const SALA_KEY = 'cdp_sala'
@@ -29,8 +30,8 @@ function renderEstado(): void {
       <div class="sala-activa">
         <span class="sala-badge">🏫 Sala activa</span>
         <div class="sala-info-row">
-          <span class="sala-code-display">${sala.code}</span>
-          <span class="sala-nombre-display">${sala.nombre}</span>
+          <span class="sala-code-display">${escapeHtml(sala.code)}</span>
+          <span class="sala-nombre-display">${escapeHtml(sala.nombre)}</span>
         </div>
         <p class="sala-hint">Tus puntajes se suben a esta sala al terminar cada partida con medalla.</p>
         <button class="btn btn-outline btn-sm" id="btnVerRankingSala">🏆 Ver ranking de la sala</button>
@@ -232,19 +233,19 @@ function renderSalaDocente(s: SalaInfo): string {
     ? '<span class="sala-estado activa">activa</span>'
     : '<span class="sala-estado inactiva">inactiva</span>'
   return `
-    <div class="sala-docente-card" id="salaCard_${s.code}">
+    <div class="sala-docente-card" id="salaCard_${escapeHtml(s.code)}">
       <div class="sala-docente-header">
-        <span class="sala-code-display" style="font-size:1.3rem">${s.code}</span>
+        <span class="sala-code-display" style="font-size:1.3rem">${escapeHtml(s.code)}</span>
         ${estadoBadge}
       </div>
-      <div class="sala-docente-nombre">${s.nombre}</div>
-      ${s.descripcion ? `<div class="sala-docente-desc">${s.descripcion}</div>` : ''}
+      <div class="sala-docente-nombre">${escapeHtml(s.nombre)}</div>
+      ${s.descripcion ? `<div class="sala-docente-desc">${escapeHtml(s.descripcion)}</div>` : ''}
       <div class="sala-docente-fecha">Creada: ${fecha}</div>
       <div class="sala-docente-btns">
-        <button class="btn btn-outline btn-xs" id="btnVerSala_${s.code}">🏆 Ver ranking</button>
-        <button class="btn btn-outline btn-xs" id="btnLimpiarSala_${s.code}" style="color:#f59e0b;border-color:#f59e0b55">🗑 Limpiar scores</button>
-        ${s.activa ? `<button class="btn btn-outline btn-xs" id="btnDesactivarSala_${s.code}" style="color:#ef4444;border-color:#ef444455">✖ Desactivar</button>` : ''}
-        <button class="btn btn-outline btn-xs" id="btnEliminarSala_${s.code}" style="color:#ef4444;border-color:#ef444455;margin-top:.25rem">🗑️ Eliminar sala</button>
+        <button class="btn btn-outline btn-xs" id="btnVerSala_${escapeHtml(s.code)}">🏆 Ver ranking</button>
+        <button class="btn btn-outline btn-xs" id="btnLimpiarSala_${escapeHtml(s.code)}" style="color:#f59e0b;border-color:#f59e0b55">🗑 Limpiar scores</button>
+        ${s.activa ? `<button class="btn btn-outline btn-xs" id="btnDesactivarSala_${escapeHtml(s.code)}" style="color:#ef4444;border-color:#ef444455">✖ Desactivar</button>` : ''}
+        <button class="btn btn-outline btn-xs" id="btnEliminarSala_${escapeHtml(s.code)}" style="color:#ef4444;border-color:#ef444455;margin-top:.25rem">🗑️ Eliminar sala</button>
       </div>
     </div>`
 }

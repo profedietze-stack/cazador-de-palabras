@@ -25,7 +25,8 @@ viven en sus repos, y la numeración no se pisa.
 | `1791600000_cdp_marca_sospecha.js` | ✅ 2026-09-06 | Campos `sospechoso` y `motivo_sospecha` para el auditor. |
 | `1791700000_limpieza_pruebas_auditor.js` | ✅ 2026-09-06 | Borra los puntajes de esas pruebas. |
 | `1791800000_limpieza_partidas_reales.js` | ✅ 2026-09-06 | Borra las tres partidas jugadas de verdad para probarlo. |
-| `1795000000_cdp_cierre_auditoria_2026_10_28.js` | ⏳ NO aplicada | Cierra SEG-1/4/8/11 de la auditoría: `createRule` de salas exige la clave del dueño, puntajes solo a sala activa o vacía, `sospechoso` bloqueado, topes de largo y formato del código. Extiende la regla viva de `cdp_scores`, no la reemplaza. Probar en copia de `data.db` y hacer backup antes. |
+| `1795000000_cdp_cierre_auditoria_2026_10_28.js` | ✅ 2026-10-28 | Cierra SEG-1/4/8/11 de la auditoría: `createRule` de salas exige la clave del dueño, puntajes solo a sala activa o vacía, `sospechoso` bloqueado, topes de largo y formato del código. Extiende la regla viva de `cdp_scores`, no la reemplaza. Probada antes en una copia (34/34) y aplicada con backup `data-previa-aplicar-2026-10-28-2335.db`. |
+| `1795100000_cdp_errores.js` | ✅ 2026-10-28 | Colección `cdp_errores` (panel del docente): lectura y borrado solo del dueño de la sala, sin identificadores de dispositivo. Va con el hook `pb_hooks/cdp_errores.pb.js`. |
 
 ## Hooks (auditor de puntajes)
 

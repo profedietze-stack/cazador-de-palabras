@@ -5,6 +5,12 @@
 // caracteres que no sean letras, para que lo que llegue al panel del docente
 // (que igual se escapa al dibujar) no sea basura ni un vector.
 //
+// Falla CERRADO: si no se puede leer `fallos` como JSON, se rechaza. Un
+// validador que ante la duda deja pasar no valida nada. Por eso hay que probarlo
+// en una copia antes de aplicarlo (ver docs/infra/probar-migraciones-en-copia.md):
+// si `toString` no devolviera el JSON en esta version de PocketBase, un `fallos`
+// valido se rechazaria y lo vas a ver en la prueba, no en el aula.
+//
 // Todo va DENTRO del handler: el JSVM de PocketBase no comparte las constantes
 // de nivel superior con los handlers.
 
@@ -14,15 +20,21 @@ onRecordCreateRequest((e) => {
   const SOLO_LETRAS = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ¡!¿? ]+$/;
 
   const r = e.record;
-  let fallos = r.get('fallos');
-  if (typeof fallos === 'string') {
-    try { fallos = JSON.parse(fallos); } catch (err) { fallos = null; }
-  }
-  // Los tipos que llegan de goja pueden ser objetos nativos de Go: se normaliza
-  // pasando por JSON.
-  try { fallos = JSON.parse(JSON.stringify(fallos)); } catch (err) { fallos = null; }
+  const crudo = r.get('fallos');
 
-  if (fallos === null || fallos === undefined) { e.next(); return; }
+  // Un campo JSON llega como bytes de Go (types.JSONRaw); `toString` los vuelve texto.
+  let fallos = null;
+  if (crudo !== null && crudo !== undefined) {
+    let texto = '';
+    try { texto = toString(crudo); } catch (err) { texto = ''; }
+    if (texto && texto !== 'null') {
+      try { fallos = JSON.parse(texto); } catch (err) {
+        throw new BadRequestError('fallos no es JSON valido');
+      }
+    }
+  }
+
+  if (fallos === null) { e.next(); return; }
   if (typeof fallos !== 'object' || Array.isArray(fallos)) {
     throw new BadRequestError('fallos tiene que ser un objeto palabra -> cantidad');
   }

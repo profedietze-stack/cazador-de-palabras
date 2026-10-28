@@ -496,3 +496,4 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
    denuncia. El alumno conserva su puntaje y su lugar en la tabla. */
 .rk-fila-sospechosa{background:rgba(245,158,11,.08)}
 .rk-sospechoso{cursor:help;opacity:.85;font-size:.9em}
+.sg-aviso{margin-top:.6rem;font-size:.85rem;line-height:1.35;color:var(--text-soft)}

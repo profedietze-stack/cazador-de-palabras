@@ -11,6 +11,7 @@ import { cargarDatos, guardarDatos } from '../storage/GameStorage'
 import { showAlert } from '../ui/Dialog'
 import { postScore } from '../services/LeaderboardService'
 import { lsGet } from '../utils/storage'
+import { motivoSinMedalla } from '../game/reglas'
 
 export function initResultScreen(): void {
   setOnGameEnd(mostrarResultado)
@@ -71,7 +72,9 @@ function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void 
   const ptsEl = document.getElementById('resPts')!
   ptsEl.textContent = '0 pts'
   setTimeout(() => animarPuntos(p.pts, ptsEl), 400)
-  document.getElementById('resTitle')!.textContent = p.medalla ? '¡Nivel Completado!' : 'Tiempo agotado'
+  const sinPrecision = motivoSinMedalla(p.pts, G.obj, p.precision)
+  document.getElementById('resTitle')!.textContent =
+    p.medalla ? '¡Nivel Completado!' : sinPrecision ? 'Casi: falta precisión' : 'Tiempo agotado'
 
   const m = Math.floor(p.tiempoUsado / 60), s = p.tiempoUsado % 60
   document.getElementById('resStats')!.innerHTML = `
@@ -79,6 +82,7 @@ function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void 
     <div class="sg-row"><span>Palabras incorrectas:</span><strong>${p.erradas}</strong></div>
     <div class="sg-row"><span>Precisión:</span><strong>${p.precision}%</strong></div>
     <div class="sg-row"><span>Tiempo:</span><strong>${m}:${s.toString().padStart(2, '0')}</strong></div>
+    ${sinPrecision ? `<p class="sg-aviso">${sinPrecision}</p>` : ''}
   `
 
   const lr = document.getElementById('resLogros')!

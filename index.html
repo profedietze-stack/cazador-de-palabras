@@ -157,7 +157,7 @@
     </div>
     <div class="podio" id="podioCont"></div>
     <div style="overflow-x:auto"><table class="ranking-tbl">
-      <thead><tr><th>#</th><th>Jugador</th><th>Puntos</th><th>Categoría</th><th>Nivel</th><th>Fecha</th></tr></thead>
+      <thead><tr><th>#</th><th>Jugador</th><th>Puntos</th><th>Precisión</th><th>Categoría</th><th>Nivel</th><th>Fecha</th></tr></thead>
       <tbody id="rankingBody"></tbody>
     </table></div>
   </div>
@@ -194,7 +194,7 @@
         <h3>Tiempo</h3>
         <p>Cada nivel dura 3 minutos. Si no alcanzás el objetivo, se suman 3 minutos extra, pero la medalla máxima posible será Plata.</p>
         <h3>Combos</h3>
-        <p>Cazar palabras correctas en cadena activa combos que multiplican los puntos. ¡Cuanto más larga la racha, mayor el multiplicador!</p>
+        <p>Cazar palabras correctas en cadena activa combos que multiplican los puntos. ¡Cuanto más larga la racha, mayor el multiplicador! Cada palabra correcta vale lo mismo según el nivel, y un error resta lo mismo que vale acertar: dejar pasar una palabra que no estás seguro de qué es no cuesta nada.</p>
       </div>
     </div>
 
@@ -219,13 +219,13 @@
       <div class="info-sec">
         <h2>🏅 Medallas</h2>
         <div class="medal-row"><span class="medal-em">🥇</span><div><strong>Oro:</strong> Objetivo alcanzado en tiempo normal con ≥90% de precisión</div></div>
-        <div class="medal-row"><span class="medal-em">🥈</span><div><strong>Plata:</strong> Objetivo alcanzado con ≥75% de precisión (o en tiempo extra)</div></div>
-        <div class="medal-row"><span class="medal-em">🥉</span><div><strong>Bronce:</strong> Objetivo alcanzado con menos del 75% de precisión</div></div>
-        <div class="medal-row"><span class="medal-em">❌</span><div><strong>Sin medalla:</strong> No se alcanzó el objetivo</div></div>
+        <div class="medal-row"><span class="medal-em">🥈</span><div><strong>Plata:</strong> Objetivo alcanzado con ≥75% de precisión (o en tiempo extra, con ≥70%)</div></div>
+        <div class="medal-row"><span class="medal-em">🥉</span><div><strong>Bronce:</strong> Objetivo alcanzado con entre 70% y 75% de precisión</div></div>
+        <div class="medal-row"><span class="medal-em">❌</span><div><strong>Sin medalla:</strong> No se alcanzó el objetivo, o se llegó con menos del 70% de precisión: tocar todo sin leer no alcanza</div></div>
       </div>
       <div class="info-sec">
         <h2>🏆 Logros y Títulos</h2>
-        <p>Hay <strong>10 logros</strong> que se desbloquean automáticamente según tu desempeño — primera partida, combos, precisión perfecta, jugar todas las categorías, y más.</p>
+        <p>Hay <strong>10 logros</strong> que se desbloquean automáticamente según tu desempeño — primera partida, precisión perfecta, jugar todas las categorías, y más.</p>
         <p style="margin-top:.8rem">Hay <strong>7 títulos progresivos</strong> que reflejan tu nivel acumulado como cazador de palabras, desde "Aprendiz de Palabras" hasta el rango máximo.</p>
       </div>
     </div>

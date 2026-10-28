@@ -4,6 +4,7 @@ import type { GameRecord } from '../types'
 import { withRetry } from '../utils/network'
 import { lsGet, lsSet } from '../utils/storage'
 import { showBanner } from '../ui/Banner'
+import { compararRanking } from '../game/reglas'
 
 const DEVICE_KEY = 'cdp_device_id'
 
@@ -83,6 +84,7 @@ export interface GlobalScore {
   pts: number
   medalla: string | null
   precision: number
+  tiempo?: number | null
   fecha: string
 }
 
@@ -136,9 +138,9 @@ export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<Gl
     const result = await pb.collection('cdp_scores').getList(1, limit, {
       filter: pb.filter('sala_code = {:code}', { code: salaCode }),
       sort: '-pts',
-      fields: 'jugador,sala_code,cat_nombre,nivel,pts,medalla,precision,created,sospechoso,motivo_sospecha',
+      fields: 'jugador,sala_code,cat_nombre,nivel,pts,medalla,precision,tiempo_usado,created,sospechoso,motivo_sospecha',
     })
-    return result.items.map(r => ({
+    const filas = result.items.map(r => ({
       jugador:    r['jugador'],
       sala_code:  r['sala_code'] ?? null,
       cat_nombre: r['cat_nombre'],
@@ -146,11 +148,13 @@ export async function fetchSalaRanking(salaCode: string, limit = 50): Promise<Gl
       pts:        r['pts'],
       medalla:    r['medalla'] ?? null,
       precision:  r['precision'],
+      tiempo:     typeof r['tiempo_usado'] === 'number' ? r['tiempo_usado'] : null,
       fecha:      r['created'],
       // Marca del auditor del servidor: el puntaje declara algo que no cierra.
       sospechoso: r['sospechoso'] === true,
       motivo:     r['motivo_sospecha'] ?? null,
     }))
+    return filas.sort(compararRanking)
   } catch (_) {
     showBanner('⚠️ Sin conexión — no se pudo cargar el ranking')
     return []

@@ -37,6 +37,7 @@ function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string
     return `<tr${s.sospechoso ? ' class="rk-fila-sospechosa"' : ''}>
       <td>${i + 1}</td><td>${escapeHtml(s.jugador)}${aviso}</td>
       <td>${escapeHtml(s.pts)} ${med}</td>
+      <td>${escapeHtml(s.precision)}%</td>
       <td>${escapeHtml(cat)}</td><td>${escapeHtml(s.nivel)}</td><td>${escapeHtml(formatFecha(s.fecha))}</td>
     </tr>`
   }).join('')
@@ -44,7 +45,7 @@ function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string
 
 function setLoading(on: boolean): void {
   const body = document.getElementById('rankingBody')!
-  if (on) body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted)">⏳ Cargando...</td></tr>'
+  if (on) body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--text-muted)">⏳ Cargando...</td></tr>'
 }
 
 async function loadTab(mode: TabMode): Promise<void> {

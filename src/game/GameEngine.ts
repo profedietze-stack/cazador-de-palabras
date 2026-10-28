@@ -7,6 +7,7 @@ import { COMBOS, actualizarCombo, resetCombo } from './ComboSystem'
 import { programarPalabras, detenerWordSpawner, setWordClickHandler } from './WordSpawner'
 import { checkLogros } from './ScoreSystem'
 import { showBanner } from '../ui/Banner'
+import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
 
 // callbacks set by screens
 let _onGameEnd: ((record: GameRecord, logros: ReturnType<typeof checkLogros>) => void) | null = null
@@ -56,17 +57,10 @@ export function terminarJuego(): void {
   detenerWordSpawner()
   document.getElementById('gameArea')!.querySelectorAll('.palabra').forEach(p => p.remove())
 
-  const total = G.cazadas + G.erradas
-  const precision = total > 0 ? Math.round(G.cazadas / total * 100) : 100
+  const precision = calcularPrecision(G.cazadas, G.erradas)
   const tiempoUsado = Math.round((Date.now() - G.tiempoInicioNivel!) / 1000)
 
-  let medalla: Medal | null = null
-  if (G.pts >= G.obj) {
-    if (G.tiempoExtra) { medalla = 'PLATA' }
-    else if (precision >= 90) { medalla = 'ORO' }
-    else if (precision >= 75) { medalla = 'PLATA' }
-    else { medalla = 'BRONCE' }
-  }
+  const medalla: Medal | null = calcularMedalla(G.pts, G.obj, precision, G.tiempoExtra)
 
   const partida: GameRecord = {
     cat: G.cat!,
@@ -153,7 +147,7 @@ function cazarPalabra(el: HTMLElement): void {
     document.getElementById('hudPts')!.textContent = String(G.pts)
     if (G.pts >= G.obj) terminarJuego()
   } else {
-    const resta = Math.max(1, Math.floor(ptsBase / 2))
+    const resta = restaPorError(G.nivel)
     G.pts = Math.max(0, G.pts - resta); G.erradas++
     sonidoMal()
     el.classList.add('hit-mal')

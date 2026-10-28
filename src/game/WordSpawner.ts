@@ -2,6 +2,7 @@ import { G } from './state'
 import { CATS } from '../data/categories'
 import { shuffleArr } from '../utils'
 import { animarCaida } from './WordPhysics'
+import { puntosPorAcierto } from './reglas'
 
 type OnClickFn = (el: HTMLElement) => void
 let _onClick: OnClickFn = () => {}
@@ -88,7 +89,7 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   }
 
   el.dataset.ok = esCorrecta ? '1' : '0'
-  el.dataset.pts = String(Math.round(texto.replace(/[¡!¿?]/g, '').length * (1 + (G.nivel - 1) * 0.5)))
+  el.dataset.pts = String(puntosPorAcierto(G.nivel))
   el.dataset.size = String(size)
 
   // touchend handles mobile; click handles desktop (pointer events don't fire touchend)

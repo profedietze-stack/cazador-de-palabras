@@ -29,9 +29,10 @@ export function checkLogros(p: GameRecord): typeof LOGROS_DEF {
 
   if (partidas.filter(x => x.medalla === 'ORO').length >= 5) add(3)
   if (p.erradas === 0 && p.medalla) add(4)
-  if (p.tiempoUsado < 120 && p.medalla) add(5)
+  if (p.tiempoUsado < 120 && p.medalla && p.precision >= 90) add(5)
 
-  const total = partidas.reduce((s, x) => s + x.pts, 0)
+  // Solo suman las partidas con Plata u Oro: el Bronce se podía juntar tocando todo.
+  const total = partidas.filter(x => x.medalla === 'PLATA' || x.medalla === 'ORO').reduce((s, x) => s + x.pts, 0)
   if (total >= 10000) add(6)
 
   const catsJugadas = new Set(partidas.filter(x => x.medalla).map(x => x.cat))

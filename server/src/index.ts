@@ -1,6 +1,6 @@
 import { createServer } from 'http'
 import { Server, Socket } from 'socket.io'
-import type { RoomState, DuelWord, PowerId } from './types'
+import type { RoomState, PowerId } from './types'
 import {
   createRoom, addPlayer, removePlayer, getPlayerBySocket, marcarDesconectado, reconectar, GRACIA_RECONEXION_MS,
   getRival, setBoard, markReady, allReady, catchWord,

@@ -43,9 +43,11 @@ export type DuelEventMap = {
   disconnect:         () => void
 }
 
+type Manejador = (...args: unknown[]) => void
+
 class DuelService {
   private socket: Socket | null = null
-  private handlers = new Map<string, Set<Function>>()
+  private handlers = new Map<string, Set<Manejador>>()
   // Para volver a un duelo en curso después de un corte (socket.io reconecta solo,
   // pero el servidor ve un socket nuevo: hay que presentarse con el token).
   private token = ''
@@ -82,11 +84,11 @@ class DuelService {
 
   on<K extends keyof DuelEventMap>(event: K, handler: DuelEventMap[K]): void {
     if (!this.handlers.has(event)) this.handlers.set(event, new Set())
-    this.handlers.get(event)!.add(handler as Function)
+    this.handlers.get(event)!.add(handler as unknown as Manejador)
   }
 
   off<K extends keyof DuelEventMap>(event: K, handler: DuelEventMap[K]): void {
-    this.handlers.get(event)?.delete(handler as Function)
+    this.handlers.get(event)?.delete(handler as unknown as Manejador)
   }
 
   createDuel(data: {

@@ -1,4 +1,4 @@
-import type { GameRecord, AchievementRecord } from '../types'
+import type { GameRecord } from '../types'
 import { LOGROS_DEF, TITULOS } from '../data/achievements'
 import { CATS } from '../data/categories'
 import { cargarDatos, getLogros, setLogros } from '../storage/GameStorage'

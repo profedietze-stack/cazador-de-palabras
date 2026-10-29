@@ -9,7 +9,7 @@ const requireRaiz = createRequire(resolve(process.cwd(), '../package.json'))
 const { io: conectar } = requireRaiz('socket.io-client') as typeof import('socket.io-client')
 
 const PUERTO = 3900 + Math.floor(Math.random() * 90)
-let abiertos: ClientSocket[] = []
+const abiertos: ClientSocket[] = []
 
 function cliente(): Promise<ClientSocket> {
   return new Promise((ok, mal) => {

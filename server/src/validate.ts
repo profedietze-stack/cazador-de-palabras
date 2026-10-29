@@ -45,6 +45,7 @@ export function esTexto(v: unknown): v is string {
 export function textoLimpio(v: unknown, max: number): string {
   if (!esTexto(v)) return ''
   // Se sacan los caracteres de control: no aportan nada y ensucian los logs.
+  // eslint-disable-next-line no-control-regex -- justamente se buscan los caracteres de control
   return v.replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, max)
 }
 

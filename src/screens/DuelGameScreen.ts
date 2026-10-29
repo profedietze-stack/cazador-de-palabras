@@ -111,8 +111,6 @@ function renderSlot(i: number): void {
   }
 }
 
-function renderSlots(): void { renderSlot(0); renderSlot(1) }
-
 function assignPower(powerId: PowerId): void {
   // Put in first non-occupied, non-cooldown slot
   for (let i = 0; i < 2; i++) {

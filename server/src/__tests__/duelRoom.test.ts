@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
-  createRoom, addPlayer, removePlayer, getPlayerBySocket,
-  getRival, setBoard, markReady, allReady, catchWord,
+  createRoom, addPlayer, removePlayer,
+  setBoard, markReady, allReady, catchWord,
   getScores, determineWinner,
 } from '../DuelRoom'
 import type { RoomState, DuelWord } from '../types'

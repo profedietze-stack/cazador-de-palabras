@@ -68,7 +68,7 @@ export function initLogger(): void {
   ): void {
     const wrapped = ((...args: unknown[]) => {
       logDuelEvent(event as string, args[0])
-      return (handler as Function)(...args)
+      return (handler as (...a: unknown[]) => unknown)(...args)
     }) as DuelEventMap[K]
     _on(event, wrapped)
   }

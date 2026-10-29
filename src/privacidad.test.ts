@@ -59,3 +59,24 @@ describe('migración que quita las columnas (sin aplicar)', () => {
     expect(m).toMatch(/\}, \(app\) => \{[\s\S]*TextField\(TEXT\('creator_device_hash'\)\)[\s\S]*TextField\(TEXT\('device_hash'\)\)/)
   })
 })
+
+// Los dos fallos que encontró la prueba en una copia de PocketBase 0.39.3 (no se veían leyendo):
+describe('migración 1796000000: lo que mostró la prueba en la copia', () => {
+  const m = readFileSync('pocketbase/migrations/1796000000_cdp_quitar_device_hash.js', 'utf8')
+
+  it('quita el índice idx_cdp_scores_device_hash antes de borrar la columna', () => {
+    const indice = m.indexOf('col.indexes = sin')
+    const borrar = m.indexOf('scores.fields.removeById(f2.id)')
+    expect(indice).toBeGreaterThan(-1)
+    expect(borrar).toBeGreaterThan(indice)
+  })
+
+  it('lee las reglas con String(): en el JSVM son objetos y typeof da "object"', () => {
+    expect(m).toContain('String(col[nombre])')
+    expect(m).not.toMatch(/typeof\s+salas\.updateRule\s*===\s*'string'/)
+  })
+
+  it('la marcha atrás recrea el índice', () => {
+    expect(m).toContain('CREATE INDEX idx_cdp_scores_device_hash ON cdp_scores (device_hash)')
+  })
+})

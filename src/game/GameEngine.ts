@@ -42,7 +42,11 @@ export function iniciarJuego(): void {
   const gameEl = document.getElementById('gameScreen')!
   gameEl.className = gameEl.className.replace(/\bcat-bg-\w+/g, '').trim()
   if (G.cat) gameEl.classList.add(`cat-bg-${G.cat}`)
-  const el = gameEl
+  // Pantalla completa sobre TODO el documento, no sobre #gameScreen: el diálogo
+  // de «Salir», los avisos y el banner de errores viven en <body>, y fuera del
+  // elemento en pantalla completa el navegador no los dibuja (el alumno tocaba
+  // «Salir» y no pasaba nada visible mientras el reloj seguía corriendo).
+  const el = document.documentElement
   if (document.fullscreenEnabled && el.requestFullscreen) {
     el.requestFullscreen().catch(() => {})
   } else if ((document as any).webkitFullscreenEnabled && (el as any).webkitRequestFullscreen) {

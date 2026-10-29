@@ -10,8 +10,12 @@ export function initGameScreen(): void {
   document.getElementById('btnVolver')!.addEventListener('click', async () => {
     // Terminar una práctica no pierde nada: se llega al resumen de repaso.
     if (G.practica) { terminarPractica(); return }
+    // El reloj no corre mientras el alumno decide si sale.
+    const yaPausado = G.pausado
+    G.pausado = true
     const ok = await showConfirm('¿Salir del nivel? El progreso actual no se guardará.')
-    if (!ok) return
+    if (!ok) { G.pausado = yaPausado; return }
+    G.pausado = yaPausado
     detenerJuego()
     mostrarSeleccionCategoria()
   })
@@ -31,7 +35,8 @@ export function initGameScreen(): void {
 }
 
 function toggleFS(): void {
-  const el = document.getElementById('gameScreen')!
+  // Sobre el documento entero (ver iniciarJuego): así los diálogos se ven.
+  const el = document.documentElement
   const isFs = document.fullscreenElement || (document as any).webkitFullscreenElement
   if (!isFs) {
     if (el.requestFullscreen) el.requestFullscreen().catch(() => {})

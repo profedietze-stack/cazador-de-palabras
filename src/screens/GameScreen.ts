@@ -1,10 +1,25 @@
 import { G } from '../game/state'
 import { mostrarSeleccionCategoria } from './CategoryScreen'
 import { detenerJuego, terminarPractica } from '../game/GameEngine'
+import { enfocarPalabra } from '../game/WordSpawner'
 import { iniciarMusica, detenerMusica } from '../audio/AudioEngine'
 import { showConfirm } from '../ui/Dialog'
 
 export function initGameScreen(): void {
+  // Teclado dentro de la partida: flechas para recorrer las palabras que caen
+  // (la más baja primero), Enter o espacio para cazar la enfocada, P para pausar.
+  document.addEventListener('keydown', e => {
+    if (!G.activo) return
+    if (!document.getElementById('gameScreen')?.classList.contains('active')) return
+    if (document.getElementById('dialogOverlay')?.classList.contains('show')) return
+    const actual = document.activeElement instanceof HTMLElement && document.activeElement.classList.contains('palabra')
+      ? document.activeElement : null
+    if (G.pausado) { if (e.key === 'p' || e.key === 'P') document.getElementById('btnPausa')?.click(); return }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); enfocarPalabra(1, actual) }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); enfocarPalabra(-1, actual) }
+    else if ((e.key === 'p' || e.key === 'P') && !actual) { document.getElementById('btnPausa')?.click() }
+  })
+
   document.getElementById('btnVolver')!.addEventListener('click', async () => {
     // Terminar una práctica no pierde nada: se llega al resumen de repaso.
     if (G.practica) { terminarPractica(); return }

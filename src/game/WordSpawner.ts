@@ -13,6 +13,29 @@ export function setWordClickHandler(fn: OnClickFn): void {
   _onClick = fn
 }
 
+/**
+ * Palabras que se pueden cazar ahora, de la más baja (la que está por salir) a la
+ * más alta. Es el orden en que las recorre el teclado.
+ */
+export function palabrasActivas(): HTMLElement[] {
+  const area = document.getElementById('gameArea')
+  if (!area) return []
+  return [...area.querySelectorAll<HTMLElement>('.palabra')]
+    .filter(el => el.dataset.cazada !== '1')
+    .sort((a, b) => parseFloat(b.style.top || '0') - parseFloat(a.style.top || '0'))
+}
+
+/** Foco a la palabra siguiente en ese orden (o a la más baja si no hay ninguna enfocada). */
+export function enfocarPalabra(sentido: 1 | -1, desde?: HTMLElement | null): HTMLElement | null {
+  const lista = palabrasActivas()
+  if (lista.length === 0) return null
+  const i = desde ? lista.indexOf(desde) : -1
+  const destino = i === -1 ? (sentido === 1 ? lista[0]! : lista[lista.length - 1]!)
+    : lista[Math.min(lista.length - 1, Math.max(0, i + sentido))]!
+  destino.focus({ preventScroll: true })
+  return destino
+}
+
 // La respuesta no viaja en el DOM (antes `data-ok`, legible desde el inspector):
 // un bot de diez líneas ganaba el nivel 1 en 32 s leyéndolo.
 const correctas = new WeakSet<HTMLElement>()
@@ -88,6 +111,23 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   if (esCorrecta) correctas.add(el)
   el.dataset.pts = String(puntosPorAcierto(G.nivel))
   el.dataset.size = String(size)
+
+  // Teclado: cada palabra es un botón para los lectores de pantalla y se opera con
+  // Enter o espacio. Las flechas (GameScreen) recorren las palabras de la más baja a
+  // la más alta. Antes el juego solo se podía jugar con puntero.
+  el.tabIndex = 0
+  el.setAttribute('role', 'button')
+  el.setAttribute('aria-label', textoVisible(texto))
+  el.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    // El foco pasa a la siguiente (la de más arriba) antes de que ésta desaparezca.
+    const lista = palabrasActivas()
+    const i = lista.indexOf(el)
+    const siguiente = lista[i + 1] ?? lista[i - 1] ?? null
+    _onClick(el)
+    siguiente?.focus({ preventScroll: true })
+  })
 
   // touchend handles mobile; click handles desktop (pointer events don't fire touchend)
   el.addEventListener('touchend', e => { e.preventDefault(); _onClick(el) }, { passive: false })

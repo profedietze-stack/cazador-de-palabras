@@ -82,3 +82,42 @@ describe('lectores de pantalla y teclado', () => {
     expect(css).toContain('.duel-chip.taken-rival::before')
   })
 })
+
+// Auditoría 28-oct (UX-13): las palabras que caen eran div sin rol que solo reaccionaban
+// al puntero; con teclado el juego no se podía jugar. Y no había landmark <main>.
+describe('teclado y landmark', () => {
+  const w = readFileSync('src/game/WordSpawner.ts', 'utf8')
+  const g = readFileSync('src/screens/GameScreen.ts', 'utf8')
+
+  it('cada palabra es un botón para los lectores de pantalla y para Tab', () => {
+    expect(w).toContain('el.tabIndex = 0')
+    expect(w).toContain("el.setAttribute('role', 'button')")
+    expect(w).toContain("el.setAttribute('aria-label', textoVisible(texto))")
+  })
+
+  it('Enter y espacio cazan la palabra enfocada y el foco pasa a otra', () => {
+    expect(w).toMatch(/e\.key !== 'Enter' && e\.key !== ' '/)
+    expect(w).toContain('siguiente?.focus')
+  })
+
+  it('las flechas recorren las palabras de la más baja a la más alta; P pausa', () => {
+    expect(g).toContain("e.key === 'ArrowRight' || e.key === 'ArrowDown'")
+    expect(g).toContain("e.key === 'ArrowLeft' || e.key === 'ArrowUp'")
+    expect(g).toContain("'btnPausa'")
+    expect(w).toMatch(/sort\(\(a, b\) => parseFloat\(b\.style\.top/)
+  })
+
+  it('el teclado no actúa con un diálogo abierto', () => {
+    expect(g).toContain("getElementById('dialogOverlay')?.classList.contains('show')")
+  })
+
+  it('hay exactamente un <main> que contiene las pantallas y no el diálogo', () => {
+    const mains = html.match(/<main[\s>]/g) ?? []
+    expect(mains).toHaveLength(1)
+    const i = html.indexOf('<main'), j = html.indexOf('</main>')
+    const dentro = html.slice(i, j)
+    expect(dentro).toContain('id="gameScreen"')
+    expect(dentro).toContain('id="duelResultScreen"')
+    expect(dentro).not.toContain('id="dialogOverlay"')
+  })
+})

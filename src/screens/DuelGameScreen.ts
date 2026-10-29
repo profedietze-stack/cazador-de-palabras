@@ -5,6 +5,7 @@ import { duelService } from '../services/DuelService'
 import { POWER_META } from '../types/duel'
 import type { PowerId, DuelScores } from '../types/duel'
 import { showAlert } from '../ui/Dialog'
+import { showBanner } from '../ui/Banner'
 
 // Last duel end data — read by DuelResultScreen
 export let lastDuelEnd: { winner: 'A' | 'B' | 'draw'; scores: DuelScores; reason: string } | null = null
@@ -201,12 +202,30 @@ export function cleanupDuelGame(): void {
   if (freezeTimeout) { clearTimeout(freezeTimeout); freezeTimeout = null }
   if (decoyTimeout) { clearTimeout(decoyTimeout); decoyTimeout = null }
   decoyChips.forEach(c => c.remove()); decoyChips.length = 0
+  if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
+  document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
   document.getElementById('duelFreezeOverlay')!.style.display = 'none'
   document.getElementById('duelDecoyNotice')!.style.display = 'none'
   document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
 }
 
+const ESPERA_RECONEXION_MS = 20000
+let reconexionFallida: ReturnType<typeof setTimeout> | null = null
+
+function mostrarOverlay(texto: string, esperando: boolean): void {
+  const ov = document.getElementById('duelDisconnectOverlay')!
+  ov.querySelector('.duel-disconnect-msg')!.textContent = texto
+  // Mientras se reconecta no se ofrece salir: el botón aparece si no se logra.
+  document.getElementById('btnDuelDisconnectBack')!.style.display = esperando ? 'none' : ''
+  ov.style.display = 'flex'
+}
+function ocultarOverlay(): void {
+  document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
+}
+
 function volverAlMenuPorDesconexion(): void {
+  if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
+  ocultarOverlay()
   cleanupDuelGame()
   resetDuelState()
   duelService.disconnect()
@@ -300,12 +319,55 @@ export function initDuelGameScreen(): void {
     import('./DuelResultScreen').then(m => m.mostrarDuelResult())
   })
 
-  // Own socket disconnected mid-duel — show recovery overlay instead of freezing
+  // Perdí la conexión en plena partida: socket.io reconecta solo y el servicio se
+  // presenta con el token. Mientras tanto se avisa y se espera; si no se recupera,
+  // se vuelve al menú con un mensaje (antes el alumno quedaba colgado sin saber qué pasó).
   duelService.on('disconnect', () => {
     if (D.phase !== 'playing') return
+    mostrarOverlay('📡 Sin conexión. Reconectando…', true)
+    if (reconexionFallida) clearTimeout(reconexionFallida)
+    reconexionFallida = setTimeout(() => {
+      if (D.phase !== 'playing') return
+      stopTimer()
+      D.phase = 'ended'
+      mostrarOverlay('⚠️ No se pudo volver al duelo', false)
+    }, ESPERA_RECONEXION_MS)
+  })
+
+  duelService.on('duel_resync', (r) => {
+    if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
+    ocultarOverlay()
+    D.mySlot = r.slot
+    D.rivalNombre = r.rivalNombre
+    D.words = r.words.map(w => ({ ...w, isCorrect: false } as typeof D.words[number]))
+    D.myPowers = r.powers
+    buildBoard()
+    for (const w of r.words) {
+      if (w.takenBy) {
+        const chip = getChip(w.id)
+        if (chip) { chip.classList.remove('free'); chip.classList.add(w.takenBy === D.mySlot ? 'taken-me' : 'taken-rival') }
+      }
+    }
+    updateScores(r.scores)
+    startTimer(r.segundosRestantes)
+    showBanner('✅ Volviste al duelo')
+  })
+
+  duelService.on('rejoin_failed', () => {
+    if (D.phase !== 'playing') return
+    if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
     stopTimer()
     D.phase = 'ended'
-    document.getElementById('duelDisconnectOverlay')!.style.display = 'flex'
+    mostrarOverlay('⚠️ El duelo ya terminó', false)
+  })
+
+  duelService.on('rival_reconnecting', ({ segundos }) => {
+    if (D.phase !== 'playing') return
+    showBanner(`⚠️ A tu rival se le cortó la conexión. Lo esperamos hasta ${segundos} s…`)
+  })
+  duelService.on('rival_back', () => {
+    if (D.phase !== 'playing') return
+    showBanner('✅ Tu rival volvió')
   })
 
   // Rival disconnected mid-duel

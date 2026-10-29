@@ -2,7 +2,7 @@ import { createServer } from 'http'
 import { Server, Socket } from 'socket.io'
 import type { RoomState, DuelWord, PowerId } from './types'
 import {
-  createRoom, addPlayer, removePlayer, getPlayerBySocket,
+  createRoom, addPlayer, removePlayer, getPlayerBySocket, marcarDesconectado, reconectar, GRACIA_RECONEXION_MS,
   getRival, setBoard, markReady, allReady, catchWord,
   getScores, determineWinner, pruneExpiredEffects,
 } from './DuelRoom'
@@ -42,11 +42,17 @@ const io = new Server(httpServer, {
   // Los mensajes legitimos pesan unos cientos de bytes. El tope por defecto
   // (1 MB) dejaba procesar paquetes de cientos de KB.
   maxHttpBufferSize: 16 * 1024,
+  // Detectar la caída de un cliente en ~14 s en vez de ~45 s: la gracia de reconexión
+  // (GRACIA_RECONEXION_MS) corre desde que se detecta.
+  pingInterval: 8000,
+  pingTimeout: 6000,
 })
 
 const rooms = new Map<string, RoomState>()
 const socketRoom = new Map<string, string>()
 const limiteCaptura = crearLimitadorCaptura()
+// Temporizadores de gracia por token de jugador caído.
+const graciaTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
 /**
  * Saca al socket de la sala en la que ya estaba, para que un mismo cliente no
@@ -199,7 +205,7 @@ io.on('connection', (socket: Socket) => {
     rooms.set(code, room)
     socketRoom.set(socket.id, code)
     socket.join(code)
-    socket.emit('duel_created', { code, slot })
+    socket.emit('duel_created', { code, slot, token: room.players.get(slot)!.token })
 
     // Auto-destroy idle room if no second player joins
     room.timerHandle = setTimeout(() => {
@@ -233,7 +239,7 @@ io.on('connection', (socket: Socket) => {
     socket.join(code)
 
     const rival = getRival(room, slot)
-    socket.emit('duel_joined', { slot, rivalNombre: rival ? rival.nombre : '' })
+    socket.emit('duel_joined', { slot, rivalNombre: rival ? rival.nombre : '', token: room.players.get(slot)!.token })
     socket.to(code).emit('rival_joined', { nombre })
   }))
 
@@ -416,14 +422,68 @@ io.on('connection', (socket: Socket) => {
     const room = rooms.get(code)
     if (!room) return
 
-    removePlayer(room, socket.id)
-
+    // En plena partida no se termina al instante: un corte de wifi de unos
+    // segundos mataba el duelo (el rival veía «¡Empate! 0-0» y quien se cayó
+    // quedaba colgado jugando en una sala que ya no existía). Se le da tiempo a
+    // volver con su token (`rejoin_duel`).
     if (room.phase === 'playing') {
-      endDuel(room, 'disconnect')
-      socket.to(code).emit('rival_disconnected')
-    } else if (room.players.size === 0) {
-      rooms.delete(code)
+      const caido = marcarDesconectado(room, socket.id)
+      if (caido) {
+        socket.to(code).emit('rival_reconnecting', { segundos: Math.round(GRACIA_RECONEXION_MS / 1000) })
+        graciaTimers.set(caido.token, setTimeout(() => {
+          graciaTimers.delete(caido.token)
+          if (rooms.get(code) !== room || room.phase !== 'playing' || caido.desconectadoEn === null) return
+          removePlayer(room, caido.socketId)
+          endDuel(room, 'disconnect')
+          io.to(code).emit('rival_disconnected')
+        }, GRACIA_RECONEXION_MS))
+        return
+      }
     }
+
+    removePlayer(room, socket.id)
+    if (room.players.size === 0) rooms.delete(code)
+  }))
+
+  // ── Rejoin: volver a un duelo en curso después de perder la conexión ──────
+  socket.on('rejoin_duel', seguro(socket, 'rejoin_duel', (data: unknown) => {
+    const d = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>
+    const code = codigoSala(d['code'])
+    const token = typeof d['token'] === 'string' ? d['token'].slice(0, 64) : ''
+    const room = code ? rooms.get(code) : undefined
+    if (!room || room.phase !== 'playing') { socket.emit('rejoin_failed'); return }
+
+    const r = reconectar(room, token, socket.id)
+    if (!r) { socket.emit('rejoin_failed'); return }
+
+    const t = graciaTimers.get(r.jugador.token)
+    if (t) { clearTimeout(t); graciaTimers.delete(r.jugador.token) }
+    // Si el servidor todavía no se había dado cuenta de la caída, el socket
+    // viejo sigue «vivo»: se lo cierra. Su `disconnect` no hace nada porque ya no
+    // pertenece a ningún jugador.
+    if (r.socketAnterior !== socket.id) {
+      socketRoom.delete(r.socketAnterior)
+      io.sockets.sockets.get(r.socketAnterior)?.disconnect(true)
+    }
+    socketRoom.set(socket.id, room.code)
+    socket.join(room.code)
+    registerSocket(socket.id)
+
+    const rival = getRival(room, r.jugador.slot)
+    const restante = room.startedAt === null ? room.duracion
+      : Math.max(0, Math.round(room.duracion - (Date.now() - room.startedAt) / 1000))
+    socket.emit('duel_resync', {
+      slot: r.jugador.slot,
+      rivalNombre: rival ? rival.nombre : '',
+      // Sin `isCorrect`, igual que en duel_start.
+      words: room.words.map(({ id, text, takenBy }) => ({ id, text, takenBy })),
+      scores: getScores(room),
+      powers: r.jugador.powerInventory,
+      segundosRestantes: restante,
+      cats: room.cats,
+      nivel: room.nivel,
+    })
+    socket.to(room.code).emit('rival_back')
   }))
 })
 

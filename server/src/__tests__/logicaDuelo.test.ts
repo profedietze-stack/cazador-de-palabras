@@ -298,3 +298,37 @@ describe('tocar todo no es una estrategia (auditoría DID-20)', () => {
     }
   })
 })
+
+describe('reconexión: reglas puras', () => {
+  it('marcar caído no saca al jugador de la sala; reconectar con su token lo reengancha', async () => {
+    const { marcarDesconectado, reconectar } = await import('../DuelRoom')
+    const room = sala([palabra('0', true)])
+    const ana = room.players.get('A')!
+    const caido = marcarDesconectado(room, 'sock-a', 1234)!
+    expect(caido.desconectadoEn).toBe(1234)
+    expect(room.players.size).toBe(2)
+    const r = reconectar(room, ana.token, 'sock-nuevo')!
+    expect(r.socketAnterior).toBe('sock-a')
+    expect(ana.socketId).toBe('sock-nuevo')
+    expect(ana.desconectadoEn).toBeNull()
+  })
+
+  it('un token inventado, vacío o de otro tipo no reconecta a nadie', async () => {
+    const { reconectar } = await import('../DuelRoom')
+    const room = sala([palabra('0', true)])
+    for (const t of ['', 'abc', 'x'.repeat(24), undefined as unknown as string, 5 as unknown as string]) {
+      expect(reconectar(room, t, 'sock-x')).toBeNull()
+    }
+  })
+
+  it('el puntaje sigue siendo del jugador después de volver', async () => {
+    const { marcarDesconectado, reconectar } = await import('../DuelRoom')
+    const room = sala([palabra('0', true), palabra('1', true)])
+    catchWord(room, 'sock-a', '0')
+    const ana = room.players.get('A')!
+    marcarDesconectado(room, 'sock-a')
+    reconectar(room, ana.token, 'sock-a2')
+    catchWord(room, 'sock-a2', '1')
+    expect(ana.score).toBe(20)
+  })
+})

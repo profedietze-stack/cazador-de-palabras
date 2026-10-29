@@ -40,6 +40,7 @@ async function duelo(nivel = 1) {
 
 beforeAll(async () => {
   process.env.PORT = String(PUERTO)
+  process.env.DUELO_GRACIA_MS = '1500'   // la gracia real es de 15 s
   process.env.CORS_ORIGINS = 'http://localhost:5173'
   await import('../index')
   await new Promise(r => setTimeout(r, 200))
@@ -102,5 +103,83 @@ describe('servidor de duelos (integracion)', () => {
     const err = una<string>(a, 'error', 1500)
     a.emit('join_duel', { code, nombre: 'ZZTEST_Solo' })
     expect(await err).toBe('Sala no encontrada')
+  }, 15000)
+})
+
+// Un corte de wifi de unos segundos mataba el duelo (auditoría UX-7): el rival veía
+// «¡Empate! 0-0» y quien se cayó quedaba jugando en una sala que ya no existía.
+describe('reconexión en plena partida', () => {
+  async function duelo2() {
+    const a = await cliente(), b = await cliente()
+    const creado = una<{ code: string; token: string }>(a, 'duel_created')
+    a.emit('create_duel', { nombre: 'ZZTEST_A', cats: ['sustantivos'], nivel: 1, duracion: 40 })
+    const { code, token: tokenA } = await creado
+    const unido = una<{ token: string }>(b, 'duel_joined')
+    b.emit('join_duel', { code, nombre: 'ZZTEST_B' })
+    const { token: tokenB } = await unido
+    const inicio = una<{ words: Array<Record<string, unknown>> }>(a, 'duel_start', 9000)
+    a.emit('player_ready'); b.emit('player_ready')
+    return { a, b, code, tokenA, tokenB, inicio: await inicio }
+  }
+
+  it('los tokens viajan una vez y son distintos para cada jugador', async () => {
+    const { tokenA, tokenB } = await duelo2()
+    expect(tokenA).toMatch(/^[0-9a-f]{24}$/)
+    expect(tokenB).toMatch(/^[0-9a-f]{24}$/)
+    expect(tokenA).not.toBe(tokenB)
+  }, 15000)
+
+  it('si A se cae y vuelve dentro de la gracia, el duelo sigue y recupera su estado', async () => {
+    const { a, b, code, tokenA } = await duelo2()
+    const aviso = una(b, 'rival_reconnecting')
+    a.close()
+    await aviso
+    const a2 = await cliente()
+    const resync = una<{ slot: string; words: Array<Record<string, unknown>>; segundosRestantes: number; scores: Record<string, number> }>(a2, 'duel_resync')
+    const volvio = una(b, 'rival_back')
+    a2.emit('rejoin_duel', { code, token: tokenA })
+    const r = await resync
+    await volvio
+    expect(r.slot).toBe('A')
+    expect(r.words.length).toBe(20)
+    expect(r.words.every(w => !('isCorrect' in w))).toBe(true)
+    expect(r.segundosRestantes).toBeGreaterThan(0)
+    // y puede seguir jugando
+    const tomada = una<{ wordId: string }>(a2, 'word_taken')
+    a2.emit('word_caught', r.words[0]!['id'])
+    expect((await tomada).wordId).toBe(r.words[0]!['id'])
+  }, 20000)
+
+  it('si no vuelve dentro de la gracia, el duelo termina por desconexión', async () => {
+    const { a, b } = await duelo2()
+    const fin = una<{ reason: string }>(b, 'duel_end', 8000)
+    const caido = una(b, 'rival_disconnected', 8000)
+    a.close()
+    expect((await fin).reason).toBe('disconnect')
+    await caido
+  }, 20000)
+
+  it('un token ajeno o inventado no deja entrar', async () => {
+    const { a, code } = await duelo2()
+    const intruso = await cliente()
+    const fallo = una(intruso, 'rejoin_failed')
+    intruso.emit('rejoin_duel', { code, token: 'a'.repeat(24) })
+    await fallo
+    const otro = await cliente()
+    const fallo2 = una(otro, 'rejoin_failed')
+    otro.emit('rejoin_duel', { code: 'ZZZZZ', token: 'b'.repeat(24) })
+    await fallo2
+    expect(a.connected).toBe(true)
+  }, 15000)
+
+  it('volver sin que el servidor se haya enterado de la caída también funciona (el socket viejo se cierra)', async () => {
+    const { a, code, tokenA } = await duelo2()
+    const a2 = await cliente()
+    const resync = una(a2, 'duel_resync')
+    a2.emit('rejoin_duel', { code, token: tokenA })
+    await resync
+    await new Promise(r => setTimeout(r, 400))
+    expect(a.connected).toBe(false)     // el servidor cerró el socket anterior
+    expect(a2.connected).toBe(true)
   }, 15000)
 })

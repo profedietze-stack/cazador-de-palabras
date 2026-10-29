@@ -1,4 +1,8 @@
+import { randomBytes } from 'crypto'
 import type { RoomState, PlayerState, PlayerSlot, DuelWord, PowerId } from './types'
+
+/** Cuánto se espera a que vuelva un jugador que perdió la conexión en plena partida. */
+export const GRACIA_RECONEXION_MS = Number(process.env['DUELO_GRACIA_MS'] ?? 15000)
 
 const POWER_UNLOCK_EVERY = 3   // every N catches, earn a power
 const MAX_INVENTORY = 2
@@ -37,8 +41,36 @@ export function addPlayer(room: RoomState, socketId: string, nombre: string): Pl
     activeEffects: [],
     catchCount: 0,
     ready: false,
+    token: randomBytes(12).toString('hex'),
+    desconectadoEn: null,
   })
   return slot
+}
+
+/** Marca al jugador como caído sin sacarlo de la sala: tiene GRACIA_RECONEXION_MS para volver. */
+export function marcarDesconectado(room: RoomState, socketId: string, ahora: number = Date.now()): PlayerState | null {
+  const p = getPlayerBySocket(room, socketId)
+  if (!p) return null
+  p.desconectadoEn = ahora
+  return p
+}
+
+/**
+ * Reengancha a un jugador con su token en un socket nuevo. Devuelve el jugador y el
+ * socket anterior (para cerrarlo si el servidor todavía no se había enterado de la
+ * caída). El token no se compara con `===` contra una cadena corta ni se loguea.
+ */
+export function reconectar(room: RoomState, token: string, nuevoSocketId: string): { jugador: PlayerState; socketAnterior: string } | null {
+  if (typeof token !== 'string' || token.length < 8) return null
+  for (const p of room.players.values()) {
+    if (p.token === token) {
+      const socketAnterior = p.socketId
+      p.socketId = nuevoSocketId
+      p.desconectadoEn = null
+      return { jugador: p, socketAnterior }
+    }
+  }
+  return null
 }
 
 export function removePlayer(room: RoomState, socketId: string): PlayerSlot | null {

@@ -17,6 +17,10 @@ export interface PlayerState {
   activeEffects: ActiveEffect[]
   catchCount: number            // words caught, used for power unlock cadence
   ready: boolean
+  // Secreto de reconexión: solo lo conoce este jugador (viaja una vez, en duel_created / duel_joined).
+  token: string
+  // Cuándo se le cayó la conexión en plena partida; null si está conectado.
+  desconectadoEn: number | null
 }
 
 export interface ActiveEffect {

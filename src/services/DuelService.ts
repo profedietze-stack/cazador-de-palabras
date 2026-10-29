@@ -4,9 +4,21 @@ import type { DuelWord, DuelScores, PowerId, PlayerSlot } from '../types/duel'
 const SERVER_URL = 'https://aulaplay.duckdns.org'
 const SOCKET_PATH = '/duel/socket.io'
 
+/** Estado completo para retomar un duelo después de perder la conexión. */
+export interface DuelResync {
+  slot: PlayerSlot
+  rivalNombre: string
+  words: Array<{ id: string; text: string; takenBy: PlayerSlot | null }>
+  scores: DuelScores
+  powers: PowerId[]
+  segundosRestantes: number
+  cats: string[]
+  nivel: number
+}
+
 export type DuelEventMap = {
-  duel_created:       (data: { code: string; slot: PlayerSlot }) => void
-  duel_joined:        (data: { slot: PlayerSlot; rivalNombre: string }) => void
+  duel_created:       (data: { code: string; slot: PlayerSlot; token: string }) => void
+  duel_joined:        (data: { slot: PlayerSlot; rivalNombre: string; token: string }) => void
   rival_joined:       (data: { nombre: string }) => void
   countdown_start:    () => void
   duel_start:         (data: { words: DuelWord[]; duracion: number; cats: string[]; nivel: number }) => void
@@ -20,6 +32,10 @@ export type DuelEventMap = {
   shield_consumed:    (powerId: PowerId) => void
   duel_end:           (data: { winner: 'A' | 'B' | 'draw'; scores: DuelScores; reason: string }) => void
   rival_disconnected: () => void
+  rival_reconnecting: (data: { segundos: number }) => void
+  rival_back:         () => void
+  duel_resync:        (data: DuelResync) => void
+  rejoin_failed:      () => void
   rematch_requested:  () => void
   rematch_start:      () => void
   error:              (msg: string) => void
@@ -30,6 +46,11 @@ export type DuelEventMap = {
 class DuelService {
   private socket: Socket | null = null
   private handlers = new Map<string, Set<Function>>()
+  // Para volver a un duelo en curso después de un corte (socket.io reconecta solo,
+  // pero el servidor ve un socket nuevo: hay que presentarse con el token).
+  private token = ''
+  private code = ''
+  private jugando = false
 
   connect(): void {
     if (this.socket?.connected) return
@@ -37,7 +58,17 @@ class DuelService {
       path: SOCKET_PATH,
       transports: ['websocket', 'polling'],
     })
+    this.socket.on('connect', () => {
+      if (this.jugando && this.token && this.code) {
+        this.socket?.emit('rejoin_duel', { code: this.code, token: this.token })
+      }
+    })
     this.socket.onAny((event: string, ...args: unknown[]) => {
+      const d = args[0] as { code?: string; token?: string } | undefined
+      if (event === 'duel_created' && d?.token) { this.token = d.token; this.code = d.code ?? '' }
+      if (event === 'duel_joined' && d?.token) this.token = d.token
+      if (event === 'duel_start') this.jugando = true
+      if (event === 'duel_end' || event === 'rival_disconnected' || event === 'rejoin_failed') this.jugando = false
       this.handlers.get(event)?.forEach(h => h(...args))
     })
   }
@@ -45,6 +76,7 @@ class DuelService {
   disconnect(): void {
     this.socket?.disconnect()
     this.socket = null
+    this.token = ''; this.code = ''; this.jugando = false
     // handlers kept intentionally — init-time registrations must survive reconnects
   }
 
@@ -68,6 +100,7 @@ class DuelService {
   }
 
   joinDuel(code: string, nombre: string): void {
+    this.code = code.toUpperCase()
     this.socket?.emit('join_duel', { code, nombre })
   }
 

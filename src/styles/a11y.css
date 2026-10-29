@@ -1,0 +1,45 @@
+/* Accesibilidad y uso táctil (auditoría 28-oct-2026: UX-9 a UX-14).
+   Va al final de la cascada: ajusta lo anterior sin reescribirlo. */
+
+/* ── Blancos táctiles de al menos 44 px ─────────────────────────────────── */
+.nv-btn, .info-tab, .rk-tab, .duel-opt-btn, .back-btn, .btn-borrar,
+.btn-xs, .btn-sm, .game-btns button, .sala-modo-tabs button,
+.duel-input, #inputCrearCode, #inputCrearNombre, #rkSalaInput {
+  min-height: 44px;
+}
+.nv-btn, .duel-opt-btn, .game-btns button { min-width: 44px; }
+.game-btns button { padding-left: .9rem; padding-right: .9rem; }
+
+/* Subtítulos sobre el degradado: 2,9:1 -> legibles */
+.screen-sub { color: rgba(255, 255, 255, .96); }
+.hud-label { opacity: .95; }
+
+/* Rótulos del HUD pegados a 390 px */
+.game-hud { gap: .4rem; }
+.hud-stat { min-width: 0; padding: 0 .2rem; }
+.hud-label { white-space: nowrap; font-size: .66rem; }
+
+/* Foco visible para teclado (el de por defecto desaparece sobre los degradados) */
+:focus-visible { outline: 3px solid #fde047; outline-offset: 2px; }
+
+/* ── Celulares angostos: categorías en una columna, sin scroll lateral ───── */
+@media (max-width: 420px) {
+  .cats-grid { grid-template-columns: 1fr; }
+  .nivel-row { flex-wrap: nowrap; }
+  .nv-btn { flex: 1; }
+}
+
+/* Quién tomó cada ficha del duelo: no solo por color (daltonismo) */
+.duel-chip.taken-me::before { content: '✓ '; font-weight: 700; }
+.duel-chip.taken-rival::before { content: '✗ '; font-weight: 700; }
+
+/* ── Menos movimiento ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  #menuBg { display: none; }
+}

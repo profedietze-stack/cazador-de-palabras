@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Cazador de Palabras</title>
   <meta name="description" content="Juego educativo de gramática española. Cazá palabras por categoría gramatical.">
   <meta name="theme-color" content="#4f5fd1">
@@ -16,7 +16,7 @@
 <body>
 
 <!-- ═══════════════════════════════ MODAL NOMBRE ═══════════════════════════════ -->
-<div id="modalNombre">
+<div id="modalNombre" role="dialog" aria-modal="true" aria-label="Tu nombre">
   <div class="modal-box">
     <div style="font-size:2.5rem;margin-bottom:.5rem">🎮</div>
     <h2>¡Bienvenido!</h2>
@@ -100,7 +100,7 @@
 <!-- ═══════════════════════════════ RESULTADO ═══════════════════════════════ -->
 <div id="resultadoScreen" class="screen">
   <div class="card resultado-card">
-    <h2 id="resTitle" style="color:#667eea;font-size:1.5rem">¡Nivel Completado!</h2>
+    <h2 id="resTitle" style="color:#4f5fd1;font-size:1.5rem">¡Nivel Completado!</h2>
     <div class="medalla-grande" id="resMedalla">🥇</div>
     <div class="pts-grande" id="resPts">0</div>
     <div class="stats-grid" id="resStats"></div>

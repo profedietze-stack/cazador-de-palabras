@@ -8,7 +8,7 @@
 .btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
 .btn:active{transform:translateY(0)}
 .btn-primary{background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff}
-.btn-outline{background:#fff;color:#667eea;border:2px solid #667eea}
+.btn-outline{background:#fff;color:#4f5fd1;border:2px solid #4f5fd1}
 .btn-ok{background:var(--ok);color:#fff}
 .btn-danger{background:var(--mal);color:#fff}
 .btn-sm{padding:.5rem 1rem;font-size:.85rem}
@@ -27,7 +27,7 @@
   box-shadow:var(--shadow);text-align:center;
   animation:fadeIn .3s ease;
 }
-.modal-box h2{font-size:1.6rem;color:#667eea;margin-bottom:.5rem}
+.modal-box h2{font-size:1.6rem;color:#4f5fd1;margin-bottom:.5rem}
 .modal-box p{color:var(--text-muted);margin-bottom:1.5rem}
 .modal-box input{
   width:100%;padding:.85rem 1rem;margin-bottom:1.2rem;
@@ -85,7 +85,7 @@
 .logro-sticker-frase{
   position:absolute;pointer-events:none;z-index:5;
   background:rgba(255,255,255,.92);border-radius:12px;padding:.3rem .7rem;
-  font-size:.78rem;font-weight:700;color:#667eea;
+  font-size:.78rem;font-weight:700;color:#4f5fd1;
   box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap;
   transform:rotate(var(--rot,0deg));opacity:0;transition:opacity .8s ease .15s;
 }

@@ -75,7 +75,9 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   el.textContent = textoVisible(texto)
   el.dataset.palabra = texto
 
-  const size = 12 + Math.random() * 20
+  // Mínimo 18 px: las de 12-15 px giraban a 150°/s y eran ilegibles para baja
+  // visión y dislexia; se castigaba un error de lectura como si fuera de gramática.
+  const size = 18 + Math.random() * 14
   el.style.fontSize = size + 'px'
 
   const maxX = area.clientWidth - 160
@@ -89,7 +91,8 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
 
   // touchend handles mobile; click handles desktop (pointer events don't fire touchend)
   el.addEventListener('touchend', e => { e.preventDefault(); _onClick(el) }, { passive: false })
-  el.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') _onClick(el) })
+  // Mouse y lápiz (pizarras digitales); el dedo lo atiende touchend.
+  el.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') _onClick(el) })
 
   area.appendChild(el)
   animarCaida(el, size)

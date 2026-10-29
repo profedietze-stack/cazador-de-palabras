@@ -1,7 +1,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   /* brand */
-  --bg1:#667eea;--bg2:#764ba2;
+  --bg1:#4f5fd1;--bg2:#764ba2;
   --oro:#f59e0b;--plata:#94a3b8;--bronce:#cd7c3a;
   --ok:#10b981;--mal:#ef4444;--warn:#f59e0b;
   --radius:16px;
@@ -19,7 +19,7 @@
   --text-faint:#9ca3af;
   /* borders / inputs */
   --border:#e2e8f0;
-  --border-acc:#667eea;
+  --border-acc:#4f5fd1;
   --input-bg:#ffffff;
   --input-border:#e2e8f0;
 }

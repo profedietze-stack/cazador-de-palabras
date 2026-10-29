@@ -6,6 +6,7 @@ import './styles/animations.css'
 import './styles/components.css'
 import './styles/screens.css'
 import './styles/responsive.css'
+import './styles/a11y.css'
 
 import { G } from './game/state'
 import { mostrar } from './screens/ScreenManager'

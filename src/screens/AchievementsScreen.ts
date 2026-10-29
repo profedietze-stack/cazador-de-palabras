@@ -33,7 +33,7 @@ export function mostrarLogros(): void {
     <div class="scard"><div class="sl">Mejor Puntaje</div><div class="sv">${mejorPts}</div></div>
     <div class="scard"><div class="sl">Precisión Prom.</div><div class="sv">${precProm}%</div></div>
     <div class="scard"><div class="sl">Palabras Cazadas</div><div class="sv">${totalCaz}</div></div>
-    <div class="scard" style="border:2px solid #667eea"><div class="sl">⏱ Tiempo de Juego</div><div class="sv" style="color:#764ba2">${tiempoTotal}</div></div>
+    <div class="scard" style="border:2px solid #4f5fd1"><div class="sl">⏱ Tiempo de Juego</div><div class="sv" style="color:#764ba2">${tiempoTotal}</div></div>
   `
 
   const em = { ORO: '🥇', PLATA: '🥈', BRONCE: '🥉' }

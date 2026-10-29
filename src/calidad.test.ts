@@ -21,7 +21,9 @@ describe('calidad de ingeniería', () => {
 
   it('ningún barajado usa sort con Math.random (no es un barajado)', () => {
     for (const f of ['src/utils.ts', 'src/game/WordSpawner.ts', 'src/game/distractores.ts', 'server/src/tablero.ts', 'server/src/PowerManager.ts']) {
-      expect(readFileSync(f, 'utf8'), f).not.toMatch(/sort\(\s*\(\)\s*=>\s*Math\.random/)
+      // Se ignoran los comentarios: algunos explican justamente por qué NO se usa.
+      const codigo = readFileSync(f, 'utf8').split(/\r?\n/).filter(l => !/^\s*(\/\/|\/\*|\*)/.test(l)).join(' ')
+      expect(codigo, f).not.toMatch(/sort\(\s*\(\)\s*=>\s*Math\.random/)
     }
   })
 })

@@ -13,6 +13,7 @@ import {
   numeroEnRango, MIN_DURACION, MAX_DURACION, generateCode,
 } from './validate'
 import { publicarResultado } from './ranking'
+import { contar, crearManejadorHttp } from './observabilidad'
 import {
   crearLimitadorCaptura, ipDelCliente, MAX_SALAS_POR_IP,
 } from './ritmo'
@@ -30,7 +31,13 @@ const MAX_ROOMS = 500
 // El modo bot es para desarrollo. En producción no se expone.
 const DEBUG_BOT = process.env.DEBUG_BOT === '1'
 
-const httpServer = createServer()
+// `/health` y `/report` (errores anónimos del cliente). Todo lo que no es de
+// socket.io pasa por acá; sin manejador, esos pedidos quedaban colgados.
+let conectados = 0
+const httpServer = createServer(crearManejadorHttp(
+  { salas: () => rooms.size, sockets: () => conectados },
+  (req) => ipDelCliente(req.headers, req.socket.remoteAddress ?? ''),
+))
 const io = new Server(httpServer, {
   // Sólo los orígenes donde corre el juego. Con `*` cualquier página de
   // internet podía abrir duelos contra este servidor.
@@ -115,6 +122,7 @@ function endDuel(room: RoomState, reason: 'time' | 'all_words' | 'disconnect'): 
   const winner = determineWinner(room)
   const scores = getScores(room)
   io.to(room.code).emit('duel_end', { winner, scores, reason })
+  contar('duelo_fin', { razon: reason, jugadores: room.players.size })
 
   // El ranking se avisa aparte y sin esperar: que falle no puede demorar ni
   // romper el final de la partida, que ya se le mostro a los jugadores.
@@ -144,6 +152,8 @@ function cancelarLimpieza(code: string): void {
 
 io.on('connection', (socket: Socket) => {
   registerSocket(socket.id)
+  conectados++
+  socket.on('disconnect', () => { conectados-- })
 
   // ── Create duel ──────────────────────────────────────────────────────────
   // El cliente elige categorías, nivel y duración. El TABLERO lo arma el
@@ -205,6 +215,7 @@ io.on('connection', (socket: Socket) => {
     rooms.set(code, room)
     socketRoom.set(socket.id, code)
     socket.join(code)
+    contar('duelo_creado')
     socket.emit('duel_created', { code, slot, token: room.players.get(slot)!.token })
 
     // Auto-destroy idle room if no second player joins
@@ -227,7 +238,7 @@ io.on('connection', (socket: Socket) => {
     if (!liberarSalaPrevia(socket)) { socket.emit('error', 'Ya estás en un duelo en curso'); return }
 
     const room = rooms.get(code)
-    if (!room) { socket.emit('error', 'Sala no encontrada'); return }
+    if (!room) { contar('union_rechazada', { motivo: 'no_existe' }); socket.emit('error', 'Sala no encontrada'); return }
     if (room.phase !== 'waiting') { socket.emit('error', 'La partida ya comenzó'); return }
     if (room.players.size >= 2) { socket.emit('error', 'Sala llena'); return }
 
@@ -239,6 +250,7 @@ io.on('connection', (socket: Socket) => {
     socket.join(code)
 
     const rival = getRival(room, slot)
+    contar('duelo_unido')
     socket.emit('duel_joined', { slot, rivalNombre: rival ? rival.nombre : '', token: room.players.get(slot)!.token })
     socket.to(code).emit('rival_joined', { nombre })
   }))
@@ -297,7 +309,7 @@ io.on('connection', (socket: Socket) => {
     if (!room || room.phase !== 'playing') return
 
     // Ritmo humano: mas rapido que esto es un script, no se procesa.
-    if (!limiteCaptura.permitir(socket.id)) return
+    if (!limiteCaptura.permitir(socket.id)) { contar('captura_descartada_por_ritmo'); return }
 
     pruneExpiredEffects(room)
     const result = catchWord(room, socket.id, wordId)
@@ -451,10 +463,10 @@ io.on('connection', (socket: Socket) => {
     const code = codigoSala(d['code'])
     const token = typeof d['token'] === 'string' ? d['token'].slice(0, 64) : ''
     const room = code ? rooms.get(code) : undefined
-    if (!room || room.phase !== 'playing') { socket.emit('rejoin_failed'); return }
+    if (!room || room.phase !== 'playing') { contar('reconexion_fallida', { motivo: 'sin_duelo' }); socket.emit('rejoin_failed'); return }
 
     const r = reconectar(room, token, socket.id)
-    if (!r) { socket.emit('rejoin_failed'); return }
+    if (!r) { contar('reconexion_fallida', { motivo: 'token' }); socket.emit('rejoin_failed'); return }
 
     const t = graciaTimers.get(r.jugador.token)
     if (t) { clearTimeout(t); graciaTimers.delete(r.jugador.token) }
@@ -472,6 +484,7 @@ io.on('connection', (socket: Socket) => {
     const rival = getRival(room, r.jugador.slot)
     const restante = room.startedAt === null ? room.duracion
       : Math.max(0, Math.round(room.duracion - (Date.now() - room.startedAt) / 1000))
+    contar('reconexion_ok')
     socket.emit('duel_resync', {
       slot: r.jugador.slot,
       rivalNombre: rival ? rival.nombre : '',

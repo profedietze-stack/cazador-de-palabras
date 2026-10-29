@@ -1,3 +1,5 @@
+import { reportarError } from './reporteErrores'
+
 let bannerEl: HTMLDivElement | null = null
 
 function getBanner(): HTMLDivElement {
@@ -60,11 +62,13 @@ function format(err: unknown, source?: string, lineno?: number): { short: string
 export function initErrorBanner(): void {
   window.addEventListener('error', (e) => {
     const { short, full } = format(e.error ?? e.message, e.filename, e.lineno)
+    reportarError(e.error?.message ?? e.message, e.filename, e.lineno)
     show(short + '\n\n(tap to copy full stack)', full)
   })
 
   window.addEventListener('unhandledrejection', (e) => {
     const { short, full } = format(e.reason)
+    reportarError(e.reason instanceof Error ? e.reason.message : e.reason)
     show('[Unhandled Promise]\n' + short + '\n\n(tap to copy full stack)', full)
   })
 }

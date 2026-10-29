@@ -17,7 +17,12 @@ function renderPodio(scores: { jugador: string; pts: number }[]): void {
     </div>`).join('')
 }
 
-function renderTabla(scores: { jugador: string; pts: number; cat_nombre?: string; catNombre?: string; cat?: string; nivel: number; medalla?: string | null; precision: number; fecha: string; sospechoso?: boolean; motivo?: string | null }[]): void {
+function renderTabla(vacio: string, scores: { jugador: string; pts: number; cat_nombre?: string; catNombre?: string; cat?: string; nivel: number; medalla?: string | null; precision: number; fecha: string; sospechoso?: boolean; motivo?: string | null }[]): void {
+  if (scores.length === 0) {
+    // Estado vacío con mensaje: una tabla en blanco parece rota.
+    document.getElementById('rankingBody')!.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--text-muted)">${escapeHtml(vacio)}</td></tr>`
+    return
+  }
   document.getElementById('rankingBody')!.innerHTML = scores.map((s, i) => {
     const cat = (s as any).cat_nombre || (s as any).catNombre || (s as any).cat || '—'
     const medallaEmoji: Record<string, string> = { ORO: '🥇', PLATA: '🥈', BRONCE: '🥉' }
@@ -59,7 +64,7 @@ async function loadTab(mode: TabMode): Promise<void> {
   if (mode === 'local') {
     const scores = getRankingGlobal()
     renderPodio(scores)
-    renderTabla(scores)
+    renderTabla('Todavía no jugaste partidas con medalla en este dispositivo.', scores)
     return
   }
 
@@ -70,7 +75,7 @@ async function loadTab(mode: TabMode): Promise<void> {
     if (!code) { setLoading(false); return }
     const scores = await fetchSalaRanking(code)
     renderPodio(scores)
-    renderTabla(scores)
+    renderTabla('Todavía no hay puntajes en esta sala. Cuando los alumnos terminen una partida con medalla, aparecen acá.', scores)
   }
 }
 

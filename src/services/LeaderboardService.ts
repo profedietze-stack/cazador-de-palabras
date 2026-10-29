@@ -184,15 +184,19 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
   }
 }
 
-export async function verificarSala(code: string): Promise<boolean> {
+/**
+ * 'si' | 'no' | 'red'. Antes todo fallo daba `false`, y sin internet el alumno leía
+ * «No se encontró una sala activa»: se culpaba al código de un problema de red.
+ */
+export async function verificarSala(code: string): Promise<'si' | 'no' | 'red'> {
   try {
     setSalaContexto(code)
     await pb.collection('cdp_salas').getFirstListItem(
       pb.filter('code = {:code} && activa = true', { code: code.toUpperCase() })
     )
-    return true
-  } catch (_) {
-    return false
+    return 'si'
+  } catch (e) {
+    return e instanceof ClientResponseError && e.status === 404 ? 'no' : 'red'
   }
 }
 

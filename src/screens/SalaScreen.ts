@@ -127,7 +127,11 @@ async function handleUnirse(): Promise<void> {
   btn.disabled = false
   btn.textContent = '✅ Unirme'
 
-  if (!existe) {
+  if (existe === 'red') {
+    await showAlert('No se pudo conectar con el servidor.\n\nRevisá la conexión a internet y probá de nuevo.')
+    return
+  }
+  if (existe === 'no') {
     await showAlert(`No se encontró una sala activa con el código "${code}".\n\nVerificá el código con tu docente.`)
     return
   }

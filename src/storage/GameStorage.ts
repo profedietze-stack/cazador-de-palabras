@@ -1,12 +1,14 @@
 import type { GameRecord, AchievementRecord, PlayerData } from '../types'
 import { G } from '../game/state'
+import { validarDatos, validarLayout } from './validarDatos'
 
 function storageKey(): string {
   return 'cdp_' + G.jugador
 }
 
 export function cargarDatos(): PlayerData {
-  try { return JSON.parse(localStorage.getItem(storageKey()) || '{}') } catch (e) { return {} }
+  // Campo por campo: un guardado con el tipo cambiado no puede romper las pantallas.
+  try { return validarDatos(JSON.parse(localStorage.getItem(storageKey()) || '{}')) } catch (e) { return {} }
 }
 
 export function guardarDatos(d: PlayerData): void {
@@ -34,13 +36,19 @@ export function setLogros(l: AchievementRecord[]): void {
   guardarDatos(d)
 }
 
+// Claves de localStorage que empiezan con cdp_ y no son el guardado de un jugador.
+const CLAVES_QUE_NO_SON_DE_UN_JUGADOR = [
+  'cdp_nombre', 'cdp_sonido', 'cdp_tema', 'cdp_stk_', 'cdp_repaso_', 'cdp_sala',
+  'cdp_host_key', 'cdp_device',
+]
+
 export function getRankingGlobal(): (GameRecord & { jugador: string })[] {
   const all: (GameRecord & { jugador: string })[] = []
   try {
     for (const k in localStorage) {
-      if (k.startsWith('cdp_') && k !== 'cdp_nombre' && k !== 'cdp_sonido' && k !== 'cdp_tema' && !k.startsWith('cdp_stk_')) {
+      if (k.startsWith('cdp_') && !CLAVES_QUE_NO_SON_DE_UN_JUGADOR.some(p => k === p || k.startsWith(p))) {
         try {
-          const d: PlayerData = JSON.parse(localStorage.getItem(k) || '{}')
+          const d: PlayerData = validarDatos(JSON.parse(localStorage.getItem(k) || '{}'))
           const jug = k.slice(4)
           ;(d.partidas || []).forEach(p => all.push({ ...p, jugador: jug }))
         } catch (e) {}
@@ -59,7 +67,7 @@ export function skStickers(tipo: string): string {
 }
 
 export function cargarLayoutStickers(tipo: string): any[] | null {
-  try { return JSON.parse(localStorage.getItem(skStickers(tipo)) || 'null') } catch (e) { return null }
+  try { return validarLayout(JSON.parse(localStorage.getItem(skStickers(tipo)) || 'null')) } catch (e) { return null }
 }
 
 export function guardarLayoutStickers(tipo: string, layout: any[]): void {

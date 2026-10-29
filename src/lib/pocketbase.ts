@@ -53,7 +53,18 @@ export async function crearClaveDocente(): Promise<{ clave: string; id: string; 
   return { clave, id: registro.id, guardada: guardarClaveDocente(clave, registro.id) }
 }
 
+/**
+ * Tope de espera por pedido. Sin esto, un pedido colgado (wifi de escuela que
+ * deja de contestar) dejaba «⏳ Cargando...» para siempre y la pantalla sorda.
+ */
+export const TIMEOUT_PEDIDO_MS = 10000
+
 pb.beforeSend = (url, options) => {
+  if (!options.signal) {
+    const c = new AbortController()
+    setTimeout(() => c.abort(), TIMEOUT_PEDIDO_MS)
+    options.signal = c.signal
+  }
   options.headers = {
     ...options.headers,
     'x-host-key': getHostKey(),

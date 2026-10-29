@@ -3,76 +3,27 @@ import { pb, getHostKeyId, setSalaContexto } from '../lib/pocketbase'
 import type { RegistroErrores } from '../game/panelDocente'
 import type { GameRecord } from '../types'
 import { withRetry } from '../utils/network'
-import { lsGet, lsSet } from '../utils/storage'
 import { showBanner } from '../ui/Banner'
 import { compararRanking } from '../game/reglas'
 
-const DEVICE_KEY = 'cdp_device_id'
-
-export function getDeviceId(): string {
-  let id = lsGet(DEVICE_KEY)
-  if (!id) {
-    id = crypto.randomUUID()
-    lsSet(DEVICE_KEY, id)
-  }
-  return id
-}
-
-// ── Identidad de dispositivo por hash ────────────────────────────────────────
-// `cdp_salas` y `cdp_scores` tienen lectura publica. Guardar el UUID del
-// dispositivo en crudo permitia que cualquiera lo copiara de la API a su propio
-// localStorage y quedara como duenio de las salas ajenas: verlas, desactivarlas
-// y borrarlas, sin escribir codigo.
-//
-// Ahora se guarda el SHA-256. El cliente conoce su UUID, calcula el hash y
-// consulta por hash; un atacante lee el hash pero no puede derivar el UUID.
-// El hash se cachea porque las consultas de salas son frecuentes.
-
-const DEVICE_HASH_KEY = 'cdp_device_hash'
-
-async function sha256Hex(input: string): Promise<string> {
-  // crypto.subtle solo existe en contextos seguros (https o localhost). Si no
-  // esta, devolvemos '' y el llamador cae al filtro por el id viejo.
-  if (!globalThis.crypto?.subtle) return ''
-  try {
-    const bytes = new TextEncoder().encode(input)
-    const digest = await crypto.subtle.digest('SHA-256', bytes)
-    return Array.from(new Uint8Array(digest))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
-  } catch {
-    return ''
-  }
-}
-
-/** Hash del device id, cacheado en localStorage. Idempotente. */
-export async function getDeviceHash(): Promise<string> {
-  const cached = lsGet(DEVICE_HASH_KEY)
-  if (cached) return cached
-  const hash = await sha256Hex(getDeviceId())
-  if (hash) lsSet(DEVICE_HASH_KEY, hash)
-  return hash
-}
+// ── Propiedad de las salas ────────────────────────────────────────────────────
+// La propiedad la da la clave de docente (`owner_key_id` + cabeceras que valida el
+// servidor), no un identificador de dispositivo. Antes se guardaba el SHA-256 del
+// device id en `creator_device_hash` y en `cdp_scores.device_hash`: un identificador
+// persistente de un menor, legible por quien tuviera el código de la sala y sin
+// ningún uso (las reglas ya no lo miraban; hallazgo SEG-12 de la auditoría).
 
 /**
- * Filtro de propiedad en modo dual.
- *
- * Empareja por hash y, mientras exista la columna vieja, tambien por el id en
- * crudo, para que las salas creadas antes de la migracion sigan siendo
- * administrables por su duenio. Cuando se elimine `creator_device_id`, la rama
- * legacy queda muerta y se puede borrar.
+ * Filtro de las salas de este docente. Sin clave de docente no hay forma de
+ * identificarlo: se devuelve un filtro que no matchea nada, para que la pantalla
+ * muestre «sin salas» en vez de romperse (`id = ""` nunca matchea).
  */
 async function filtroPropiedad(extra = ''): Promise<string> {
-  const hash = await getDeviceHash()
-  // Sin hash no hay forma de identificar al duenio: se devuelve un filtro que
-  // no matchea nada, para que la UI muestre "sin salas" en vez de romperse.
-  // Solo pasa si crypto.subtle no esta disponible (contexto no seguro).
-  // `id = ""` nunca matchea: los ids de PocketBase siempre tienen valor.
-  const base = hash
-    ? pb.filter('creator_device_hash = {:h}', { h: hash })
-    : "id = ''"
+  const id = getHostKeyId()
+  const base = id ? pb.filter('owner_key_id = {:id}', { id }) : "id = ''"
   return extra ? `${base} && ${extra}` : base
 }
+
 
 export interface GlobalScore {
   /** Lo marco el auditor del servidor: las cuentas del puntaje no cierran. */
@@ -99,10 +50,7 @@ export interface SalaInfo {
 
 export async function postScore(p: GameRecord, jugador: string, salaCode?: string): Promise<void> {
   try {
-    // Fuera del callback: `withRetry` lo reintenta, y el hash no cambia.
-    const deviceHash = await getDeviceHash()
     await withRetry(() => pb.collection('cdp_scores').create({
-      device_hash:  deviceHash,
       jugador,
       sala_code:    salaCode ?? null,
       // Deja explicito que es una partida de un jugador. Los de duelo los
@@ -171,7 +119,6 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
       nombre,
       descripcion:       descripcion ?? null,
       activa:              true,
-      creator_device_hash: await getDeviceHash(),
       owner_key_id:        getHostKeyId(),
     })
     return 'ok'

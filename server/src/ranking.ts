@@ -79,9 +79,6 @@ export async function publicarResultado(room: RoomState): Promise<void> {
       cat: 'duelo',
       cat_nombre: 'Duelo',
       nivel: room.nivel,
-      // `device_hash` identifica al dispositivo en el modo de un jugador. Acá
-      // no hay uno: se usa el id de socket, que ya es efímero y anónimo.
-      device_hash: 'duelo:' + jugador.socketId,
     }
 
     try {

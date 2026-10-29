@@ -18,7 +18,7 @@ npm run build        # tsc → dist/
 npm start            # node dist/index.js
 ```
 
-No test suite exists.
+Tests: `npm test` (cliente, vitest), `cd server && npm test`, `npm run lint`, `npm run typecheck`.
 
 ## Architecture
 
@@ -45,7 +45,7 @@ src/
     Duel*Screen.ts     # 4 files for the PvP duel flow
   services/
     DuelService.ts     # Socket.io-client wrapper; singleton duelService
-    LeaderboardService.ts  # Supabase calls for global/sala ranking
+    LeaderboardService.ts  # PocketBase calls for the sala ranking, salas and teacher keys
   storage/
     GameStorage.ts     # localStorage keyed by player name (cdp_<nombre>)
   audio/AudioEngine.ts # Web Audio API synth tones
@@ -91,8 +91,7 @@ server/src/
 | Client (Vercel) | https://cazador-de-palabras.vercel.app |
 | Socket.io server | `root@38.45.71.187` · Docker `cazador-duelo` · port 3001 |
 | Nginx proxy | `https://aulaplay.duckdns.org/duel/` → `http://localhost:3001/` |
-| PocketBase | port 8090 (unrelated, same VPS) |
-| Supabase | global/sala leaderboard (anon key in `src/lib/supabase.ts`) |
+| PocketBase | `https://aulaplay.duckdns.org` · ranking de salas (`cdp_scores`, `cdp_salas`, `cdp_errores`); Supabase ya no se usa |
 
 To redeploy server after changes:
 ```bash

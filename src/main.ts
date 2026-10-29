@@ -27,7 +27,7 @@ import { initDuelMenuScreen } from './screens/DuelMenuScreen'
 import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
 import { initDuelGameScreen } from './screens/DuelGameScreen'
 import { initDuelResultScreen } from './screens/DuelResultScreen'
-import { lsGet, lsSet } from './utils/storage'
+import { lsGet, lsSet, lsRemove } from './utils/storage'
 
 // Error banner must be absolute first
 initErrorBanner()
@@ -107,6 +107,12 @@ document.addEventListener('visibilitychange', () => {
     ;(G as any)._autoPaused = false
   }
 })
+
+// Ya no se guarda ningún identificador de dispositivo (antes: un UUID y su SHA-256,
+// que viajaban al servidor con cada puntaje). Se borra el que haya quedado de
+// versiones anteriores.
+lsRemove('cdp_device_id')
+lsRemove('cdp_device_hash')
 
 // Service Worker
 if ('serviceWorker' in navigator) {

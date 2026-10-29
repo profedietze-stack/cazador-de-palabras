@@ -83,3 +83,22 @@ describe('publicacion en el ranking del aula', () => {
     expect(metodos).toEqual(['GET', 'POST'])
   })
 })
+
+describe('el resultado del duelo no lleva identificadores de dispositivo', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('el POST al ranking no trae device_hash ni el id de socket', async () => {
+    const cuerpos: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_u: string, init?: { method?: string; body?: string }) => {
+      if (init?.method === 'POST' && init.body) cuerpos.push(init.body)
+      return { ok: true, json: async () => ({ items: [{}] }), text: async () => '' }
+    }))
+    const room = createRoom('ABCDE')
+    addPlayer(room, 'socket-secreto-123', 'ZZTEST_A')
+    room.salaCode = 'AULA2026'
+    room.startedAt = Date.now() - 60_000
+    await publicarResultado(room)
+    expect(cuerpos).toHaveLength(1)
+    expect(cuerpos[0]).not.toMatch(/device_hash|socket-secreto-123/)
+  })
+})

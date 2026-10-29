@@ -39,9 +39,9 @@ async function http(metodo, ruta, cuerpo, cabeceras = {}) {
 }
 
 const hdr = (k) => ({ 'x-host-key-id': k.id, 'x-host-key': k.key })
-const sala = (code, owner, extra = {}) => ({ code, nombre: 'ZZTEST_Aula', descripcion: '', activa: true, owner_key_id: owner, creator_device_hash: 'zztest', ...extra })
+const sala = (code, owner, extra = {}) => ({ code, nombre: 'ZZTEST_Aula', descripcion: '', activa: true, owner_key_id: owner, ...extra })
 const puntaje = (salaCode, extra = {}) => ({
-  device_hash: 'zztest', jugador: 'ZZTEST_Ana', sala_code: salaCode, modo: 'solo',
+  jugador: 'ZZTEST_Ana', sala_code: salaCode, modo: 'solo',
   cat: 'sustantivos', cat_nombre: 'Sustantivos', nivel: 1, pts: 100, medalla: 'ORO',
   precision: 100, cazadas: 10, erradas: 0, tiempo_usado: 60, combos: 1, ...extra,
 })

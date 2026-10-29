@@ -50,7 +50,7 @@ describe('sin identificadores de dispositivo', () => {
 describe('migración que quita las columnas (sin aplicar)', () => {
   const m = readFileSync('pocketbase/migrations/1796000000_cdp_quitar_device_hash.js', 'utf8')
   it('reescribe la regla de UPDATE ANTES de borrar el campo que la regla nombra', () => {
-    const regla = m.indexOf('salas.updateRule = salas.updateRule.replace')
+    const regla = m.indexOf('salas.updateRule = actual.replace')
     const borrar = m.indexOf('salas.fields.removeById(f1.id)')
     expect(regla).toBeGreaterThan(-1)
     expect(borrar).toBeGreaterThan(regla)

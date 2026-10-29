@@ -28,13 +28,14 @@
 //   nivel 2: 5 palabras, 50% correctas, ola minima 1000 ms -> 3.00 correctas/s
 //   nivel 3: 7 palabras, 30% correctas, ola minima  700 ms -> 2.86 correctas/s
 //
-// GameEngine: cada palabra vale su largo x el multiplicador de nivel, y el
-// combo maximo multiplica por 4. La palabra mas larga del diccionario tiene 14
-// caracteres.
+// reglas.ts / ComboSystem: cada palabra correcta vale puntos FIJOS por nivel
+// (10, 15, 20; ya no su largo) y el combo maximo multiplica por 4.
 //
-//   nivel 1: 14 x 1.0 x 4 =  56 puntos como maximo en una captura
-//   nivel 2: 14 x 1.5 x 4 =  84
-//   nivel 3: 14 x 2.0 x 4 = 112
+//   nivel 1: 10 x 4 = 40 puntos como maximo en una captura
+//   nivel 2: 15 x 4 = 60
+//   nivel 3: 20 x 4 = 80
+//
+// Un test (src/auditor.test.ts) compara estas cifras con las del juego.
 
 // IMPORTANTE: los hooks de PocketBase corren en un contexto aislado. El
 // callback NO puede usar constantes ni funciones declaradas afuera: da
@@ -43,7 +44,7 @@
 
 onRecordCreateRequest((e) => {
   const TASA_CORRECTAS_POR_SEG = { 1: 1.43, 2: 3.0, 3: 2.86 };
-  const PUNTOS_MAX_POR_CAPTURA = { 1: 56, 2: 84, 3: 112 };
+  const PUNTOS_MAX_POR_CAPTURA = { 1: 40, 2: 60, 3: 80 };
 
   // Margen sobre los limites teoricos. Existe para no marcar a nadie por un
   // redondeo o por una constante que se me haya escapado: preferimos dejar pasar

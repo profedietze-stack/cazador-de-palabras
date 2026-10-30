@@ -111,7 +111,7 @@ describe('el texto de otros jugadores nunca se convierte en imágenes', () => {
     const p = join(d, f)
     return statSync(p).isDirectory() ? walk(p) : [p]
   })
-  const archivos = walk('src').map(f => f.replaceAll(sep, '/')).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts'))
+  const archivos = walk('src').map(f => f.split(sep).join('/')).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts'))
 
   it('toda plantilla que pinta jugador, nombre o descripcion de otros lleva data-sin-emoji en la misma línea', () => {
     const sueltas: string[] = []

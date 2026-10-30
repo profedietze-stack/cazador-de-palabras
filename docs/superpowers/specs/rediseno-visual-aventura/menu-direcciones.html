@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Direcciones visuales — menú de inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&family=Lilita+One&family=Baloo+2:wght@600;800&family=Outfit:wght@600;800&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',system-ui,sans-serif;background:#eef0f6;color:#1e293b;padding:22px}
+  h1{font-size:1.35rem;margin-bottom:4px}
+  .sub{color:#475569;font-size:.92rem;margin-bottom:16px;max-width:900px;line-height:1.45}
+  .dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px;align-items:start}
+  .dir{background:#fff;border-radius:16px;padding:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);cursor:pointer;border:4px solid transparent;transition:border-color .15s}
+  .dir.selected,.dir:hover{border-color:#4f5fd1}
+  .dir h2{font-size:1rem;margin:2px 4px 2px}
+  .dir p.d{font-size:.8rem;color:#475569;margin:0 4px 10px;line-height:1.4}
+  .pantalla{position:relative;overflow:hidden;border-radius:12px;height:600px;display:flex;flex-direction:column;align-items:center;padding:20px 18px 14px;isolation:isolate}
+  .pantalla>*{position:relative;z-index:2}
+  .fondo{position:absolute!important;inset:0;z-index:0!important;overflow:hidden}
+  .logo{height:78px;display:flex;align-items:center;justify-content:center}
+  .logo img{width:72px;height:72px;animation:rebote 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+  @keyframes rebote{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+  .btns{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .b{display:flex;align-items:center;gap:10px;padding:10px 14px;font-weight:800;font-size:.95rem;cursor:pointer;user-select:none}
+  .b img{width:28px;height:28px;flex:0 0 auto}
+  .caen{margin-top:auto;width:100%;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-top:10px}
+  .caen small{width:100%;text-align:center;font-size:.68rem;opacity:.75;margin-bottom:2px}
+
+  /* ───────── A · CUADERNO ───────── */
+  .A{background:#fbf5e6;color:#1e2a4a;font-family:'Nunito',sans-serif;
+     background-image:repeating-linear-gradient(transparent 0 27px,#9ec5e8 27px 28px);background-position:0 12px}
+  .A::before{content:'';position:absolute;left:34px;top:0;bottom:0;width:2px;background:#f08a8a;z-index:1}
+  .A .garabatos span{position:absolute;font-family:'Fredoka';font-weight:700;color:#1e2a4a;opacity:.1;animation:flota 14s ease-in-out infinite}
+  @keyframes flota{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-16px) rotate(calc(var(--r) + 8deg))}}
+  .A .titulo{font-family:'Fredoka';font-weight:700;font-size:2.35rem;line-height:1;text-align:center;margin-top:4px;letter-spacing:.5px}
+  .A .titulo span{display:inline-block}
+  .A .titulo .hl{background:linear-gradient(transparent 55%,#ffd23f 55% 92%,transparent 92%);padding:0 6px}
+  .A .stit{font-weight:800;font-size:.78rem;margin-top:6px;opacity:.7}
+  .A .b{background:#fff;border:3px solid #1e2a4a;border-radius:14px;box-shadow:4px 4px 0 #1e2a4a;font-family:'Fredoka';font-weight:500;font-size:1rem;transition:transform .08s,box-shadow .08s}
+  .A .b:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #1e2a4a}
+  .A .b:active{transform:translate(4px,4px);box-shadow:0 0 0 #1e2a4a}
+  .A .b.p{background:#ffd23f}
+  .A .chip{font-family:'Nunito';font-weight:800;font-size:1.05rem;padding:6px 12px;border-radius:10px;background:#fff;border:2.5px solid #1e2a4a;box-shadow:3px 3px 0 #1e2a4a}
+  .A .chip.k{transform:rotate(-3deg)}.A .chip.l{transform:rotate(2deg)}.A .chip.m{transform:rotate(-1deg)}
+
+  /* ───────── B · AVENTURA ───────── */
+  .B{background:linear-gradient(#0e3b43,#1c6b5f 55%,#2f8f6b);color:#fff;font-family:'Baloo 2',sans-serif}
+  .B .luna{position:absolute;right:26px;top:26px;width:46px;height:46px;border-radius:50%;background:#fff4c2;box-shadow:0 0 40px 14px rgba(255,244,194,.45)}
+  .B .colina{position:absolute;left:-10%;width:220%;bottom:0;height:46%;animation:desliza var(--t) linear infinite}
+  @keyframes desliza{from{transform:translateX(0)}to{transform:translateX(-45.4%)}}
+  .B .luci{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe66d;box-shadow:0 0 10px 4px rgba(255,230,109,.8);animation:luci var(--d) ease-in-out infinite}
+  @keyframes luci{0%,100%{transform:translate(0,0);opacity:.2}50%{transform:translate(18px,-26px);opacity:1}}
+  .B .titulo{font-family:'Lilita One';font-size:2.25rem;line-height:1.02;text-align:center;color:#ffd23f;margin-top:2px;
+     text-shadow:0 2px 0 #e08a00,0 4px 0 #b86a00,0 6px 0 #8a4d00,0 8px 10px rgba(0,0,0,.4);-webkit-text-stroke:1.5px #7a3f00}
+  .B .stit{font-weight:800;font-size:.8rem;margin-top:12px;color:#d9fff0}
+  .B .b{border-radius:16px;font-family:'Baloo 2';font-weight:800;color:#fff;background:#2a8c7e;border-bottom:6px solid #16584f;box-shadow:0 6px 10px rgba(0,0,0,.25);transition:transform .08s,border-bottom-width .08s}
+  .B .b:active{transform:translateY(4px);border-bottom-width:2px}
+  .B .b.p{background:linear-gradient(#ffb347,#ff8a1f);border-bottom-color:#b8520a;font-size:1.05rem}
+  .B .chip{font-family:'Baloo 2';font-weight:800;font-size:1.05rem;padding:3px 13px;border-radius:12px;background:#fff6dc;color:#4a2c00;border-bottom:4px solid #d8b56a;box-shadow:0 4px 8px rgba(0,0,0,.3)}
+
+  /* ───────── C · NEÓN ───────── */
+  .C{background:#0b1020;color:#eef1ff;font-family:'Space Grotesk',sans-serif}
+  .C .blob{position:absolute;width:260px;height:260px;border-radius:50%;filter:blur(60px);opacity:.55;animation:deriva var(--t) ease-in-out infinite alternate}
+  @keyframes deriva{from{transform:translate(0,0) scale(1)}to{transform:translate(70px,60px) scale(1.25)}}
+  .C .grilla{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:34px 34px;mask-image:radial-gradient(circle at 50% 35%,#000,transparent 75%)}
+  .C .titulo{font-family:'Outfit';font-weight:800;font-size:2.4rem;line-height:1;text-align:center;margin-top:2px;letter-spacing:-.5px;
+     background:linear-gradient(100deg,#7cf2ff,#a78bfa 45%,#ff7ad9);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(167,139,250,.55))}
+  .C .stit{font-weight:500;font-size:.78rem;margin-top:8px;letter-spacing:2.5px;text-transform:uppercase;opacity:.75}
+  .C .b{border-radius:999px;font-family:'Space Grotesk';font-weight:700;color:#eef1ff;background:linear-gradient(#10172e,#10172e) padding-box,linear-gradient(100deg,rgba(124,242,255,.7),rgba(255,122,217,.7)) border-box;border:1.5px solid transparent;transition:box-shadow .2s,transform .1s}
+  .C .b:hover{box-shadow:0 0 22px rgba(124,242,255,.35)}
+  .C .b:active{transform:scale(.97)}
+  .C .b.p{background:linear-gradient(100deg,#6d5dfc,#22d3ee);border:0;box-shadow:0 0 26px rgba(109,93,252,.6);font-size:1.02rem}
+  .C .chip{font-family:'Space Grotesk';font-weight:700;font-size:1rem;padding:6px 13px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);box-shadow:0 0 16px rgba(124,242,255,.2)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  .pie{margin-top:16px;font-size:.82rem;color:#475569;max-width:900px;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>¿Cuál dirección se acerca más a lo que imaginás?</h1>
+<p class="sub">Es el menú de inicio con la misma data real del juego, en tres estilos. Tocá una para elegirla (podés tocar varias y contarme cuál te gustó de qué). Los fondos, el título y los botones se mueven. Los emojis son Fluent 3D, como pediste. Las tipografías son de una librería libre y en el juego irían dentro del propio sitio.</p>
+
+<div class="dirs">
+
+  <div class="dir" data-choice="a" onclick="toggleSelect(this)">
+    <h2>A · Cuaderno</h2>
+    <p class="d">Hoja de cuaderno con renglones y garabatos de letras. Botones tipo sticker con borde grueso y sombra dura. Cálido, escolar, muy legible. Título con marcador amarillo.</p>
+    <div class="pantalla A">
+      <div class="fondo garabatos" id="gA"></div>
+      <div class="logo"><img data-em="1f3af" alt=""></div>
+      <div class="titulo"><span style="transform:rotate(-3deg)">Cazador</span><br><span class="hl" style="transform:rotate(1.5deg)">de Palabras</span></div>
+      <div class="stit">✎ Juego de gramática</div>
+      <div class="btns" id="bA"></div>
+      <div class="caen"><small>así se leerían las palabras que caen</small><span class="chip k">desierto</span><span class="chip l">sobre</span><span class="chip m">lindo</span></div>
+    </div>
+  </div>
+
+  <div class="dir" data-choice="b" onclick="toggleSelect(this)">
+    <h2>B · Aventura</h2>
+    <p class="d">Noche de selva con colinas en capas que se desplazan, luna y luciérnagas. Título de cartel con volumen y botones 3D que se hunden al tocarlos. Más juego, más «cazador».</p>
+    <div class="pantalla B">
+      <div class="fondo" id="gB"></div>
+      <div class="logo"><img data-em="1f3af" alt=""></div>
+      <div class="titulo">Cazador<br>de Palabras</div>
+      <div class="stit">¡A cazar la gramática!</div>
+      <div class="btns" id="bB"></div>
+      <div class="caen"><small>así se leerían las palabras que caen</small><span class="chip">desierto</span><span class="chip">sobre</span><span class="chip">lindo</span></div>
+    </div>
+  </div>
+
+  <div class="dir" data-choice="c" onclick="toggleSelect(this)">
+    <h2>C · Neón moderno</h2>
+    <p class="d">Oscuro con aurora de colores que respira y grilla sutil. Vidrio, bordes luminosos y título con degradado. Parece una app actual y conserva el violeta de hoy como acento.</p>
+    <div class="pantalla C">
+      <div class="fondo" id="gC"></div>
+      <div class="logo"><img data-em="1f3af" alt=""></div>
+      <div class="titulo">Cazador<br>de Palabras</div>
+      <div class="stit">Gramática en juego</div>
+      <div class="btns" id="bC"></div>
+      <div class="caen"><small>así se leerían las palabras que caen</small><span class="chip">desierto</span><span class="chip">sobre</span><span class="chip">lindo</span></div>
+    </div>
+  </div>
+
+</div>
+<p class="pie">Todas respetarían «reducir movimiento» y «alto contraste» de Ajustes (los fondos se detienen), y mantienen las palabras que caen a 18 px o más. Lo que ves acá es solo el menú; las pantallas de partida y final seguirían la misma dirección.</p>
+
+<script>
+const CDN = 'https://cdn.jsdelivr.net/npm/@lobehub/fluent-emoji-3d@1.1.0/assets/';
+function em(img){ const c = img.dataset.em, l=[c, c+'-fe0f']; let i=0; img.src = CDN+l[0]+'.webp'; img.onerror=()=>{ if(++i<l.length) img.src=CDN+l[i]+'.webp'; }; }
+document.querySelectorAll('img[data-em]').forEach(em);
+const ITEMS=[['1f680','Iniciar Partida',1],['1f3c6','Mejores Puntuaciones'],['1f947','Medallas y Logros'],['1f3eb','Mi Sala'],['2694','Modo Duelo']];
+for(const k of ['A','B','C']){
+  const c=document.getElementById('b'+k);
+  for(const [code,txt,p] of ITEMS){ const b=document.createElement('div'); b.className='b'+(p?' p':''); b.innerHTML='<img data-em="'+code+'" alt=""><span>'+txt+'</span>'; c.appendChild(b); em(b.querySelector('img')); }
+}
+// A: garabatos
+(function(){ const g=document.getElementById('gA'); const L=['A','Ñ','¿?','¡!','b','ll','Z','é','?','S']; L.forEach((t,i)=>{ const s=document.createElement('span'); s.textContent=t; s.style.cssText=`left:${(i*37+8)%86}%;top:${(i*53+6)%86}%;font-size:${38+(i%4)*14}px;--r:${(i*29)%50-25}deg;animation-delay:${-i*1.7}s;animation-duration:${12+i}s`; g.appendChild(s); }); })();
+// B: colinas + luciérnagas + luna
+(function(){ const g=document.getElementById('gB'); g.innerHTML='<div class="luna"></div>';
+  const col=(color,alto,t,p)=>{ const d=document.createElement('div'); d.className='colina'; d.style.cssText=`--t:${t}s;height:${alto}%`; d.innerHTML=`<svg viewBox="0 0 1000 200" preserveAspectRatio="none" width="100%" height="100%"><path d="${p}" fill="${color}"/></svg>`; g.appendChild(d); };
+  const onda=(a,b)=>{ let d='M0 200 L0 '+a; for(let i=0;i<=10;i++){ d+=` Q ${i*100+50} ${i%2?b:a-60} ${i*100+100} ${a}`; } return d+' L1000 200 Z'; };
+  col('#14564f',46,60,onda(110,40)); col('#1d7a5f',36,38,onda(120,60)); col('#2a9a6a',24,24,onda(130,80));
+  for(let i=0;i<14;i++){ const f=document.createElement('div'); f.className='luci'; f.style.cssText=`left:${(i*41)%96}%;top:${35+(i*29)%55}%;--d:${3+(i%5)}s;animation-delay:${-i*.7}s`; g.appendChild(f); } })();
+// C: aurora
+(function(){ const g=document.getElementById('gC'); g.innerHTML='<div class="grilla"></div>';
+  [['#6d5dfc','-60px','-40px',16],['#22d3ee','150px','220px',20],['#ff4fd8','-30px','420px',24]].forEach(([c,x,y,t])=>{ const b=document.createElement('div'); b.className='blob'; b.style.cssText=`background:${c};left:${x};top:${y};--t:${t}s`; g.appendChild(b); }); })();
+</script>
+</body>
+</html>

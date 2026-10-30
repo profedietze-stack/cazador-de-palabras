@@ -1,0 +1,63 @@
+/* ── Pantalla ⚙️ Ajustes ──────────────────────────────────────────────────── */
+#ajustesScreen{justify-content:flex-start}
+.aj-intro{color:#fff;text-align:center;max-width:520px;margin:0 0 1rem;font-size:.9rem;line-height:1.45;opacity:.95}
+.aj-wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:.9rem;margin-bottom:1rem}
+.aj-sec{
+  background:var(--panel-bg);color:var(--text);border-radius:var(--radius);
+  padding:1rem 1.1rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.35rem;
+}
+.aj-sec h2{font-size:1.05rem;margin-bottom:.3rem}
+.aj-fila{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.45rem 0;border-top:1px solid var(--border);min-height:44px}
+.aj-sec h2 + .aj-fila,.aj-aviso + .aj-fila{border-top:0}
+.aj-txt{display:flex;flex-direction:column;font-weight:600;font-size:.95rem;flex:1}
+.aj-txt small{font-weight:400;color:var(--text-muted);font-size:.78rem;margin-top:.1rem;line-height:1.3}
+.aj-aviso{background:var(--panel-acc);border-left:4px solid var(--warn);padding:.6rem .8rem;border-radius:8px;font-size:.82rem;line-height:1.4}
+.aj-rango{display:flex;align-items:center;gap:.6rem;flex:0 0 52%}
+.aj-rango input{flex:1;accent-color:var(--border-acc);min-width:0;height:28px}
+.aj-out{min-width:3.2rem;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:.85rem}
+.aj-switch{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:48px;height:28px;border-radius:14px;background:var(--text-faint);position:relative;cursor:pointer;transition:background var(--trans);border:0}
+.aj-switch::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform var(--trans);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.aj-switch:checked{background:var(--ok)}
+.aj-switch:checked::after{transform:translateX(20px)}
+.aj-switch:disabled,.aj-rango input:disabled,.aj-op:disabled{opacity:.4;cursor:not-allowed}
+.aj-fila-seg{flex-direction:column;align-items:stretch;gap:.5rem}
+.aj-seg{display:flex;gap:.35rem;flex-wrap:wrap}
+.aj-op{
+  flex:1 1 auto;min-height:44px;padding:.4rem .8rem;border-radius:10px;cursor:pointer;
+  border:2px solid var(--border);background:var(--panel-alt);color:var(--text);font-weight:700;font-size:.85rem;
+}
+.aj-op.on{background:var(--border-acc);border-color:var(--border-acc);color:#fff}
+.aj-op:focus-visible,.aj-switch:focus-visible,.aj-rango input:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.aj-sec .btn{align-self:flex-start;margin-top:.5rem}
+
+/* ── Efectos de los ajustes (atributos de <html>, ver ui/aplicarAjustes.ts) ── */
+
+/* Palabras más grandes también en el duelo */
+.duel-chip{font-size:calc(.9rem * var(--tam-palabras, 1))}
+
+/* Fondo decorativo y stickers del menú apagados */
+html[data-fondo="no"] #menuBg{display:none}
+
+/* Reducir movimiento a pedido del alumno (el del sistema ya está en a11y.css) */
+html[data-movimiento="reducido"] *,
+html[data-movimiento="reducido"] *::before,
+html[data-movimiento="reducido"] *::after{
+  animation-duration:.01ms !important;animation-iteration-count:1 !important;
+  transition-duration:.01ms !important;scroll-behavior:auto !important;
+}
+html[data-movimiento="reducido"] #menuBg{display:none}
+
+/* Alto contraste: más diferencia de color y bordes más gruesos */
+html[data-contraste="alto"]{
+  --text:#000;--text-soft:#111;--text-muted:#1f2937;--text-faint:#374151;
+  --border:#111827;--border-acc:#1d2a99;
+  --panel-bg:#fff;--panel-alt:#f1f5f9;--panel-acc:#e2e8f0;
+}
+html[data-contraste="alto"][data-theme="dark"]{
+  --text:#fff;--text-soft:#f1f5f9;--text-muted:#e2e8f0;--text-faint:#cbd5e1;
+  --border:#e2e8f0;--border-acc:#a5b4fc;
+  --panel-bg:#000;--panel-alt:#0b1220;--panel-acc:#111827;
+}
+html[data-contraste="alto"] .palabra{background:rgba(0,0,0,.6);border:3px solid #fff;text-shadow:none}
+html[data-contraste="alto"] .btn,html[data-contraste="alto"] .aj-op,html[data-contraste="alto"] .duel-chip{border-width:3px}
+html[data-contraste="alto"] .duel-chip.free{background:#000;border-color:#fff}

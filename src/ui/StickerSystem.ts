@@ -1,4 +1,5 @@
 import { cargarLayoutStickers, guardarLayoutStickers } from '../storage/GameStorage'
+import { ajustes } from '../storage/ajustes'
 
 const STICKERS_LIT = ['📖','✏️','📝','🖊️','📚','🔤','📜','🖋️','🎭','📕','📗','📘','💡','🌟','⭐','🎓','🏅','🔡','💬','🗣️','🖍️','🔖','📃','🃏','🎪']
 const FRASES_MOTIVADORAS = [
@@ -56,12 +57,14 @@ function generarLayoutMenu(): StickerItem[] {
 }
 
 export function iniciarStickersLogros(totalCombos: number): void {
+  if (!ajustes().stickers) return
   let layout = cargarLayoutStickers('logros')
   if (!layout) { layout = generarLayoutLogros(); guardarLayoutStickers('logros', layout) }
   requestAnimationFrame(() => requestAnimationFrame(() => renderStickersLogros(layout!, totalCombos)))
 }
 
 export function iniciarStickersMenu(totalCombos: number): void {
+  if (!ajustes().stickers) return
   let layout = cargarLayoutStickers('menu')
   if (!layout) { layout = generarLayoutMenu(); guardarLayoutStickers('menu', layout) }
   renderStickersMenu(layout, totalCombos)

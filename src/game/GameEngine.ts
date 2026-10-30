@@ -11,6 +11,8 @@ import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
 import { explicarError } from './porQue'
 import { cargarRepasoJugador, guardarRepaso, falloEnRepaso, aciertoEnRepaso } from './sesionRepaso'
 import { setAlSalirSinTocar } from './WordPhysics'
+import { ajustes } from '../storage/ajustes'
+import { vibrar } from '../utils/vibracion'
 
 // callbacks set by screens
 let _onGameEnd: ((record: GameRecord, logros: ReturnType<typeof checkLogros>) => void) | null = null
@@ -29,10 +31,13 @@ let porQueTimer: ReturnType<typeof setTimeout> | null = null
 function mostrarPorQue(texto: string): void {
   const el = document.getElementById('porQue')
   if (!el) return
+  // Ajustes: 0 s = el alumno no quiere ver la explicación.
+  const seg = ajustes().porQueSeg
+  if (seg === 0) return
   el.textContent = texto
   el.classList.add('visible')
   if (porQueTimer) clearTimeout(porQueTimer)
-  porQueTimer = setTimeout(() => el.classList.remove('visible'), 4500)
+  porQueTimer = setTimeout(() => el.classList.remove('visible'), seg * 1000)
 }
 
 const EMOJIS_LITERARIOS = ['📖','✏️','📝','🖊️','📚','🔤','🅰️','💬','🗣️','📜','🖋️','🎭','📕','📗','📘','🔡','💡','🌟','⭐','✨']
@@ -179,11 +184,12 @@ function cazarPalabra(el: HTMLElement): void {
     const pts = Math.round(ptsBase * mult)
     G.pts += pts; G.cazadas++
     sonidoOk()
+    vibrar('acierto')
     el.classList.add('hit-ok')
     actualizarCombo(true)
     const label = G.comboNivel > 0 ? `+${pts} ×${COMBOS[G.comboNivel]!.mult}` : `+${pts}`
     mostrarPuntosFlotantes(label, cx, cy, G.comboNivel >= 4 ? '#f59e0b' : G.comboNivel >= 2 ? '#a855f7' : '#10b981')
-    if (G.comboNivel >= 1) {
+    if (G.comboNivel >= 1 && ajustes().stickers) {
       soltarEmojisLiterarios(cx, cy, G.comboNivel + 1)
       mostrarStickersJuego(cx, cy, G.comboNivel)
     }
@@ -193,6 +199,7 @@ function cazarPalabra(el: HTMLElement): void {
     const resta = restaPorError(G.nivel)
     G.pts = Math.max(0, G.pts - resta); G.erradas++
     sonidoMal()
+    vibrar('error')
     el.classList.add('hit-mal')
     mostrarPuntosFlotantes('-' + resta, cx, cy, '#ef4444')
     const palabra = el.dataset.palabra

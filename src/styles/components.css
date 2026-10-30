@@ -120,16 +120,6 @@
   transition:all .2s;margin:.8rem auto 0;display:block;font-size:.9rem;
 }
 .back-btn:hover{background:rgba(255,255,255,.35)}
-.vol-btn,.theme-btn{
-  position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:999;
-  width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.6);
-  background:rgba(255,255,255,.2);color:#fff;font-size:1.3rem;
-  cursor:pointer;transition:all var(--trans);display:flex;align-items:center;justify-content:center;
-}
-.vol-btn:hover,.theme-btn:hover{background:rgba(255,255,255,.35)}
-.vol-btn{right:calc(1rem + env(safe-area-inset-right))}
-.theme-btn{right:calc(4rem + env(safe-area-inset-right))}
-.vol-btn.off{opacity:.4}
 .badge{display:inline-block;padding:.15rem .5rem;border-radius:6px;font-size:.75rem;font-weight:700;color:#fff}
 .badge-oro{background:var(--oro)}
 .badge-plata{background:var(--plata)}
@@ -142,3 +132,13 @@
   animation:slideDown .4s ease;transition:opacity .4s ease,transform .4s ease;
 }
 .alert-banner.saliendo{opacity:0;transform:translateX(-50%) translateY(-12px)}
+
+/* ── Botón ⚙️ (solo en el menú de inicio) ─────────────────────────────────── */
+.aj-btn{
+  position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));right:calc(1rem + env(safe-area-inset-right));z-index:999;
+  width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.6);
+  background:rgba(255,255,255,.2);color:#fff;font-size:1.4rem;
+  cursor:pointer;transition:all var(--trans);display:none;align-items:center;justify-content:center;
+}
+.aj-btn:hover{background:rgba(255,255,255,.35)}
+body[data-pantalla="menuPrincipal"] .aj-btn{display:flex}

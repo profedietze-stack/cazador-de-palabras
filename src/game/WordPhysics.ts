@@ -1,4 +1,5 @@
 import { G } from './state'
+import { reducirMovimientoActivo } from '../utils/movimiento'
 
 let _alSalirSinTocar: ((el: HTMLElement) => void) | null = null
 export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
@@ -11,7 +12,7 @@ export function animarCaida(el: HTMLElement, size: number): void {
   let y = -60
   const speed = (1.2 + Math.random() * 2) * G.velocidadBase
   const grande = size > 26
-  const reducir = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+  const reducir = reducirMovimientoActivo()
   let osc = 0
   const startX = parseFloat(el.style.left)
   const amplitud = grande && !reducir ? 18 : 0

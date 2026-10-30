@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { MULTIPLICADOR_TAMANO } from './storage/ajustes'
 
 // Auditoría 28-oct-2026 (UX-9 a UX-14, DID-19): contraste 3,66:1, blancos táctiles
 // de 28 px, user-scalable=no, sin aria-live, sin prefers-reduced-motion, diálogo
@@ -52,7 +53,11 @@ describe('movimiento y legibilidad', () => {
   })
   it('las palabras que caen miden al menos 18 px y no giran', () => {
     const w = readFileSync('src/game/WordSpawner.ts', 'utf8')
-    expect(w).toMatch(/const size = 18 \+ Math\.random\(\) \* 14/)
+    // Piso de 18 px; el tamaño de Ajustes solo multiplica, y ninguno achica.
+    expect(w).toMatch(/let size = \(18 \+ Math\.random\(\) \* 14\) \* mult/)
+    // El tope por ancho de pantalla nunca baja del piso.
+    expect(w).toMatch(/Math\.max\(18, Math\.min\(size,/)
+    expect(Math.min(...Object.values(MULTIPLICADOR_TAMANO))).toBeGreaterThanOrEqual(1)
     const f = readFileSync('src/game/WordPhysics.ts', 'utf8')
     expect(f).not.toContain('rotate(')
   })

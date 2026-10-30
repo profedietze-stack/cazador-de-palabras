@@ -6,6 +6,7 @@ import { POWER_META } from '../types/duel'
 import type { PowerId, DuelScores } from '../types/duel'
 import { showAlert } from '../ui/Dialog'
 import { showBanner } from '../ui/Banner'
+import { vibrar } from '../utils/vibracion'
 
 // Last duel end data — read by DuelResultScreen
 export let lastDuelEnd: { winner: 'A' | 'B' | 'draw'; scores: DuelScores; reason: string } | null = null
@@ -255,8 +256,9 @@ export function mostrarDuelGame(): void {
 export function initDuelGameScreen(): void {
 
   // word_taken: update chip, scores
-  duelService.on('word_taken', ({ wordId, bySlot, scores }) => {
+  duelService.on('word_taken', ({ wordId, bySlot, correct, scores }) => {
     if (D.phase !== 'playing') return
+    if (bySlot === D.mySlot) vibrar(correct ? 'acierto' : 'error')
     const chip = getChip(wordId)
     if (chip) {
       chip.classList.remove('free')

@@ -2,6 +2,8 @@ import { DECO_PALABRAS, DECO_COLORES } from '../data/decoWords'
 import { G } from '../game/state'
 import { iniciarStickersMenu, limpiarStickersMenu } from './StickerSystem'
 import { getTotalCombosJugador } from '../storage/GameStorage'
+import { ajustes } from '../storage/ajustes'
+import { reducirMovimientoActivo } from '../utils/movimiento'
 
 // Fondo decorativo del menú.
 //
@@ -19,8 +21,7 @@ let generacion = 0
 const temporizadores = new Set<ReturnType<typeof setTimeout>>()
 const animaciones = new Map<HTMLElement, number>()
 
-const reducirMovimiento = (): boolean =>
-  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+const reducirMovimiento = reducirMovimientoActivo
 
 function programar(gen: number, ms: number, fn: () => void): void {
   const id = setTimeout(() => {
@@ -36,6 +37,7 @@ export function iniciarDecoMenu(): void {
   if (!document.getElementById('menuPrincipal')?.classList.contains('active')) return
   detenerDecoMenu()
   if (reducirMovimiento()) return   // sin fondo animado para quien pidió menos movimiento
+  if (!ajustes().fondoDecorativo) return   // Ajustes ▸ fondo decorativo apagado
   decoActivo = true
   const gen = ++generacion
   const bg = document.getElementById('menuBg')!

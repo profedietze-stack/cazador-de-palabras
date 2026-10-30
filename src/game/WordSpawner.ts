@@ -5,6 +5,7 @@ import { animarCaida } from './WordPhysics'
 import { puntosPorAcierto } from './reglas'
 import { distractoresParaNivel, textoVisible } from './distractores'
 import { priorizarDistractores } from './sesionRepaso'
+import { ajustes, MULTIPLICADOR_TAMANO } from '../storage/ajustes'
 
 type OnClickFn = (el: HTMLElement) => void
 let _onClick: OnClickFn = () => {}
@@ -100,10 +101,17 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
 
   // Mínimo 18 px: las de 12-15 px giraban a 150°/s y eran ilegibles para baja
   // visión y dislexia; se castigaba un error de lectura como si fuera de gramática.
-  const size = 18 + Math.random() * 14
+  // Ajustes ▸ tamaño de las palabras: solo cambia cuánto se ve, no la dificultad.
+  const mult = MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras]
+  let size = (18 + Math.random() * 14) * mult
+  // Agrandadas, una palabra larga no entraría en un celular angosto: se acota el
+  // tamaño para que quepa (nunca por debajo del piso de 18 px) y se la ubica según
+  // su ancho estimado. Con tamaño normal todo sigue igual.
+  if (mult > 1) size = Math.max(18, Math.min(size, (area.clientWidth - 48) / (texto.length * 0.62)))
   el.style.fontSize = size + 'px'
 
-  const maxX = area.clientWidth - 160
+  const anchoEstimado = mult > 1 ? texto.length * 0.62 * size + 40 : 160
+  const maxX = area.clientWidth - anchoEstimado
   const startX = 20 + Math.random() * Math.max(0, maxX)
   el.style.left = startX + 'px'
   el.style.top = '-60px'

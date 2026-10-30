@@ -1,6 +1,7 @@
 import type { ComboLevel } from '../types'
 import { G } from './state'
 import { playComboSound } from '../audio/AudioEngine'
+import { vibrar } from '../utils/vibracion'
 
 export const COMBOS: (ComboLevel | null)[] = [
   null,
@@ -51,5 +52,5 @@ function mostrarComboBanner(esNuevo: boolean): void {
   b.className = 'combo-banner ' + combo.clase
   b.textContent = combo.label + '  🔥×' + G.racha
   d.appendChild(b)
-  if (esNuevo) playComboSound(G.comboNivel)
+  if (esNuevo) { playComboSound(G.comboNivel); vibrar('combo') }
 }

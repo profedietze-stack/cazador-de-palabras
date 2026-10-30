@@ -6,6 +6,7 @@ export type ScreenId =
   | 'gameScreen' | 'resultadoScreen' | 'medallasScreen'
   | 'rankingScreen' | 'infoScreen' | 'salaScreen' | 'resultadosSalaScreen'
   | 'duelMenuScreen' | 'duelLobbyScreen' | 'duelGameScreen' | 'duelResultScreen'
+  | 'ajustesScreen'
 
 let _pending: ScreenId | null = null
 let _screens: NodeListOf<Element> | null = null
@@ -19,11 +20,13 @@ function activate(id: ScreenId): void {
   _pending = null
   getScreens().forEach(s => s.classList.remove('active', 'exiting'))
   document.getElementById(id)!.classList.add('active')
+  // Lo usa el CSS para mostrar el botón ⚙️ solo en el menú.
+  document.body.dataset['pantalla'] = id
 
   if (id === 'menuPrincipal') {
     setTimeout(iniciarDecoMenu, 80)
     setTimeout(() => iniciarMusica('menu'), 120)
-  } else if (id === 'seleccionCategoria' || id === 'preNivel') {
+  } else if (id === 'seleccionCategoria' || id === 'preNivel' || id === 'ajustesScreen') {
     detenerDecoMenu()
     setTimeout(() => iniciarMusica('menu'), 80)
   } else if (id === 'gameScreen') {

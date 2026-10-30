@@ -14,7 +14,6 @@ export const G: GameState = {
   pausado: false,
   intervaloTiempo: null,
   velocidadBase: 1,
-  sonido: true,
   tiempoInicioNivel: null,
   racha: 0,
   comboNivel: 0,

@@ -74,7 +74,6 @@ export interface GameState {
   pausado: boolean
   intervaloTiempo: ReturnType<typeof setInterval> | null
   velocidadBase: number
-  sonido: boolean
   tiempoInicioNivel: number | null
   racha: number
   comboNivel: number

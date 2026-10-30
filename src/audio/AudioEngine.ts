@@ -1,4 +1,5 @@
 import { G } from '../game/state'
+import { ajustes, ganancia } from '../storage/ajustes'
 
 const AC = window.AudioContext || (window as any).webkitAudioContext
 let ac: AudioContext | null = null
@@ -19,7 +20,9 @@ document.addEventListener('touchend', unlockAudio, { once: false, passive: true 
 document.addEventListener('click', unlockAudio, { once: false, passive: true })
 
 function playTone(freq: number, dur: number, type: OscillatorType = 'sine', vol = 0.18): void {
-  if (!G.sonido) return
+  const k = ganancia(ajustes(), 'efectos')
+  if (k === 0) return
+  vol *= k
   try {
     const ctx = getAC(), t = ctx.currentTime
     const o = ctx.createOscillator(), g = ctx.createGain()
@@ -51,7 +54,8 @@ export function sonidoNivel(): void {
 }
 
 export function playComboSound(nivel: number): void {
-  if (!G.sonido) return
+  const k = ganancia(ajustes(), 'efectos')
+  if (k === 0) return
   try {
     const ctx = getAC(), t = ctx.currentTime
     const secs = [
@@ -68,7 +72,7 @@ export function playComboSound(nivel: number): void {
       o.type = nivel === 5 ? 'triangle' : 'sine'; o.frequency.value = f
       const ini = t + i * 0.07
       g.gain.setValueAtTime(0, ini)
-      g.gain.linearRampToValueAtTime(0.2, ini + 0.02)
+      g.gain.linearRampToValueAtTime(0.2 * k, ini + 0.02)
       g.gain.exponentialRampToValueAtTime(0.001, ini + 0.18)
       o.start(ini); o.stop(ini + 0.22)
     })
@@ -77,7 +81,7 @@ export function playComboSound(nivel: number): void {
         const o = ctx.createOscillator(), g = ctx.createGain()
         o.connect(g); g.connect(ctx.destination)
         o.type = 'sine'; o.frequency.value = f
-        g.gain.setValueAtTime(0.1, t)
+        g.gain.setValueAtTime(0.1 * k, t)
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.65)
         o.start(t); o.stop(t + 0.68)
       })
@@ -94,7 +98,7 @@ let musicaActiva = false
 let musicaTipo: 'menu' | 'juego' | null = null
 
 export function iniciarMusica(tipo: 'menu' | 'juego'): void {
-  if (!G.sonido) return
+  if (ganancia(ajustes(), 'musica') === 0) return
   if (musicaTipo === tipo && musicaActiva) return
   detenerMusica()
   musicaActiva = true
@@ -110,12 +114,14 @@ export function iniciarMusica(tipo: 'menu' | 'juego'): void {
 
   function tocarNota(): void {
     if (!musicaActiva) return
-    if (!G.sonido) { musicaNode = setTimeout(tocarNota, beat); return }
+    // El volumen se lee en cada nota: moverlo en Ajustes se oye al instante.
+    const km = ganancia(ajustes(), 'musica')
+    if (km === 0) { musicaNode = setTimeout(tocarNota, beat); return }
     try {
       const ctx = getAC(), t = ctx.currentTime
       const idx = patron[paso % patron.length]!
       const freq = notas[idx % notas.length]!
-      const vol = tipo === 'juego' ? 0.08 : 0.055
+      const vol = (tipo === 'juego' ? 0.08 : 0.055) * km
       const dur = tipo === 'juego' ? 0.16 : 0.32
       const o = ctx.createOscillator(), g = ctx.createGain()
       o.connect(g); g.connect(ctx.destination)
@@ -127,7 +133,7 @@ export function iniciarMusica(tipo: 'menu' | 'juego'): void {
         const ob = ctx.createOscillator(), gb = ctx.createGain()
         ob.connect(gb); gb.connect(ctx.destination)
         ob.type = 'sine'; ob.frequency.value = freq / 2
-        gb.gain.setValueAtTime(0.06, t)
+        gb.gain.setValueAtTime(0.06 * km, t)
         gb.gain.exponentialRampToValueAtTime(0.001, t + 0.22)
         ob.start(t); ob.stop(t + 0.25)
       }
@@ -136,6 +142,23 @@ export function iniciarMusica(tipo: 'menu' | 'juego'): void {
     musicaNode = setTimeout(tocarNota, beat)
   }
   tocarNota()
+}
+
+/** Arranca o corta la música según los ajustes y la pantalla en la que se está. */
+export function refrescarMusica(): void {
+  if (ganancia(ajustes(), 'musica') === 0) { detenerMusica(); return }
+  const id = document.querySelector('.screen.active')?.id
+  if (id === 'menuPrincipal' || id === 'seleccionCategoria' || id === 'preNivel' || id === 'ajustesScreen') {
+    iniciarMusica('menu')
+  } else if (id === 'gameScreen' && G.activo && !G.pausado) {
+    iniciarMusica('juego')
+  }
+}
+
+/** Para el botón «Probar sonido» de Ajustes. */
+export function probarSonido(): void {
+  sonidoOk()
+  setTimeout(() => playComboSound(2), 260)
 }
 
 export function detenerMusica(): void {

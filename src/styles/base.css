@@ -53,7 +53,11 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,var(--b
 }
 .screen.active{display:flex;animation:screenIn .3s cubic-bezier(.22,1,.36,1)}
 .screen.exiting{animation:screenOut .25s ease forwards;pointer-events:none}
-#menuPrincipal,#resultadoScreen,#preNivel{justify-content:center}
+/* Centradas con margen automático y no con justify-content:center: si el contenido
+   no entra en la pantalla, el centrado lo corta por arriba y por abajo y no se puede
+   scrollear hasta los botones. Con margen auto, cuando sobra espacio se centra y
+   cuando falta arranca desde arriba y se desplaza. */
+#menuPrincipal>.card,#resultadoScreen>.card,#preNivel>.pre-box{margin-block:auto}
 
 .card{
   background:var(--panel);backdrop-filter:blur(14px);

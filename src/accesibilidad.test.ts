@@ -126,3 +126,15 @@ describe('teclado y landmark', () => {
     expect(dentro).not.toContain('id="dialogOverlay"')
   })
 })
+
+describe('pantallas centradas que tienen que poder scrollear', () => {
+  const css = readFileSync('src/styles/base.css', 'utf8')
+  it('no se centran con justify-content:center (corta el contenido y no hay scroll)', () => {
+    expect(css).not.toMatch(/#resultadoScreen[^{]*\{[^}]*justify-content:\s*center/)
+    expect(css).not.toMatch(/#menuPrincipal[^{]*\{[^}]*justify-content:\s*center/)
+    expect(css).not.toMatch(/#preNivel[^{]*\{[^}]*justify-content:\s*center/)
+  })
+  it('se centran con margen automático', () => {
+    expect(css).toContain('#menuPrincipal>.card,#resultadoScreen>.card,#preNivel>.pre-box{margin-block:auto}')
+  })
+})

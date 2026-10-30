@@ -90,6 +90,27 @@ function generarOlaPalabras(): void {
   generadorTimeout = setTimeout(generarOlaPalabras, ms)
 }
 
+/**
+ * Tamaño de letra y posición horizontal de una palabra nueva. `azarTam` y `azarX` (0 a 1) se
+ * pasan para poder probarla sin azar.
+ *
+ * Con tamaño normal (`mult` 1) es la fórmula de siempre. Agrandadas (Ajustes), una palabra larga
+ * no entraría en un celular angosto: el tamaño se acota para que quepa —nunca por debajo del
+ * piso de 18 px— y se la ubica según su ancho estimado, de modo que no se salga de la pantalla.
+ */
+export function medidasPalabra(
+  anchoArea: number, largoTexto: number, mult: number,
+  azarTam: number = Math.random(), azarX: number = Math.random(),
+): { size: number; left: number; ancho: number } {
+  let size = (18 + azarTam * 14) * mult
+  if (mult > 1) size = Math.max(18, Math.min(size, (anchoArea - 60) / (largoTexto * 0.62)))
+  if (mult > 1) {
+    const ancho = largoTexto * 0.62 * size + 40
+    return { size, ancho, left: 10 + azarX * Math.max(0, anchoArea - ancho - 10) }
+  }
+  return { size, ancho: 160, left: 20 + azarX * Math.max(0, anchoArea - 160) }
+}
+
 function crearPalabra(texto: string, esCorrecta: boolean): void {
   const area = document.getElementById('gameArea')!
   const el = document.createElement('div')
@@ -102,17 +123,8 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   // Mínimo 18 px: las de 12-15 px giraban a 150°/s y eran ilegibles para baja
   // visión y dislexia; se castigaba un error de lectura como si fuera de gramática.
   // Ajustes ▸ tamaño de las palabras: solo cambia cuánto se ve, no la dificultad.
-  const mult = MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras]
-  let size = (18 + Math.random() * 14) * mult
-  // Agrandadas, una palabra larga no entraría en un celular angosto: se acota el
-  // tamaño para que quepa (nunca por debajo del piso de 18 px) y se la ubica según
-  // su ancho estimado. Con tamaño normal todo sigue igual.
-  if (mult > 1) size = Math.max(18, Math.min(size, (area.clientWidth - 48) / (texto.length * 0.62)))
+  const { size, left: startX } = medidasPalabra(area.clientWidth, texto.length, MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras])
   el.style.fontSize = size + 'px'
-
-  const anchoEstimado = mult > 1 ? texto.length * 0.62 * size + 40 : 160
-  const maxX = area.clientWidth - anchoEstimado
-  const startX = 20 + Math.random() * Math.max(0, maxX)
   el.style.left = startX + 'px'
   el.style.top = '-60px'
 

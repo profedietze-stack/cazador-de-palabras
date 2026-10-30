@@ -81,21 +81,22 @@
 </div>
 
 <!-- ═══════════════════════════════ JUEGO ═══════════════════════════════ -->
-<div id="gameScreen" class="screen">
+<div id="gameScreen" class="screen con-mundo">
+  <div class="fondo-mundo"></div>
   <div class="game-hud">
-    <div class="hud-stat"><div class="hud-label">Puntos</div><div class="hud-val" id="hudPts">0</div></div>
-    <div class="hud-stat"><div class="hud-label">Objetivo</div><div class="hud-val" id="hudObj">500</div></div>
-    <div class="hud-stat"><div class="hud-label">Tiempo</div><div class="hud-val" id="hudTime">5:00</div></div>
-    <div class="hud-stat"><div class="hud-label">Categoría</div><div class="hud-val" id="hudCat" style="font-size:.85rem">-</div></div>
+    <div class="hud-stat placa"><div class="hud-label">Puntos</div><div class="hud-val" id="hudPts">0</div></div>
+    <div class="hud-stat placa"><div class="hud-label">Objetivo</div><div class="hud-val" id="hudObj">500</div></div>
+    <div class="hud-stat placa"><div class="hud-label">Tiempo</div><div class="hud-val" id="hudTime">5:00</div></div>
+    <div class="hud-stat placa"><div class="hud-label">Categoría</div><div class="hud-val" id="hudCat" style="font-size:.85rem">-</div></div>
   </div>
   <div id="gameArea">
     <div id="tiempoBar"><div id="tiempoBarFill" style="width:100%"></div></div>
     <div id="comboDisplay"></div>
     <div id="porQue" class="por-que" role="status" aria-live="polite"></div>
     <div class="game-btns">
-      <button id="btnVolver">🔙 Salir</button>
-      <button id="btnPausa">⏸ Pausa</button>
-      <button id="btnFs">⛶ Pantalla</button>
+      <button class="btn3d btn3d--chico" id="btnVolver">🔙 Salir</button>
+      <button class="btn3d btn3d--chico" id="btnPausa">⏸ Pausa</button>
+      <button class="btn3d btn3d--chico" id="btnFs" aria-label="Pantalla completa" title="Pantalla completa">⛶</button>
     </div>
   </div>
 </div>

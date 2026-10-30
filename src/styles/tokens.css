@@ -10,6 +10,9 @@
   /* profundidad */
   --sombra-placa: 0 5px 10px rgba(0,0,0,.28);
   --borde-3d: 6px;
+  /* palabras que caen: placa crema con letra marrón (medido en src/game/presentacion.test.ts) */
+  --palabra-bg: #fff6dc;  --palabra-fg: #3a2200;
+  --palabra-ok-bg: #c9f7dd;  --palabra-mal-bg: #ffd5d5;
   /* botones 3D: fondo / texto / borde inferior. Los pares se miden en src/screens/menu.test.ts (≥ 4,5:1). */
   --btn-sec-bg: #1f6f63;    --btn-sec-fg: #ffffff;  --btn-sec-borde: #134a42;
   --btn-pri-bg: #ffb347;    --btn-pri-fg: #3a2200;  --btn-pri-borde: #b8520a;

@@ -124,3 +124,11 @@ html[data-contraste="alto"] #menuBg{display:none}
 .pre-box .ejemplo-item{background:#fbeccb;color:#3a2200}
 .pre-box .sala-hint{color:#3a2200}
 .pre-box .pre-actions{display:flex;flex-direction:column;gap:.7rem}
+
+/* ─── Partida: viñeta que apaga el paisaje detrás de las palabras ─── */
+#gameScreen{padding:0}
+#gameScreen .fondo-mundo::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(2,20,24,.6));
+}
+#gameScreen .pa-astro{top:104px}

@@ -52,56 +52,36 @@
 /* ─── PANTALLA DE JUEGO ─── */
 #gameScreen{padding:0;transition:background .6s ease}
 .game-hud{
-  background:rgba(255,255,255,.15);backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  display:flex;justify-content:space-around;align-items:center;
-  padding:.6rem max(1rem, env(safe-area-inset-right)) .6rem max(1rem, env(safe-area-inset-left));
-  padding-top:calc(.6rem + env(safe-area-inset-top));
-  color:#fff;flex-shrink:0;
-  border-bottom:1px solid rgba(255,255,255,.2);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;color:#fff;
+  padding:.5rem max(.7rem, env(safe-area-inset-right)) .3rem max(.7rem, env(safe-area-inset-left));
+  padding-top:calc(.5rem + env(safe-area-inset-top));
 }
-.hud-stat{text-align:center}
-.hud-label{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:.5px}
-.hud-val{font-size:1.4rem;font-weight:800}
+.hud-stat{text-align:center;padding:.25rem .2rem}
+.hud-label{font-size:.62rem;opacity:.9;text-transform:uppercase;letter-spacing:.5px;font-weight:800}
+.hud-val{font-family:var(--font-titulo);font-size:1.3rem;font-weight:400;line-height:1.15}
 #gameArea{position:relative;flex:1;overflow:hidden;width:100%}
-#tiempoBar{height:4px;background:rgba(255,255,255,.3);position:absolute;top:0;left:0;right:0}
-#tiempoBarFill{height:100%;background:#10b981;transition:width .9s linear}
-.game-btns{position:absolute;top:10px;right:10px;display:flex;gap:.5rem;z-index:10}
-.game-btns button{
-  background:rgba(255,255,255,.2);color:#fff;border:none;
-  padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.8rem;
-  backdrop-filter:blur(6px);transition:all var(--trans);
-}
-.game-btns button:hover{background:rgba(255,255,255,.35)}
-
-/* ─── CATEGORY BACKGROUNDS ─── */
-#gameScreen.cat-bg-sustantivos{background:linear-gradient(135deg,#4f5fd1,#764ba2)}
-#gameScreen.cat-bg-adjetivos{background:linear-gradient(135deg,#f59e0b,#ec4899)}
-#gameScreen.cat-bg-verbos{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
-#gameScreen.cat-bg-adverbios{background:linear-gradient(135deg,#14b8a6,#0891b2)}
-#gameScreen.cat-bg-articulos{background:linear-gradient(135deg,#6366f1,#a855f7)}
-#gameScreen.cat-bg-pronombres{background:linear-gradient(135deg,#ec4899,#be185d)}
-#gameScreen.cat-bg-preposiciones{background:linear-gradient(135deg,#10b981,#059669)}
-#gameScreen.cat-bg-conjunciones{background:linear-gradient(135deg,#f97316,#dc2626)}
-#gameScreen.cat-bg-interjecciones{background:linear-gradient(135deg,#eab308,#16a34a)}
+#tiempoBar{height:10px;background:rgba(0,0,0,.35);position:absolute;top:2px;left:.7rem;right:.7rem;border-radius:6px;overflow:hidden;z-index:2}
+#tiempoBarFill{height:100%;background:linear-gradient(90deg,#ffe66d,#ff8a1f);border-radius:6px;transition:width .9s linear}
+.game-btns{position:absolute;top:18px;right:10px;display:flex;gap:.4rem;z-index:10}
+.game-btns .btn3d{min-width:44px;padding:.2rem .6rem;font-size:.78rem}
 
 /* ─── PALABRAS ─── */
 .palabra{
-  position:absolute;padding:.35rem .8rem;border-radius:8px;
-  cursor:pointer;font-weight:700;user-select:none;
-  background:rgba(255,255,255,.15);color:#fff;
-  border:2px solid rgba(255,255,255,.4);
-  transition:border-color .15s,box-shadow .15s;
-  text-shadow:0 1px 3px rgba(0,0,0,.3);will-change:transform;
+  position:absolute;padding:.3rem .8rem;border-radius:var(--r-md);
+  cursor:pointer;font-family:var(--font-texto);font-weight:800;user-select:none;
+  background:var(--palabra-bg);color:var(--palabra-fg);
+  border-bottom:4px solid #d8b56a;box-shadow:0 4px 8px rgba(0,0,0,.35);
+  transition:filter .15s;will-change:transform;
   touch-action:none;-webkit-tap-highlight-color:transparent;
 }
-.palabra:hover{background:rgba(255,255,255,.3);box-shadow:0 0 16px rgba(255,255,255,.5)}
+.palabra:hover{filter:brightness(1.06)}
+.palabra:focus-visible{outline:3px solid #ffe66d;outline-offset:2px}
 .palabra.glow-anim{animation:glowPulse 1.5s ease infinite}
 .hit-ok{animation:hitOk .45s ease forwards}
 .hit-mal{animation:hitMal .45s ease forwards}
 .punto-flotante{
-  position:absolute;font-weight:800;font-size:1.1rem;
-  color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.5);
+  position:absolute;font-family:var(--font-titulo);font-weight:400;font-size:1.3rem;
+  color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.7),0 3px 8px rgba(0,0,0,.6);
   pointer-events:none;z-index:20;
   animation:floatUp .9s ease forwards;
 }
@@ -472,7 +452,7 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .rk-fila-sospechosa{background:rgba(245,158,11,.08)}
 .rk-sospechoso{cursor:help;opacity:.85;font-size:.9em}
 .sg-aviso{margin-top:.6rem;font-size:.85rem;line-height:1.35;color:var(--text-soft)}
-.por-que{position:absolute;left:50%;bottom:.8rem;transform:translate(-50%,10px);max-width:min(92%,34rem);padding:.6rem .9rem;border-radius:12px;background:#1f2937;color:#fff;font-size:.9rem;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+.por-que{position:absolute;left:50%;bottom:.8rem;transform:translate(-50%,10px);max-width:min(92%,34rem);padding:.6rem .9rem;border-radius:var(--r-md);background:var(--palabra-bg);color:var(--palabra-fg);border-left:6px solid #ff8a1f;font-weight:700;font-size:.9rem;line-height:1.35;box-shadow:0 6px 12px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
 .por-que.visible{opacity:1;transform:translate(-50%,0)}
 .rep-lista{margin:.4rem 0 .6rem;text-align:left;font-size:.85rem;line-height:1.35}
 .rep-lista li{margin:.25rem 0}

@@ -38,12 +38,12 @@
 }
 @keyframes hitOk{
   0%{transform:scale(1);opacity:1}
-  40%{transform:scale(1.4);background:rgba(16,185,129,.9)}
+  40%{transform:scale(1.4);background:var(--palabra-ok-bg)}
   100%{transform:scale(0);opacity:0}
 }
 @keyframes hitMal{
   0%{transform:scale(1);opacity:1}
-  25%{transform:scale(1.2) rotate(-8deg);background:rgba(239,68,68,.9)}
+  25%{transform:scale(1.2) rotate(-8deg);background:var(--palabra-mal-bg)}
   50%{transform:scale(1.2) rotate(8deg)}
   100%{transform:scale(0) rotate(0);opacity:0}
 }

@@ -49,12 +49,12 @@
   text-shadow:0 2px 8px rgba(0,0,0,.4);
   animation:comboPop .35s cubic-bezier(.175,.885,.32,1.275);
 }
-.combo-lv1{background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:1.1rem}
-.combo-lv2{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:1.2rem}
-.combo-lv3{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:1.3rem}
-.combo-lv4{background:linear-gradient(135deg,#ec4899,#db2777);color:#fff;font-size:1.4rem}
+.combo-lv1{background:linear-gradient(135deg,#047857,#065f46);color:#fff;font-size:1.1rem}
+.combo-lv2{background:linear-gradient(135deg,#1d4ed8,#1e40af);color:#fff;font-size:1.2rem}
+.combo-lv3{background:linear-gradient(135deg,#6d28d9,#5b21b6);color:#fff;font-size:1.3rem}
+.combo-lv4{background:linear-gradient(135deg,#be185d,#9d174d);color:#fff;font-size:1.4rem}
 .combo-lv5{
-  background:linear-gradient(135deg,#f59e0b,#ef4444,#8b5cf6,#3b82f6);
+  background:linear-gradient(135deg,#b45309,#b91c1c,#6d28d9,#1d4ed8);
   background-size:300% 300%;color:#fff;font-size:1.55rem;
   animation:comboPop .35s cubic-bezier(.175,.885,.32,1.275),ultraGlow 1.2s ease infinite alternate;
   box-shadow:0 0 30px rgba(245,158,11,.7),0 0 60px rgba(139,92,246,.4);

@@ -54,7 +54,7 @@ describe('movimiento y legibilidad', () => {
   it('las palabras que caen miden al menos 18 px y no giran', () => {
     const w = readFileSync('src/game/WordSpawner.ts', 'utf8')
     // Piso de 18 px; el tamaño de Ajustes solo multiplica, y ninguno achica.
-    expect(w).toMatch(/let size = \(18 \+ Math\.random\(\) \* 14\) \* mult/)
+    expect(w).toMatch(/let size = \(18 \+ azarTam \* 14\) \* mult/)
     // El tope por ancho de pantalla nunca baja del piso.
     expect(w).toMatch(/Math\.max\(18, Math\.min\(size,/)
     expect(Math.min(...Object.values(MULTIPLICADOR_TAMANO))).toBeGreaterThanOrEqual(1)

@@ -11,8 +11,8 @@ import { showAlert } from '../ui/Dialog'
 import { postScore, postErrores } from '../services/LeaderboardService'
 import { lsGet } from '../utils/storage'
 import { motivoSinMedalla, calcularPrecision } from '../game/reglas'
-import { explicarError } from '../game/porQue'
-import { escapeHtml } from '../utils'
+import { repasoHtml } from '../game/repasoHtml'
+import { lanzarConfeti, cantidadConfeti } from '../ui/confeti'
 
 export function initResultScreen(): void {
   setOnGameEnd(mostrarResultado)
@@ -68,13 +68,13 @@ function pintarRepaso(): void {
   const fallos = Object.entries(G.fallosPartida).sort((a, b) => b[1] - a[1]).slice(0, 5)
   if (fallos.length === 0 || !G.cat) { cont.style.display = 'none'; cont.innerHTML = ''; return }
   cont.style.display = 'block'
-  cont.innerHTML = '<strong>📝 Palabras para repasar</strong><ul class="rep-lista">' +
-    fallos.map(([w]) => `<li>${escapeHtml(explicarError(w, G.cat!))}</li>`).join('') +
-    '</ul><small>Van a volver en tus próximas partidas de esta categoría hasta que las dejes pasar bien.</small>'
+  cont.innerHTML = repasoHtml(fallos.map(([w]) => w), G.cat)
 }
 
 function mostrarResumenPractica(): void {
   mostrar('resultadoScreen')
+  document.querySelector('.medalla-wrap')!.classList.add('sin-medalla')
+  lanzarConfeti(document.getElementById('confeti')!, 0)
   document.getElementById('resMedalla')!.textContent = '🧘'
   document.getElementById('resTitle')!.textContent = 'Práctica terminada'
   document.getElementById('resPts')!.textContent = `${G.cazadas} correctas`
@@ -103,6 +103,8 @@ function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void 
   }
 
   mostrar('resultadoScreen')
+  document.querySelector('.medalla-wrap')!.classList.toggle('sin-medalla', !p.medalla)
+  lanzarConfeti(document.getElementById('confeti')!, cantidadConfeti(p.medalla))
   const em = { ORO: '🥇', PLATA: '🥈', BRONCE: '🥉' }
   document.getElementById('resMedalla')!.textContent = p.medalla ? em[p.medalla] : '❌'
   const ptsEl = document.getElementById('resPts')!

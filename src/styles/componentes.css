@@ -132,3 +132,51 @@ html[data-contraste="alto"] #menuBg{display:none}
   background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(2,20,24,.6));
 }
 #gameScreen .pa-astro{top:104px}
+
+/* ─── Pantalla final ─── medalla 3D con rayos, placas de estadísticas, repaso plegable */
+#resultadoScreen>.card{
+  background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+  max-width:560px;padding:.3rem 1rem 1.5rem;
+}
+#confeti{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.conf{position:absolute;top:-16px;border-radius:2px;animation:confeti-cae var(--d,4s) linear var(--dl,0s) 1 both}
+@keyframes confeti-cae{from{transform:translateY(0) rotate(0)}to{transform:translateY(110vh) rotate(560deg)}}
+.titulo-resultado{font-size:1.8rem;margin:.2rem 0 .4rem}
+.medalla-wrap{position:relative;display:flex;justify-content:center;align-items:center;margin:.2rem 0}
+.rayos{
+  position:absolute;width:300px;height:300px;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(rgba(255,230,109,.28) 0 10deg,transparent 10deg 20deg);
+  -webkit-mask-image:radial-gradient(circle,#000 25%,transparent 68%);mask-image:radial-gradient(circle,#000 25%,transparent 68%);
+  animation:gira 18s linear infinite;
+}
+@keyframes gira{to{transform:rotate(360deg)}}
+.medalla-wrap.sin-medalla .rayos{display:none}
+.medalla-grande{position:relative;font-size:7rem;line-height:1;margin:0;animation:pop .5s ease,bounce 2.2s ease-in-out .5s infinite}
+.medalla-grande .emo{width:1em;height:1em;filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
+.pts-grande{font-family:var(--font-titulo);font-weight:400;font-size:3rem;line-height:1.1;color:#fff;margin:.1rem 0;text-shadow:0 3px 0 #0a3a30,0 5px 8px rgba(0,0,0,.4)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:none;padding:0;margin:.8rem 0;text-align:left}
+.sg-row{
+  display:flex;justify-content:space-between;gap:.5rem;font-size:.85rem;font-weight:700;
+  background:rgba(8,40,44,.72);color:#fff;border:2px solid rgba(255,255,255,.18);border-radius:var(--r-md);padding:.4rem .7rem;
+}
+.sg-row strong{color:#ffe66d}
+#resultadoScreen .sg-aviso{
+  grid-column:1/-1;margin:0;padding:.5rem .8rem;border-radius:var(--r-md);
+  background:rgba(8,40,44,.72);color:#fff;font-weight:700;font-size:.82rem;line-height:1.35;
+}
+.repaso{background:var(--palabra-bg);color:var(--palabra-fg);border-radius:var(--r-md);border-bottom:5px solid #d8b56a;padding:0 .9rem;text-align:left;margin-bottom:.5rem}
+.repaso summary{min-height:44px;display:flex;align-items:center;font-weight:800;font-size:.88rem;cursor:pointer}
+.repaso summary:focus-visible{outline:3px solid #ff8a1f;outline-offset:2px}
+.repaso[open]{padding-bottom:.6rem}
+.repaso small{display:block;margin-top:.4rem;font-weight:700}
+.res-logro{background:#fff3b0;color:#5a4300;border-radius:var(--r-md);border-bottom:4px solid #e0c24a;padding:.6rem .8rem;margin-bottom:.5rem;font-weight:800;font-size:.85rem}
+.res-titulo{background:var(--palabra-ok-bg);color:#053b27;border-radius:var(--r-md);border-bottom:4px solid #4fbf86;padding:.6rem .8rem;margin-bottom:.5rem;font-weight:800;font-size:.85rem;text-align:center}
+.res-btns{gap:.6rem}
+.res-btns .btn3d{flex:1 1 30%;min-width:110px}
+
+/* Menos movimiento: sin rayos que giran (el confeti ni se crea) */
+@media (prefers-reduced-motion: reduce){
+  .rayos{animation:none}
+}
+html[data-movimiento="reducido"] .rayos{animation:none}
+#resultadoScreen .pa-astro{display:none}

@@ -102,19 +102,24 @@
 </div>
 
 <!-- ═══════════════════════════════ RESULTADO ═══════════════════════════════ -->
-<div id="resultadoScreen" class="screen">
+<div id="resultadoScreen" class="screen con-mundo">
+  <div class="fondo-mundo"></div>
+  <div id="confeti" aria-hidden="true"></div>
   <div class="card resultado-card">
-    <h2 id="resTitle" style="color:#4f5fd1;font-size:1.5rem">¡Nivel Completado!</h2>
-    <div class="medalla-grande" id="resMedalla">🥇</div>
+    <h2 id="resTitle" class="titulo-cartel titulo-resultado">¡Nivel Completado!</h2>
+    <div class="medalla-wrap">
+      <div class="rayos" aria-hidden="true"></div>
+      <div class="medalla-grande" id="resMedalla">🥇</div>
+    </div>
     <div class="pts-grande" id="resPts">0</div>
     <div class="stats-grid" id="resStats"></div>
     <div id="resRepaso" style="display:none"></div>
-    <div id="resLogros" style="display:none;background:#fef9c3;padding:.8rem;border-radius:10px;margin-bottom:.5rem;font-size:.9rem"></div>
-    <div id="resTitulo" style="display:none;background:#d4edda;padding:.8rem;border-radius:10px;text-align:center;font-weight:700;color:#155724;margin-bottom:.5rem"></div>
+    <div id="resLogros" class="res-logro" style="display:none"></div>
+    <div id="resTitulo" class="res-titulo" style="display:none"></div>
     <div class="res-btns">
-      <button class="btn btn-outline" id="btnResMenu">🏠 Menú</button>
-      <button class="btn btn-primary" id="btnResReintentar">🔁 Reintentar</button>
-      <button class="btn btn-ok" id="btnResSiguiente">▶ Siguiente</button>
+      <button class="btn3d" id="btnResMenu">🏠 Menú</button>
+      <button class="btn3d btn3d--principal" id="btnResReintentar">🔁 Reintentar</button>
+      <button class="btn3d btn3d--confirmar" id="btnResSiguiente">▶ Siguiente</button>
     </div>
   </div>
 </div>

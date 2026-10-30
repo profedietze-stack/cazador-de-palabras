@@ -88,14 +88,6 @@
 
 /* ─── RESULTADO ─── */
 .resultado-card{max-width:560px;text-align:center}
-.medalla-grande{font-size:5rem;margin:.5rem 0;animation:pop .5s ease}
-.pts-grande{font-size:3rem;font-weight:800;color:#4f5fd1;margin:.3rem 0}
-.stats-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:.5rem;
-  background:var(--panel-alt);border-radius:12px;padding:1rem;margin:1rem 0;text-align:left;
-}
-.sg-row{display:flex;justify-content:space-between;font-size:.9rem;color:var(--text-soft)}
-.sg-row strong{color:#4f5fd1}
 .res-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem}
 
 /* ─── MEDALLAS Y LOGROS ─── */

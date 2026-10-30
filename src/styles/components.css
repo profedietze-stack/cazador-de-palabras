@@ -1,17 +1,21 @@
 /* ─── BOTONES ─── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
-  padding:.85rem 1.6rem;border:none;border-radius:10px;
-  font-size:.95rem;font-weight:700;cursor:pointer;
-  transition:all .2s ease;letter-spacing:.3px;
+  min-height:44px;padding:.55rem 1.3rem;border:0;border-radius:var(--r-md);
+  font-family:var(--font-texto);font-size:.95rem;font-weight:800;line-height:1.15;cursor:pointer;
+  color:var(--btn-sec-fg);background:var(--btn-sec-bg);
+  border-bottom:var(--borde-3d) solid var(--btn-sec-borde);box-shadow:var(--sombra-placa);
+  transition:transform .08s,border-bottom-width .08s,filter .15s;
 }
-.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
-.btn:active{transform:translateY(0)}
-.btn-primary{background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff}
-.btn-outline{background:#fff;color:#4f5fd1;border:2px solid #4f5fd1}
-.btn-ok{background:var(--ok);color:#fff}
-.btn-danger{background:var(--mal);color:#fff}
-.btn-sm{padding:.5rem 1rem;font-size:.85rem}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:translateY(4px);border-bottom-width:2px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn:focus-visible{outline:3px solid #ff8a1f;outline-offset:3px}
+.btn-primary{background:var(--btn-pri-bg);color:var(--btn-pri-fg);border-bottom-color:var(--btn-pri-borde)}
+.btn-outline{background:var(--btn-sec-bg);color:var(--btn-sec-fg);border-bottom-color:var(--btn-sec-borde)}
+.btn-ok{background:var(--btn-ok-bg);color:var(--btn-ok-fg);border-bottom-color:var(--btn-ok-borde)}
+.btn-danger{background:var(--btn-peligro-bg);color:var(--btn-peligro-fg);border-bottom-color:var(--btn-peligro-borde)}
+.btn-sm{padding:.4rem .9rem;font-size:.85rem}
 
 /* ─── MODAL ─── */
 #modalNombre{
@@ -22,12 +26,12 @@
 }
 #modalNombre.show{display:flex}
 .modal-box{
-  background:var(--panel-bg);border-radius:var(--radius);
+  background:var(--panel-bg);border-radius:var(--r-lg);border-bottom:6px solid #d8b56a;
   padding:2.5rem;width:100%;max-width:400px;
-  box-shadow:var(--shadow);text-align:center;
+  box-shadow:var(--sombra-placa);text-align:center;
   animation:fadeIn .3s ease;
 }
-.modal-box h2{font-size:1.6rem;color:#4f5fd1;margin-bottom:.5rem}
+.modal-box h2{font-size:1.6rem;color:var(--acento-ui);margin-bottom:.5rem}
 .modal-box p{color:var(--text-muted);margin-bottom:1.5rem}
 .modal-box input{
   width:100%;padding:.85rem 1rem;margin-bottom:1.2rem;
@@ -85,7 +89,7 @@
 .logro-sticker-frase{
   position:absolute;pointer-events:none;z-index:5;
   background:rgba(255,255,255,.92);border-radius:12px;padding:.3rem .7rem;
-  font-size:.78rem;font-weight:700;color:#4f5fd1;
+  font-size:.78rem;font-weight:700;color:var(--acento-ui);
   box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap;
   transform:rotate(var(--rot,0deg));opacity:0;transition:opacity .8s ease .15s;
 }
@@ -115,11 +119,14 @@
 
 /* ─── UTILS ─── */
 .back-btn{
-  background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.4);
-  padding:.6rem 1.4rem;border-radius:10px;cursor:pointer;font-weight:700;
-  transition:all .2s;margin:.8rem auto 0;display:block;font-size:.9rem;
+  background:var(--btn-sec-bg);color:var(--btn-sec-fg);border:0;border-bottom:var(--borde-3d) solid var(--btn-sec-borde);
+  padding:.6rem 1.4rem;min-height:48px;border-radius:var(--r-md);box-shadow:var(--sombra-placa);cursor:pointer;
+  font-family:var(--font-texto);font-weight:800;margin:.8rem auto 1rem;display:block;font-size:.95rem;
+  transition:transform .08s,border-bottom-width .08s,filter .15s;
 }
-.back-btn:hover{background:rgba(255,255,255,.35)}
+.back-btn:hover{filter:brightness(1.1)}
+.back-btn:active{transform:translateY(4px);border-bottom-width:2px}
+.back-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .badge{display:inline-block;padding:.15rem .5rem;border-radius:6px;font-size:.75rem;font-weight:700;color:#fff}
 .badge-oro{background:var(--oro)}
 .badge-plata{background:var(--plata)}
@@ -127,8 +134,8 @@
 .badge-none{background:#ccc;color:#555}
 .alert-banner{
   position:fixed;top:1rem;left:50%;transform:translateX(-50%);
-  background:#fff;border-radius:12px;padding:.8rem 1.5rem;
-  box-shadow:var(--shadow);z-index:9998;font-weight:700;color:#333;
+  background:var(--panel-bg);border-radius:var(--r-md);border-bottom:5px solid #d8b56a;padding:.8rem 1.5rem;
+  box-shadow:var(--sombra-placa);z-index:9998;font-weight:800;color:var(--text);
   animation:slideDown .4s ease;transition:opacity .4s ease,transform .4s ease;
 }
 .alert-banner.saliendo{opacity:0;transform:translateX(-50%) translateY(-12px)}

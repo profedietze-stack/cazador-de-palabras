@@ -57,8 +57,9 @@ describe('menú de inicio «Aventura»', () => {
   })
 
   it('el título cartel usa la tipografía de títulos con contorno y extrusión', () => {
-    expect(comp).toMatch(/\.titulo-cartel\s*\{[^}]*font-family:\s*var\(--font-titulo\)/)
-    expect(comp).toMatch(/\.titulo-cartel\s*\{[^}]*-webkit-text-stroke/)
-    expect(comp).toMatch(/\.titulo-cartel\s*\{[^}]*text-shadow/)
+    // El selector admite alias (.screen-title usa el mismo estilo).
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*font-family:\s*var\(--font-titulo\)/)
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*-webkit-text-stroke/)
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*text-shadow/)
   })
 })

@@ -10,6 +10,8 @@
   /* profundidad */
   --sombra-placa: 0 5px 10px rgba(0,0,0,.28);
   --borde-3d: 6px;
+  /* texto de acento sobre las superficies crema (contraste medido en src/estiloUnico.test.ts) */
+  --acento-ui: #8a3f00;
   /* palabras que caen: placa crema con letra marrón (medido en src/game/presentacion.test.ts) */
   --palabra-bg: #fff6dc;  --palabra-fg: #3a2200;
   --palabra-ok-bg: #c9f7dd;  --palabra-mal-bg: #ffd5d5;

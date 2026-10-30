@@ -28,7 +28,7 @@
 .btn3d--chico{font-size:.85rem;min-height:44px;opacity:.92}
 
 /* ─── Título cartel ─── amarillo con contorno y extrusión en capas */
-.titulo-cartel{
+.titulo-cartel,.screen-title{
   font-family:var(--font-titulo);font-weight:400;font-size:2.6rem;line-height:1.02;text-align:center;
   color:#ffd23f;-webkit-text-stroke:1.5px #7a3f00;
   text-shadow:0 2px 0 #e08a00,0 4px 0 #b86a00,0 6px 0 #8a4d00,0 9px 12px rgba(0,0,0,.45);
@@ -131,7 +131,6 @@ html[data-contraste="alto"] #menuBg{display:none}
   content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(2,20,24,.6));
 }
-#gameScreen .pa-astro{top:104px}
 
 /* ─── Pantalla final ─── medalla 3D con rayos, placas de estadísticas, repaso plegable */
 #resultadoScreen>.card{
@@ -180,3 +179,34 @@ html[data-contraste="alto"] #menuBg{display:none}
 }
 html[data-movimiento="reducido"] .rayos{animation:none}
 #resultadoScreen .pa-astro{display:none}
+
+.screen-title{font-size:2rem;margin-bottom:.4rem}
+.screen .screen-sub{color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+/* ─── Astro: en las pantallas que no son el menú queda entre las colinas, lejos de los títulos ─── */
+.con-mundo .pa-astro{width:36px;height:36px;top:auto;bottom:30%;right:18px}
+#menuPrincipal .pa-astro{width:44px;height:44px;top:22px;bottom:auto;right:22px}
+
+/* ─── Títulos de pantalla en celulares angostos ─── */
+@media (max-width:420px){
+  .screen-title{font-size:1.55rem}
+}
+
+/* ─── Duelo: HUD, fichas y poderes con el lenguaje Aventura ─── */
+.duel-hud{width:100%;background:rgba(8,40,44,.72);border-bottom:2px solid rgba(255,255,255,.18);box-shadow:var(--sombra-placa)}
+.duel-hud-nombre{opacity:.9;font-weight:800}
+.duel-hud-timer{font-family:var(--font-titulo);font-weight:400;color:#ffe66d}
+#duelTimerBar{width:100%;height:8px;background:rgba(0,0,0,.35)}
+#duelTimerBarFill{background:linear-gradient(90deg,#ffe66d,#ff8a1f)}
+.duel-board{width:100%}
+.duel-chip{border-radius:var(--r-md);padding:.4rem .9rem;font-family:var(--font-texto);font-weight:800;min-height:44px;display:inline-flex;align-items:center}
+.duel-chip.free{background:var(--palabra-bg);color:var(--palabra-fg);border:0;border-bottom:4px solid #d8b56a;box-shadow:0 4px 8px rgba(0,0,0,.35)}
+.duel-chip.free:active{background:var(--palabra-bg);transform:translateY(2px);border-bottom-width:2px}
+.duel-chip.taken-me{background:var(--palabra-ok-bg);color:#053b27;border:0;border-bottom:4px solid #4fbf86}
+.duel-chip.taken-rival{background:var(--palabra-mal-bg);color:#5a0f0f;border:0;border-bottom:4px solid #e07070}
+.duel-chip.decoy{opacity:.85;font-style:italic}
+.duel-powers-bar{width:100%;background:rgba(8,40,44,.72);border-top:2px solid rgba(255,255,255,.18)}
+.duel-powers-label{color:#fff;opacity:.9}
+
+/* Las tarjetas transparentes (menú y resultado) no llevan el borde inferior de la placa */
+#menuPrincipal>.card,#resultadoScreen>.card{border-bottom:0}

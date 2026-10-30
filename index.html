@@ -524,12 +524,13 @@
 </div>
 
 <!-- ═══════════════════════════════ AJUSTES ═══════════════════════════════ -->
-<div id="ajustesScreen" class="screen">
-  <h1 class="screen-title">⚙️ Ajustes</h1>
+<div id="ajustesScreen" class="screen con-mundo">
+  <div class="fondo-mundo"></div>
+  <h1 class="titulo-cartel titulo-pantalla">⚙️ Ajustes</h1>
   <p class="aj-intro">Se guardan en este dispositivo. No cambian la dificultad ni el puntaje: todos juegan la misma partida.</p>
   <div class="aj-wrap">
 
-    <section class="aj-sec" aria-labelledby="ajh-sonido">
+    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-sonido">
       <h2 id="ajh-sonido">🔊 Sonido</h2>
       <label class="aj-fila"><span class="aj-txt">Sonido<small>Interruptor general: apagado, no suena nada.</small></span><input type="checkbox" class="aj-switch" data-aj="sonido" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Volumen general</span><span class="aj-rango"><input type="range" min="0" max="100" step="5" data-aj="volGeneral"><output class="aj-out" data-out="volGeneral"></output></span></label>
@@ -537,10 +538,10 @@
       <label class="aj-fila"><span class="aj-txt">Volumen de la música</span><span class="aj-rango"><input type="range" min="0" max="100" step="5" data-aj="volMusica"><output class="aj-out" data-out="volMusica"></output></span></label>
       <label class="aj-fila"><span class="aj-txt">Efectos<small>Aciertos, errores, combos y botones.</small></span><input type="checkbox" class="aj-switch" data-aj="efectos" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Volumen de los efectos</span><span class="aj-rango"><input type="range" min="0" max="100" step="5" data-aj="volEfectos"><output class="aj-out" data-out="volEfectos"></output></span></label>
-      <button type="button" class="btn btn-outline btn-sm" id="ajProbarSonido">▶ Probar sonido</button>
+      <button type="button" class="btn3d btn3d--chico" id="ajProbarSonido">▶ Probar sonido</button>
     </section>
 
-    <section class="aj-sec" aria-labelledby="ajh-vib">
+    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-vib">
       <h2 id="ajh-vib">📳 Vibración</h2>
       <p class="aj-aviso" id="ajVibNoDisp" hidden>Este dispositivo no permite vibrar desde el navegador (iPhone y iPad no lo tienen). Los ajustes de vibración no tienen efecto acá.</p>
       <label class="aj-fila"><span class="aj-txt">Vibración</span><input type="checkbox" class="aj-switch" data-aj="vibracion" role="switch"></label>
@@ -548,10 +549,10 @@
       <label class="aj-fila"><span class="aj-txt">Al acertar</span><input type="checkbox" class="aj-switch" data-aj="vibAcierto" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Al equivocarse</span><input type="checkbox" class="aj-switch" data-aj="vibError" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Al subir el combo</span><input type="checkbox" class="aj-switch" data-aj="vibCombo" role="switch"></label>
-      <button type="button" class="btn btn-outline btn-sm" id="ajProbarVib">▶ Probar vibración</button>
+      <button type="button" class="btn3d btn3d--chico" id="ajProbarVib">▶ Probar vibración</button>
     </section>
 
-    <section class="aj-sec" aria-labelledby="ajh-aspecto">
+    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-aspecto">
       <h2 id="ajh-aspecto">🎨 Aspecto</h2>
       <div class="aj-fila aj-fila-seg"><span class="aj-txt" id="ajl-tema">Tema</span><div class="aj-seg" data-aj="tema" role="radiogroup" aria-labelledby="ajl-tema"><button type="button" class="aj-op" data-valor="auto" role="radio" aria-checked="false">Automático</button><button type="button" class="aj-op" data-valor="claro" role="radio" aria-checked="false">Claro</button><button type="button" class="aj-op" data-valor="oscuro" role="radio" aria-checked="false">Oscuro</button></div></div>
       <div class="aj-fila aj-fila-seg"><span class="aj-txt" id="ajl-tamanoPalabras">Tamaño de las palabras</span><div class="aj-seg" data-aj="tamanoPalabras" role="radiogroup" aria-labelledby="ajl-tamanoPalabras"><button type="button" class="aj-op" data-valor="normal" role="radio" aria-checked="false">Normal</button><button type="button" class="aj-op" data-valor="grande" role="radio" aria-checked="false">Grande</button><button type="button" class="aj-op" data-valor="muygrande" role="radio" aria-checked="false">Muy grande</button></div></div>
@@ -561,18 +562,18 @@
       <label class="aj-fila"><span class="aj-txt">Stickers y emojis<small>Los que aparecen al hacer combos y en el menú.</small></span><input type="checkbox" class="aj-switch" data-aj="stickers" role="switch"></label>
     </section>
 
-    <section class="aj-sec" aria-labelledby="ajh-ayuda">
+    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-ayuda">
       <h2 id="ajh-ayuda">💡 Ayuda al jugar</h2>
       <div class="aj-fila aj-fila-seg"><span class="aj-txt" id="ajl-porQueSeg">Explicación después de un error («¿Por qué?»)</span><div class="aj-seg" data-aj="porQueSeg" role="radiogroup" aria-labelledby="ajl-porQueSeg"><button type="button" class="aj-op" data-valor="0" role="radio" aria-checked="false">No mostrar</button><button type="button" class="aj-op" data-valor="3" role="radio" aria-checked="false">3 s</button><button type="button" class="aj-op" data-valor="5" role="radio" aria-checked="false">5 s</button><button type="button" class="aj-op" data-valor="8" role="radio" aria-checked="false">8 s</button></div></div>
     </section>
 
-    <section class="aj-sec" aria-labelledby="ajh-datos">
+    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-datos">
       <h2 id="ajh-datos">🧹 Restablecer</h2>
-      <button type="button" class="btn btn-outline btn-sm" id="ajRestablecer">↺ Volver a los ajustes de fábrica</button>
+      <button type="button" class="btn3d btn3d--chico" id="ajRestablecer">↺ Volver a los ajustes de fábrica</button>
     </section>
 
   </div>
-  <button class="back-btn" id="backFromAjustes">← Volver al Menú</button>
+  <button class="btn3d btn3d--volver" id="backFromAjustes">← Volver al Menú</button>
 </div>
 
 <!-- ═══════════════════════════════ BOTÓN FLOTANTE ═══════════════════════════════ -->

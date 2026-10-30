@@ -1,6 +1,8 @@
 import { initErrorBanner } from './ui/ErrorBanner'
 import { initDebugMode } from './debug'
 import { initLogger } from './utils/logger'
+import './styles/fuentes.css'
+import './styles/tokens.css'
 import './styles/base.css'
 import './styles/animations.css'
 import './styles/components.css'

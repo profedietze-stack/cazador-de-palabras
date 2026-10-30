@@ -1,0 +1,16 @@
+/* Tipografías propias (public/fonts, subconjunto latin; licencia OFL).
+   Nada de Google Fonts en ejecución: el juego arranca sin internet. */
+@font-face {
+  font-family: 'Lilita One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/lilita-one-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/baloo-2-latin.woff2') format('woff2');
+}

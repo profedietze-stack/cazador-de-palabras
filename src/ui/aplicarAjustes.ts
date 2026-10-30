@@ -7,10 +7,19 @@ function sistemaOscuro(): boolean {
   return typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches
 }
 
+export type Cielo = 'noche' | 'dia'
+
+/** El cielo de los mundos: noche con el tema oscuro, día con el claro (y «auto» según el sistema). */
+export function cieloActual(): Cielo {
+  return document.documentElement.dataset['cielo'] === 'dia' ? 'dia' : 'noche'
+}
+
 export function aplicarAjustes(a: Readonly<Ajustes> = ajustes()): void {
   const h = document.documentElement
-  if (oscuroEfectivo(a, sistemaOscuro())) h.dataset['theme'] = 'dark'
+  const oscuro = oscuroEfectivo(a, sistemaOscuro())
+  if (oscuro) h.dataset['theme'] = 'dark'
   else delete h.dataset['theme']
+  h.dataset['cielo'] = oscuro ? 'noche' : 'dia'
   h.dataset['contraste'] = a.altoContraste ? 'alto' : 'normal'
   h.dataset['movimiento'] = a.reducirMovimiento ? 'reducido' : 'normal'
   h.dataset['fondo'] = a.fondoDecorativo ? 'si' : 'no'

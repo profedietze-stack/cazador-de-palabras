@@ -3,6 +3,7 @@
 // qué era la palabra ni cómo reconocerlo.
 
 import { CATS } from '../data/categories'
+import { CONTEXTOS } from '../data/contextos'
 import type { CategoryKey } from '../types'
 
 const UN: Record<CategoryKey, string> = {
@@ -39,11 +40,35 @@ function categoriaCorrecta(w: string): CategoryKey | null {
 
 const limpio = (w: string): string => w.replace(/[¡!]/g, '')
 
+/** Categorías en las que el juego da por buena la palabra (casi siempre una). */
+function categoriasDelJuego(w: string): CategoryKey[] {
+  return (Object.keys(CATS) as CategoryKey[]).filter(k => CATS[k].ok.includes(w))
+}
+
+/**
+ * Palabra con más de un uso: se muestran los usos en oraciones y se aclara cómo
+ * la cuenta el juego. Antes se le decía «no es un verbo» a quien tenía razón en
+ * que `casa` también lo es (DID-8).
+ */
+function explicarAmbigua(palabra: string, w: string): string | null {
+  const usos = CONTEXTOS[palabra]
+  if (!usos) return null
+  const partes = usos.map(u => `${UN[u.cat]} en «${u.frase.replace(/\.$/, '')}»`)
+  const lista = partes.length > 2
+    ? `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}`
+    : partes.join(' y ')
+  const juego = categoriasDelJuego(palabra).map(k => UN[k])
+  const cuenta = juego.length > 0 ? ` En este juego cuenta como ${juego.join(' y como ')}.` : ''
+  return `«${w}» tiene más de un uso: es ${lista}.${cuenta}`
+}
+
 /** Frase corta para el alumno: qué es la palabra y cómo reconocerlo. */
 export function explicarError(palabra: string, catJugada: CategoryKey): string {
   const w = limpio(palabra)
   const esp = ESPECIALES[palabra]
   if (esp) return `«${w}» ${esp}.`
+  const amb = explicarAmbigua(palabra, w)
+  if (amb) return amb
   const real = categoriaCorrecta(palabra)
   if (real && real !== catJugada) {
     return `«${w}» no es ${UN[catJugada]}: es ${UN[real]} (${PISTA[real]}).`

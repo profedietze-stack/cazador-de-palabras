@@ -32,7 +32,7 @@ function renderEstado(): void {
         <span class="sala-badge">🏫 Sala activa</span>
         <div class="sala-info-row">
           <span class="sala-code-display">${escapeHtml(sala.code)}</span>
-          <span class="sala-nombre-display">${escapeHtml(sala.nombre)}</span>
+          <span class="sala-nombre-display" data-sin-emoji>${escapeHtml(sala.nombre)}</span>
         </div>
         <p class="sala-hint">Tus puntajes se suben a esta sala al terminar cada partida con medalla.</p>
         <button class="btn btn-outline btn-sm" id="btnVerRankingSala">🏆 Ver ranking de la sala</button>
@@ -244,8 +244,8 @@ function renderSalaDocente(s: SalaInfo): string {
         <span class="sala-code-display" style="font-size:1.3rem">${escapeHtml(s.code)}</span>
         ${estadoBadge}
       </div>
-      <div class="sala-docente-nombre">${escapeHtml(s.nombre)}</div>
-      ${s.descripcion ? `<div class="sala-docente-desc">${escapeHtml(s.descripcion)}</div>` : ''}
+      <div class="sala-docente-nombre" data-sin-emoji>${escapeHtml(s.nombre)}</div>
+      ${s.descripcion ? `<div class="sala-docente-desc" data-sin-emoji>${escapeHtml(s.descripcion)}</div>` : ''}
       <div class="sala-docente-fecha">Creada: ${fecha}</div>
       <div class="sala-docente-btns">
         <button class="btn btn-outline btn-xs" id="btnVerSala_${escapeHtml(s.code)}">🏆 Ver ranking</button>

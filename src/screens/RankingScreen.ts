@@ -12,7 +12,7 @@ function renderPodio(scores: { jugador: string; pts: number }[]): void {
   document.getElementById('podioCont')!.innerHTML = scores.slice(0, 3).map((s, i) => `
     <div class="podio-item">
       <div class="podio-pos">${posEmoji[i] ?? i + 1}</div>
-      <div class="podio-nom">${escapeHtml(s.jugador)}</div>
+      <div class="podio-nom" data-sin-emoji>${escapeHtml(s.jugador)}</div>
       <div class="podio-pts">${escapeHtml(s.pts)} pts</div>
     </div>`).join('')
 }
@@ -40,7 +40,7 @@ function renderTabla(vacio: string, scores: { jugador: string; pts: number; cat_
     // puntaje con el contenido que quiera. `med` no se escapa porque no es
     // dato: es un emoji elegido de una tabla fija.
     return `<tr${s.sospechoso ? ' class="rk-fila-sospechosa"' : ''}>
-      <td>${i + 1}</td><td>${escapeHtml(s.jugador)}${aviso}</td>
+      <td>${i + 1}</td><td><span data-sin-emoji>${escapeHtml(s.jugador)}</span>${aviso}</td>
       <td>${escapeHtml(s.pts)} ${med}</td>
       <td>${escapeHtml(s.precision)}%</td>
       <td>${escapeHtml(cat)}</td><td>${escapeHtml(s.nivel)}</td><td>${escapeHtml(formatFecha(s.fecha))}</td>

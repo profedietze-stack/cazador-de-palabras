@@ -8,6 +8,7 @@ import './styles/screens.css'
 import './styles/responsive.css'
 import './styles/a11y.css'
 import './styles/ajustes.css'
+import './styles/componentes.css'
 
 import { G } from './game/state'
 import { mostrar } from './screens/ScreenManager'
@@ -30,6 +31,7 @@ import { initDuelGameScreen } from './screens/DuelGameScreen'
 import { initDuelResultScreen } from './screens/DuelResultScreen'
 import { lsGet, lsRemove } from './utils/storage'
 import { iniciarAjustes } from './ui/aplicarAjustes'
+import { iniciarHidratacion } from './ui/emoji'
 import { alCambiarAjustes } from './storage/ajustes'
 import { initAjustesScreen } from './screens/AjustesScreen'
 
@@ -44,6 +46,10 @@ initLogger()
 // ya nazcan con el aspecto elegido.
 iniciarAjustes()
 alCambiarAjustes(() => refrescarMusica())
+
+// Los emojis del juego pasan a imágenes propias: ahora (HTML estático) y a medida que se agregan.
+// Antes de las pantallas, para que ninguna se pinte con el emoji del sistema.
+iniciarHidratacion()
 
 // Init all screens
 initDialog()

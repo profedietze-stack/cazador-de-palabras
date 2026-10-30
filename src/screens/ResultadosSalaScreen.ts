@@ -37,7 +37,7 @@ export async function mostrarResultadosSala(code: string, nombre: string): Promi
     <td>${escapeHtml(w.veces)}</td><td>${escapeHtml(w.alumnos)}</td></tr>`).join('')
   const filaAl = p.alumnos.map(a => `
     <tr${a.necesitaAyuda ? ' class="rs-ayuda"' : ''}>
-      <td>${escapeHtml(a.jugador)}${a.necesitaAyuda ? ' <span title="Menos de 60 % de precisión en al menos 2 intentos">⚠️ necesita ayuda</span>' : ''}</td>
+      <td><span data-sin-emoji>${escapeHtml(a.jugador)}</span>${a.necesitaAyuda ? ' <span title="Menos de 60 % de precisión en al menos 2 intentos">⚠️ necesita ayuda</span>' : ''}</td>
       <td>${escapeHtml(a.intentos)}</td><td>${escapeHtml(a.precision)}%</td>
       <td>${a.palabras.map(w => escapeHtml(textoVisible(w))).join(', ') || '—'}</td></tr>`).join('')
 

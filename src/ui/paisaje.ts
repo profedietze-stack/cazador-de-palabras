@@ -27,7 +27,7 @@ const N_LUCIERNAGAS = 12
 const N_DESTELLOS = 8
 
 /** Contorno de una colina: ondas suaves entre las alturas `a` (cresta) y `b` (valle). */
-function ondas(a: number, b: number): string {
+export function ondas(a: number, b: number): string {
   let d = `M0 200 L0 ${a}`
   for (let i = 0; i <= 10; i++) d += ` Q ${i * 100 + 50} ${i % 2 ? b : a - 60} ${i * 100 + 100} ${a}`
   return d + ' L1000 200 Z'

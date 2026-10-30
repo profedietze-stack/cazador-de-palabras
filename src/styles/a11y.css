@@ -24,7 +24,7 @@
 
 /* ── Celulares angostos: categorías en una columna, sin scroll lateral ───── */
 @media (max-width: 420px) {
-  .cats-grid { grid-template-columns: 1fr; }
+  .cats-grid { grid-template-columns: 1fr 1fr; }
   .nivel-row { flex-wrap: nowrap; }
   .nv-btn { flex: 1; }
 }

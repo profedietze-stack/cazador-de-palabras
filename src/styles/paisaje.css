@@ -1,0 +1,42 @@
+/* Paisaje de los mundos (ui/paisaje.ts). Los colores vienen de las variables que escribe
+   ui/aplicarMundo.ts; acá solo está la forma y el movimiento. */
+
+.paisaje{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+  background:linear-gradient(var(--cielo-alto),var(--cielo-bajo));
+}
+/* Alto contraste: sin paisaje, fondo liso y bien oscuro. */
+.paisaje.liso{background:#06161a;background:color-mix(in srgb,var(--cielo-alto) 35%,#000)}
+
+.pa-astro{position:absolute;right:22px;top:22px;width:44px;height:44px;border-radius:50%;background:var(--astro)}
+.pa-luna{box-shadow:0 0 40px 14px rgba(255,244,194,.4)}
+.pa-sol{box-shadow:0 0 46px 18px rgba(255,210,63,.55)}
+
+.pa-colina{position:absolute;left:-10%;width:220%;bottom:0;animation:pa-desliza var(--t,40s) linear infinite}
+.pa-colina svg{display:block;width:100%;height:100%}
+.pa-c1 path{fill:var(--colina-1)}
+.pa-c2 path{fill:var(--colina-2)}
+.pa-c3 path{fill:var(--colina-3)}
+@keyframes pa-desliza{from{transform:translateX(0)}to{transform:translateX(-45.4%)}}
+
+.pa-luci,.pa-destello{position:absolute;border-radius:50%}
+.pa-luci{width:5px;height:5px;background:#ffe66d;box-shadow:0 0 10px 4px rgba(255,230,109,.8);animation:pa-luci var(--d,4s) ease-in-out infinite}
+.pa-destello{width:7px;height:7px;background:#fff;box-shadow:0 0 8px 3px rgba(255,255,255,.8);animation:pa-destello var(--d,4s) ease-in-out infinite}
+@keyframes pa-luci{0%,100%{transform:translate(0,0);opacity:.2}50%{transform:translate(18px,-26px);opacity:1}}
+@keyframes pa-destello{0%,100%{transform:scale(.4);opacity:.1}50%{transform:scale(1);opacity:.9}}
+
+/* Paisaje quieto (fondo apagado o menos movimiento) */
+.quieto{animation:none}
+
+/* Menos movimiento: del sistema y de Ajustes */
+@media (prefers-reduced-motion: reduce){
+  .pa-colina,.pa-luci,.pa-destello{animation:none}
+}
+html[data-movimiento="reducido"] .pa-colina,
+html[data-movimiento="reducido"] .pa-luci,
+html[data-movimiento="reducido"] .pa-destello{animation:none}
+
+/* Pestaña oculta: pausa (se reanuda sola al volver) */
+html.pestana-oculta .pa-colina,
+html.pestana-oculta .pa-luci,
+html.pestana-oculta .pa-destello{animation-play-state:paused}

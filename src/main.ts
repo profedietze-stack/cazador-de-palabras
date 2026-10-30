@@ -11,6 +11,7 @@ import './styles/responsive.css'
 import './styles/a11y.css'
 import './styles/ajustes.css'
 import './styles/componentes.css'
+import './styles/paisaje.css'
 
 import { G } from './game/state'
 import { mostrar } from './screens/ScreenManager'
@@ -34,6 +35,7 @@ import { initDuelResultScreen } from './screens/DuelResultScreen'
 import { lsGet, lsRemove } from './utils/storage'
 import { iniciarAjustes } from './ui/aplicarAjustes'
 import { iniciarHidratacion } from './ui/emoji'
+import { iniciarPausaPorVisibilidad } from './ui/paisaje'
 import { alCambiarAjustes } from './storage/ajustes'
 import { initAjustesScreen } from './screens/AjustesScreen'
 
@@ -47,6 +49,7 @@ initLogger()
 // Ajustes del dispositivo (tema, contraste, tamaño…): antes que las pantallas, para que
 // ya nazcan con el aspecto elegido.
 iniciarAjustes()
+iniciarPausaPorVisibilidad()
 alCambiarAjustes(() => refrescarMusica())
 
 // Los emojis del juego pasan a imágenes propias: ahora (HTML estático) y a medida que se agregan.

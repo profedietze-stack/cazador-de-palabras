@@ -27,11 +27,11 @@ describe('pantalla de ajustes', () => {
     expect(html).toContain('id="ajustesBtn"')
     expect(html).not.toContain('id="volBtn"')
     expect(html).not.toContain('id="themeBtn"')
-    expect(leer('src/styles/components.css')).toMatch(/body\[data-pantalla="menuPrincipal"\] \.aj-btn/)
+    expect(leer('src/styles/componentes.css')).toMatch(/body\[data-pantalla="menuPrincipal"\] \.aj-btn/)
   })
 
   it('el botón ⚙️ solo se muestra en el menú de inicio', () => {
-    const css = leer('src/styles/components.css')
+    const css = leer('src/styles/componentes.css')
     expect(css).toMatch(/\.aj-btn\{[^}]*display:none/)
     expect(leer('src/screens/ScreenManager.ts')).toContain("document.body.dataset['pantalla'] = id")
   })

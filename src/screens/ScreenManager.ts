@@ -1,4 +1,5 @@
 import { iniciarDecoMenu, detenerDecoMenu } from '../ui/DecoBackground'
+import { actualizarFondo } from '../ui/fondoMundo'
 import { iniciarMusica, detenerMusica } from '../audio/AudioEngine'
 
 export type ScreenId =
@@ -19,7 +20,9 @@ function getScreens(): NodeListOf<Element> {
 function activate(id: ScreenId): void {
   _pending = null
   getScreens().forEach(s => s.classList.remove('active', 'exiting'))
-  document.getElementById(id)!.classList.add('active')
+  const pantalla = document.getElementById(id)!
+  pantalla.classList.add('active')
+  actualizarFondo(pantalla)
   // Lo usa el CSS para mostrar el botón ⚙️ solo en el menú.
   document.body.dataset['pantalla'] = id
 

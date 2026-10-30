@@ -6,33 +6,8 @@
   user-select:none;pointer-events:none;will-change:transform;
 }
 
-/* ─── MENÚ PRINCIPAL ─── */
-#menuPrincipal{position:relative}
-#menuPrincipal .card{position:relative;z-index:1}
-#menuPrincipal .logo-wrap{text-align:center;margin-bottom:.5rem;position:relative}
-#menuPrincipal .logo-icon{font-size:3.5rem;display:block;animation:bounce 2s ease-in-out infinite}
-#menuPrincipal .logo{
-  font-size:2.6rem;font-weight:900;line-height:1.1;
-  background:linear-gradient(135deg,#4f5fd1 0%,#a855f7 40%,#ec4899 70%,#f59e0b 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  text-align:center;letter-spacing:-1px;
-  filter:drop-shadow(0 2px 8px rgba(102,126,234,.35));
-  animation:shimmer 3s ease-in-out infinite alternate;
-}
-#menuPrincipal .logo-stars{
-  font-size:.85rem;letter-spacing:6px;color:#a855f7;
-  text-align:center;margin-bottom:.3rem;opacity:.8;
-  animation:twinkle 1.8s ease-in-out infinite alternate;
-}
-#menuPrincipal .logo-sub{
-  font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  color:var(--text-faint);text-align:center;margin-bottom:1.5rem;
-}
-#menuPrincipal .sub{color:var(--text-muted);margin-bottom:2rem;text-align:center}
+/* ─── MENÚ PRINCIPAL ─── (el aspecto «Aventura» está en componentes.css) */
 .menu-btns{display:flex;flex-direction:column;gap:.8rem}
-.footer-credit{margin-top:1.5rem;text-align:center;color:var(--text-faint);font-size:.85rem;font-style:italic}
-.btn-borrar{background:transparent;color:#ef4444;border:1.5px solid #ef444455;font-size:.82rem;padding:.6rem 1rem;opacity:.75}
-.btn-borrar:hover{background:#fef2f2;opacity:1;border-color:#ef4444}
 
 /* ─── SELECCIÓN CATEGORÍAS ─── */
 .screen-title{color:#fff;font-size:2rem;font-weight:800;margin-bottom:.5rem;text-align:center}

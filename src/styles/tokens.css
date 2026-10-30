@@ -10,4 +10,9 @@
   /* profundidad */
   --sombra-placa: 0 5px 10px rgba(0,0,0,.28);
   --borde-3d: 6px;
+  /* botones 3D: fondo / texto / borde inferior. Los pares se miden en src/screens/menu.test.ts (≥ 4,5:1). */
+  --btn-sec-bg: #1f6f63;    --btn-sec-fg: #ffffff;  --btn-sec-borde: #134a42;
+  --btn-pri-bg: #ffb347;    --btn-pri-fg: #3a2200;  --btn-pri-borde: #b8520a;
+  --btn-ok-bg: #34d399;     --btn-ok-fg: #053b27;   --btn-ok-borde: #087a58;
+  --btn-peligro-bg: #b42323; --btn-peligro-fg: #ffffff; --btn-peligro-borde: #6e1414;
 }

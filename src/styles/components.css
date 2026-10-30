@@ -132,13 +132,3 @@
   animation:slideDown .4s ease;transition:opacity .4s ease,transform .4s ease;
 }
 .alert-banner.saliendo{opacity:0;transform:translateX(-50%) translateY(-12px)}
-
-/* ── Botón ⚙️ (solo en el menú de inicio) ─────────────────────────────────── */
-.aj-btn{
-  position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));right:calc(1rem + env(safe-area-inset-right));z-index:999;
-  width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.6);
-  background:rgba(255,255,255,.2);color:#fff;font-size:1.4rem;
-  cursor:pointer;transition:all var(--trans);display:none;align-items:center;justify-content:center;
-}
-.aj-btn:hover{background:rgba(255,255,255,.35)}
-body[data-pantalla="menuPrincipal"] .aj-btn{display:flex}

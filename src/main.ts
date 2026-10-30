@@ -36,6 +36,7 @@ import { lsGet, lsRemove } from './utils/storage'
 import { iniciarAjustes } from './ui/aplicarAjustes'
 import { iniciarHidratacion } from './ui/emoji'
 import { iniciarPausaPorVisibilidad } from './ui/paisaje'
+import { iniciarFondoReactivo } from './ui/fondoMundo'
 import { alCambiarAjustes } from './storage/ajustes'
 import { initAjustesScreen } from './screens/AjustesScreen'
 
@@ -50,6 +51,7 @@ initLogger()
 // ya nazcan con el aspecto elegido.
 iniciarAjustes()
 iniciarPausaPorVisibilidad()
+iniciarFondoReactivo()
 alCambiarAjustes(() => refrescarMusica())
 
 // Los emojis del juego pasan a imágenes propias: ahora (HTML estático) y a medida que se agregan.

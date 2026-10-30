@@ -2,3 +2,81 @@
 
 /* Emoji propio (imagen): del tamaño del texto que lo rodea. */
 .emo{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;object-fit:contain}
+
+/* ─── Fondo de mundo: cubre la ventana aunque la pantalla se scrollee ─── */
+.fondo-mundo{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ─── Botón 3D ─── cuerpo sólido, borde inferior grueso, se hunde al apretar */
+.btn3d{
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+  min-height:48px;padding:.55rem 1.1rem;border:0;border-radius:var(--r-md);
+  font-family:var(--font-texto);font-weight:800;font-size:1rem;line-height:1.15;text-align:center;
+  color:var(--btn-sec-fg);background:var(--btn-sec-bg);
+  border-bottom:var(--borde-3d) solid var(--btn-sec-borde);
+  box-shadow:var(--sombra-placa);
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:transform .08s,border-bottom-width .08s,filter .15s;
+}
+.btn3d:hover{filter:brightness(1.1)}
+.btn3d:active{transform:translateY(4px);border-bottom-width:2px}
+.btn3d:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.5);transform:none;border-bottom-width:var(--borde-3d)}
+.btn3d:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn3d .emo{width:1.5em;height:1.5em;vertical-align:middle}
+.btn3d--principal{background:var(--btn-pri-bg);color:var(--btn-pri-fg);border-bottom-color:var(--btn-pri-borde);font-size:1.15rem}
+.btn3d--confirmar{background:var(--btn-ok-bg);color:var(--btn-ok-fg);border-bottom-color:var(--btn-ok-borde)}
+.btn3d--peligro{background:var(--btn-peligro-bg);color:var(--btn-peligro-fg);border-bottom-color:var(--btn-peligro-borde)}
+.btn3d--chico{font-size:.85rem;min-height:44px;opacity:.92}
+
+/* ─── Título cartel ─── amarillo con contorno y extrusión en capas */
+.titulo-cartel{
+  font-family:var(--font-titulo);font-weight:400;font-size:2.6rem;line-height:1.02;text-align:center;
+  color:#ffd23f;-webkit-text-stroke:1.5px #7a3f00;
+  text-shadow:0 2px 0 #e08a00,0 4px 0 #b86a00,0 6px 0 #8a4d00,0 9px 12px rgba(0,0,0,.45);
+  letter-spacing:.5px;
+}
+
+/* ─── Placas ─── superficies de interfaz sobre el paisaje */
+.placa{
+  background:rgba(8,40,44,.72);color:#fff;
+  border:2px solid rgba(255,255,255,.18);border-radius:var(--r-md);
+  box-shadow:var(--sombra-placa);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.placa--crema{
+  background:#fff6dc;color:#3a2200;border:0;border-bottom:5px solid #d8b56a;border-radius:var(--r-lg);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+
+/* ─── Menú de inicio ─── sin tarjeta de vidrio: botones y título sobre el paisaje */
+#menuPrincipal>.card{
+  position:relative;z-index:1;background:transparent;box-shadow:none;
+  backdrop-filter:none;-webkit-backdrop-filter:none;max-width:420px;padding:1rem 1rem 1.5rem;
+}
+#menuPrincipal .logo-wrap{text-align:center;margin-bottom:1rem}
+#menuPrincipal .logo-icon{display:block;font-size:3.4rem;line-height:1;margin-bottom:.4rem;animation:bounce 2.2s ease-in-out infinite}
+#menuPrincipal .logo-icon .emo{width:1.3em;height:1.3em;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3))}
+#menuPrincipal .logo-sub{
+  margin-top:.9rem;font-weight:800;font-size:.85rem;letter-spacing:.5px;color:#fff;text-align:center;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+}
+#menuPrincipal .menu-btns{gap:.7rem}
+#menuPrincipal .footer-credit{margin-top:1.2rem;text-align:center;color:#fff;font-size:.85rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+@media (max-width:420px){.titulo-cartel{font-size:2.2rem}}
+
+/* ─── Botón ⚙️ (solo en el menú de inicio) ─── redondo, con el mismo volumen que los botones 3D */
+.aj-btn{
+  position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));right:calc(1rem + env(safe-area-inset-right));z-index:999;
+  width:52px;height:52px;border-radius:50%;border:0;border-bottom:5px solid var(--btn-sec-borde);
+  background:var(--btn-sec-bg);box-shadow:var(--sombra-placa);font-size:1.5rem;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:transform .08s,border-bottom-width .08s,filter .15s;
+}
+.aj-btn:hover{filter:brightness(1.1)}
+.aj-btn:active{transform:translateY(3px);border-bottom-width:2px}
+.aj-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.aj-btn .emo{width:1.2em;height:1.2em}
+body[data-pantalla="menuPrincipal"] .aj-btn{display:flex}
+/* El menú deja lugar abajo para que el ⚙️ no tape el último botón */
+#menuPrincipal{padding-bottom:5rem}
+
+/* Alto contraste: sin palabras flotantes detrás del título (ensucian la lectura) */
+html[data-contraste="alto"] #menuBg{display:none}

@@ -55,11 +55,11 @@
 #menuPrincipal .logo-icon{display:block;font-size:3.4rem;line-height:1;margin-bottom:.4rem;animation:bounce 2.2s ease-in-out infinite}
 #menuPrincipal .logo-icon .emo{width:1.3em;height:1.3em;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3))}
 #menuPrincipal .logo-sub{
-  margin-top:.9rem;font-weight:800;font-size:.85rem;letter-spacing:.5px;color:#fff;text-align:center;
-  text-shadow:0 1px 3px rgba(0,0,0,.6);
+  margin-top:.9rem;font-weight:800;font-size:.85rem;letter-spacing:.5px;color:var(--sobre-cielo);text-align:center;
+  text-shadow:var(--sombra-sobre-cielo);
 }
 #menuPrincipal .menu-btns{gap:.7rem}
-#menuPrincipal .footer-credit{margin-top:1.2rem;text-align:center;color:#fff;font-size:.85rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#menuPrincipal .footer-credit{margin-top:1.2rem;text-align:center;color:var(--sobre-cielo);font-size:.85rem;font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 @media (max-width:420px){.titulo-cartel{font-size:2.2rem}}
 
 /* ─── Botón ⚙️ (solo en el menú de inicio) ─── redondo, con el mismo volumen que los botones 3D */
@@ -84,7 +84,7 @@ html[data-contraste="alto"] #menuBg{display:none}
 /* ─── Pantallas con paisaje: el contenido va por encima del fondo fijo ─── */
 .con-mundo>:not(.fondo-mundo){position:relative;z-index:1}
 .titulo-pantalla{font-size:2.1rem;margin-bottom:.4rem}
-.con-mundo .screen-sub{color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.con-mundo .screen-sub{color:var(--sobre-cielo);font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 .btn3d--volver{width:100%;max-width:320px;margin:.4rem auto 1rem}
 
 /* ─── Selección de categoría: nueve «mundos» ─── */
@@ -181,7 +181,7 @@ html[data-movimiento="reducido"] .rayos{animation:none}
 #resultadoScreen .pa-astro{display:none}
 
 .screen-title{font-size:2rem;margin-bottom:.4rem}
-.screen .screen-sub{color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.screen .screen-sub{color:var(--sobre-cielo);font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 
 /* ─── Astro: en las pantallas que no son el menú queda entre las colinas, lejos de los títulos ─── */
 .con-mundo .pa-astro{width:36px;height:36px;top:auto;bottom:30%;right:18px}
@@ -210,3 +210,14 @@ html[data-movimiento="reducido"] .rayos{animation:none}
 
 /* Las tarjetas transparentes (menú y resultado) no llevan el borde inferior de la placa */
 #menuPrincipal>.card,#resultadoScreen>.card{border-bottom:0}
+
+/* ─── Tema claro = día ─── el texto suelto sobre el cielo cambia de color con el cielo */
+:root{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6)}
+html[data-cielo="dia"]{--sobre-cielo:#3a2200;--sombra-sobre-cielo:0 1px 0 rgba(255,255,255,.55)}
+.aj-intro{color:var(--sobre-cielo);text-shadow:var(--sombra-sobre-cielo)}
+/* En la partida de día el cielo se atenúa (así las palabras crema resaltan) */
+html[data-cielo="dia"] #gameScreen .fondo-mundo::after{background:rgba(10,25,40,.42)}
+.info-tab:not(.active){color:var(--sobre-cielo);text-shadow:var(--sombra-sobre-cielo)}
+
+/* Alto contraste: el fondo liso es oscuro de noche y de día, así que el texto suelto es blanco */
+html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6)}

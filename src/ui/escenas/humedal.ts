@@ -1,5 +1,5 @@
 import { ALTO, X0, X1, estrellas, f, grad, marcaLinea, motas, rad, ridge, rng, svgBorde, svgFondo, type Dibujo, type Hora } from './dibujo'
-import { arboleda, nube, pajaros } from './formas'
+import { arboleda, pajaros } from './formas'
 
 // Humedal: un lago de aguas quietas con arboleda de sauces al fondo, juncos a los lados, patos y
 // nenúfares. Escena de los adverbios (caza de patos). Las palabras se hunden en el agua.

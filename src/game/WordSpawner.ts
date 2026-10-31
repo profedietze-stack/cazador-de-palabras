@@ -2,6 +2,7 @@ import { G } from './state'
 import { CATS } from '../data/categories'
 import { shuffleArr } from '../utils'
 import { animarCaida } from './WordPhysics'
+import { alturaDe } from './caida'
 import { puntosPorAcierto } from './reglas'
 import { distractoresParaNivel, textoVisible } from './distractores'
 import { priorizarDistractores } from './sesionRepaso'
@@ -23,7 +24,7 @@ export function palabrasActivas(): HTMLElement[] {
   if (!area) return []
   return [...area.querySelectorAll<HTMLElement>('.palabra')]
     .filter(el => el.dataset.cazada !== '1')
-    .sort((a, b) => parseFloat(b.style.top || '0') - parseFloat(a.style.top || '0'))
+    .sort((a, b) => alturaDe(b) - alturaDe(a))
 }
 
 /** Foco a la palabra siguiente en ese orden (o a la más baja si no hay ninguna enfocada). */
@@ -126,7 +127,6 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   const { size, left: startX } = medidasPalabra(area.clientWidth, texto.length, MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras])
   el.style.fontSize = size + 'px'
   el.style.left = startX + 'px'
-  el.style.top = '-60px'
 
   if (esCorrecta) correctas.add(el)
   el.dataset.pts = String(puntosPorAcierto(G.nivel))

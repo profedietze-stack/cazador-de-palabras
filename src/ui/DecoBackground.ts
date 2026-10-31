@@ -4,6 +4,7 @@ import { iniciarStickersMenu, limpiarStickersMenu } from './StickerSystem'
 import { getTotalCombosJugador } from '../storage/GameStorage'
 import { ajustes } from '../storage/ajustes'
 import { reducirMovimientoActivo } from '../utils/movimiento'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, DT_MAX_MS } from '../game/caida'
 
 // Fondo decorativo del menú.
 //
@@ -92,15 +93,19 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
 
   const H = window.innerHeight
   const startY = inicial ? Math.random() * H * progreso * 1.4 - 60 : -55
-  el.style.top = startY + 'px'
 
-  const speed = 0.35 + (size / 34) * 0.65 + Math.random() * 0.4
-  const oscila = size > 26
-  const ampX = 10 + Math.random() * 20
-  const freqX = 0.4 + Math.random() * 0.6
-  const startX = x
-  let t = 0
-  let posY = startY
+  // Misma velocidad de antes (px por fotograma × 60 = px por segundo): igual en 60, 120 o 144 Hz.
+  const pxPorSeg = (0.35 + (size / 34) * 0.65 + Math.random() * 0.4) * 60
+  const amplitud = 6 + Math.random() * 12
+  const frecuencia = 0.7 + Math.random() * 0.9
+  let fase = Math.random() * Math.PI * 2
+  let y = startY
+  let ultimo: number | null = null
+  let hundida = false
+  const lineaAgua = H * 0.86   // el agua ocupa el 14 % de abajo del paisaje
+
+  aplicarPosicion(el, { y, escala: inicial ? 1 : entrada(y).escala })
+  if (!inicial) el.style.opacity = '0'
 
   bg.appendChild(el)
 
@@ -109,13 +114,24 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
     el.remove()
   }
 
-  const animar = (): void => {
+  const animar = (ahora: number): void => {
     if (gen !== generacion || !decoActivo) { terminar(); return }
-    posY += speed
-    t += 0.03
-    el.style.top = posY + 'px'
-    if (oscila) el.style.left = (startX + Math.sin(t * freqX * Math.PI * 2) * ampX) + 'px'
-    if (posY > H + 40) { terminar(); return }
+    const dt = ultimo === null ? 1000 / 60 : ahora - ultimo
+    ultimo = ahora
+    y = avanzar(y, pxPorSeg, dt)
+    fase += Math.min(Math.max(dt, 0), DT_MAX_MS) / 1000 * frecuencia
+    const { dx, rot } = balanceo(fase, amplitud, 3)
+    const e = entrada(y)
+    aplicarPosicion(el, { x: dx, y, rot, escala: inicial ? 1 : e.escala })
+    if (!inicial && e.opacidad < 1) el.style.opacity = String(e.opacidad)
+    else if (el.style.opacity) el.style.opacity = ''
+    // Al llegar a la laguna se hunde con una onda, como las de la partida.
+    if (!hundida && y >= lineaAgua - 30) {
+      hundida = true
+      el.classList.add('se-hunde')
+      lanzarChapuzon(bg, x + dx + el.offsetWidth / 2, lineaAgua)
+    }
+    if (y > H + 40) { terminar(); return }
     animaciones.set(el, requestAnimationFrame(animar))
   }
   animaciones.set(el, requestAnimationFrame(animar))

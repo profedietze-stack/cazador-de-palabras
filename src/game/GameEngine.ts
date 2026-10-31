@@ -11,6 +11,7 @@ import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
 import { explicarError } from './porQue'
 import { cargarRepasoJugador, guardarRepaso, falloEnRepaso, aciertoEnRepaso } from './sesionRepaso'
 import { setAlSalirSinTocar } from './WordPhysics'
+import { lanzarChispas, cantidadChispas } from './caida'
 import { ajustes } from '../storage/ajustes'
 import { vibrar } from '../utils/vibracion'
 
@@ -184,6 +185,8 @@ function cazarPalabra(el: HTMLElement): void {
     vibrar('acierto')
     el.classList.add('hit-ok')
     actualizarCombo(true)
+    // Chispas del color del mundo, más cuanto más alto el combo (sin «reducir movimiento»).
+    lanzarChispas(area, cx, cy + rect.height / 2, cantidadChispas(G.comboNivel), 'var(--acento, #ffb347)')
     const label = G.comboNivel > 0 ? `+${pts} ×${COMBOS[G.comboNivel]!.mult}` : `+${pts}`
     mostrarPuntosFlotantes(label, cx, cy, G.comboNivel >= 4 ? '#f59e0b' : G.comboNivel >= 2 ? '#a855f7' : '#10b981')
     if (G.comboNivel >= 1 && ajustes().stickers) {

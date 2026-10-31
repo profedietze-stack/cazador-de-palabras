@@ -1,7 +1,8 @@
 /* ─── PALABRAS DECORATIVAS MENÚ ─── */
 #menuBg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .deco-palabra{
-  position:absolute;top:-60px;font-weight:700;
+  position:absolute;top:0;font-weight:700;
+  transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--r,0deg)) scale(var(--s,1));
   color:rgba(255,255,255,.18);white-space:nowrap;
   user-select:none;pointer-events:none;will-change:transform;
 }
@@ -67,7 +68,8 @@
 
 /* ─── PALABRAS ─── */
 .palabra{
-  position:absolute;padding:.3rem .8rem;border-radius:var(--r-md);
+  position:absolute;top:0;padding:.3rem .8rem;
+  transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--r,0deg)) scale(var(--s,1));border-radius:var(--r-md);
   cursor:pointer;font-family:var(--font-texto);font-weight:800;user-select:none;
   background:var(--palabra-bg);color:var(--palabra-fg);
   border-bottom:4px solid #d8b56a;box-shadow:0 4px 8px rgba(0,0,0,.35);

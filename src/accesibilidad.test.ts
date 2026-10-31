@@ -109,7 +109,8 @@ describe('teclado y landmark', () => {
     expect(g).toContain("e.key === 'ArrowRight' || e.key === 'ArrowDown'")
     expect(g).toContain("e.key === 'ArrowLeft' || e.key === 'ArrowUp'")
     expect(g).toContain("'btnPausa'")
-    expect(w).toMatch(/sort\(\(a, b\) => parseFloat\(b\.style\.top/)
+    // La altura sale de caida.ts (la posición va en variables CSS, no en `top`).
+    expect(w).toMatch(/sort\(\(a, b\) => alturaDe\(b\) - alturaDe\(a\)\)/)
   })
 
   it('el teclado no actúa con un diálogo abierto', () => {

@@ -35,6 +35,17 @@
   letter-spacing:.5px;
 }
 
+/* ─── Título del juego ─── caligrafía de bosque, una sola línea, con un arco y una flecha finos debajo.
+   Dorado de noche; marrón oscuro de día, que es lo que se lee sobre el cielo claro. */
+.titulo-juego{
+  font-family:var(--font-cartel);font-weight:700;font-size:clamp(1.5rem,8vw,2.3rem);line-height:1.1;
+  text-align:center;white-space:nowrap;letter-spacing:.03em;color:var(--titulo-oro);text-shadow:var(--titulo-sombra);
+}
+.titulo-adorno{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:.4rem;color:var(--titulo-oro)}
+.titulo-adorno i{flex:0 0 44px;height:1px;background:linear-gradient(90deg,transparent,currentColor);opacity:.75}
+.titulo-adorno i:last-child{background:linear-gradient(270deg,transparent,currentColor)}
+.titulo-adorno svg{width:64px;height:34.6px;display:block}
+
 /* ─── Placas ─── superficies de interfaz sobre el paisaje */
 .placa{
   background:rgba(8,40,44,.72);color:#fff;
@@ -52,8 +63,6 @@
   backdrop-filter:none;-webkit-backdrop-filter:none;max-width:420px;padding:1rem 1rem 1.5rem;
 }
 #menuPrincipal .logo-wrap{text-align:center;margin-bottom:1rem}
-#menuPrincipal .logo-icon{display:block;font-size:3.4rem;line-height:1;margin-bottom:.4rem;animation:bounce 2.2s ease-in-out infinite}
-#menuPrincipal .logo-icon .emo{width:1.3em;height:1.3em;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3))}
 #menuPrincipal .logo-sub{
   margin-top:.9rem;font-weight:800;font-size:.85rem;letter-spacing:.5px;color:var(--sobre-cielo);text-align:center;
   text-shadow:var(--sombra-sobre-cielo);
@@ -196,15 +205,15 @@ html[data-movimiento="reducido"] .rayos{animation:none}
 #menuPrincipal>.card,#resultadoScreen>.card{border-bottom:0}
 
 /* ─── Tema claro = día ─── el texto suelto sobre el cielo cambia de color con el cielo */
-:root{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6)}
-html[data-cielo="dia"]{--sobre-cielo:#3a2200;--sombra-sobre-cielo:0 1px 0 rgba(255,255,255,.55)}
+:root{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6);--titulo-oro:#f3d27a;--titulo-sombra:0 2px 0 rgba(60,35,5,.55)}
+html[data-cielo="dia"]{--sobre-cielo:#3a2200;--sombra-sobre-cielo:0 1px 0 rgba(255,255,255,.55);--titulo-oro:#5a3410;--titulo-sombra:0 1px 0 rgba(255,255,255,.55)}
 .aj-intro{color:var(--sobre-cielo);text-shadow:var(--sombra-sobre-cielo)}
 /* En la partida de día el cielo se atenúa (así las palabras crema resaltan) */
 html[data-cielo="dia"] #gameScreen .fondo-mundo::after{background:rgba(10,25,40,.42)}
 .info-tab:not(.active){color:var(--sobre-cielo);text-shadow:var(--sombra-sobre-cielo)}
 
 /* Alto contraste: el fondo liso es oscuro de noche y de día, así que el texto suelto es blanco */
-html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6)}
+html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px rgba(0,0,0,.6);--titulo-oro:#ffe9a8;--titulo-sombra:0 2px 0 rgba(0,0,0,.7)}
 
 /* ─── Caída de las palabras: acierto con chispas, hundimiento en la laguna ─── */
 .chispa{

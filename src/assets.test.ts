@@ -56,9 +56,10 @@ describe('assets propios', () => {
     expect(pesoDe(DIR_EMOJI)).toBeGreaterThan(0)
   })
 
-  it('las dos tipografías existen y pesan 90 kB o menos entre ambas', () => {
+  it('las tres tipografías existen y pesan 90 kB o menos entre todas', () => {
     expect(existsSync(join(DIR_FUENTES, 'lilita-one-latin.woff2'))).toBe(true)
     expect(existsSync(join(DIR_FUENTES, 'baloo-2-latin.woff2'))).toBe(true)
+    expect(existsSync(join(DIR_FUENTES, 'almendra-sc-latin.woff2'))).toBe(true)
     expect(pesoDe(DIR_FUENTES)).toBeLessThanOrEqual(90 * KB)
   })
 })

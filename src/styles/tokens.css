@@ -2,6 +2,7 @@
 :root{
   /* tipografía */
   --font-titulo: 'Lilita One', 'Baloo 2', system-ui, sans-serif;
+  --font-cartel: 'Almendra SC', 'Lilita One', Georgia, serif;
   --font-texto: 'Baloo 2', system-ui, 'Segoe UI', sans-serif;
   /* radios */
   --r-sm: 10px;

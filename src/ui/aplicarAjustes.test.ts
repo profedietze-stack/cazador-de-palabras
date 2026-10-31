@@ -50,7 +50,7 @@ describe('tipografías y tokens', () => {
 
   it('declara las dos familias con font-display: swap y archivos que existen', () => {
     const bloques = fuentes.match(/@font-face\s*\{[^}]*\}/g) ?? []
-    expect(bloques.length).toBe(2)
+    expect(bloques.length).toBe(3)
     for (const b of bloques) {
       expect(b).toMatch(/font-display:\s*swap/)
       const url = /url\(['"]?\/fonts\/([\w.-]+\.woff2)['"]?\)/.exec(b)?.[1]
@@ -59,6 +59,7 @@ describe('tipografías y tokens', () => {
     }
     expect(fuentes).toContain("'Lilita One'")
     expect(fuentes).toContain("'Baloo 2'")
+    expect(fuentes).toContain("'Almendra SC'")
   })
 
   it('Baloo 2 es variable (400 a 800) para los botones y las palabras', () => {

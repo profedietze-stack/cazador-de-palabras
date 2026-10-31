@@ -6,7 +6,7 @@
 //   Se baja solo el subconjunto que el juego usa (tools/emoji-inventario.mjs), se reduce a
 //   128×128 y se guarda en public/emoji/. «sharp» se instala en una carpeta temporal fuera
 //   del repo: no es una dependencia del juego.
-// - Tipografías: Lilita One (títulos) y Baloo 2 (texto), licencia OFL, subconjunto «latin»
+// - Tipografías: Lilita One (títulos), Baloo 2 (texto) y Almendra SC (título del juego), licencia OFL, subconjunto «latin»
 //   de Google Fonts, guardadas como woff2 en public/fonts/.
 //
 // Nada de esto se pide en tiempo de ejecución: el juego usa los archivos copiados.
@@ -51,6 +51,7 @@ try {
   const fuentes = [
     ['Lilita+One', 'lilita-one-latin.woff2'],
     ['Baloo+2:wght@400..800', 'baloo-2-latin.woff2'],
+    ['Almendra+SC', 'almendra-sc-latin.woff2'],
   ]
   for (const [familia, archivo] of fuentes) {
     const css = await (await fetch(`https://fonts.googleapis.com/css2?family=${familia}&display=swap`, { headers: { 'User-Agent': UA_CHROME } })).text()

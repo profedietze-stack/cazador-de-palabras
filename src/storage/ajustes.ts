@@ -50,7 +50,7 @@ export const AJUSTES_DE_FABRICA: Readonly<Ajustes> = Object.freeze({
   efectos: true, volEfectos: 100,
   vibracion: true, vibIntensidad: 'media' as IntensidadVibracion,
   vibAcierto: false, vibError: true, vibCombo: true,
-  tema: 'auto' as Tema,
+  tema: 'oscuro' as Tema,
   tamanoPalabras: 'normal' as TamanoPalabras,
   reducirMovimiento: false, altoContraste: false,
   fondoDecorativo: true, stickers: true,
@@ -107,7 +107,7 @@ export function leerAjustes(guardado: string | null, sonidoViejo: string | null,
   }
   return normalizarAjustes({
     sonido: sonidoViejo === '0' ? false : true,
-    tema: temaViejo === 'dark' ? 'oscuro' : temaViejo === 'light' ? 'claro' : 'auto',
+    tema: temaViejo === 'dark' ? 'oscuro' : temaViejo === 'light' ? 'claro' : 'oscuro',
   })
 }
 

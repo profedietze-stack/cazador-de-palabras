@@ -16,6 +16,8 @@ export interface Paleta {
   /** De la colina más lejana a la más cercana. */
   colinas: [string, string, string]
   acento: string
+  /** Laguna al pie de las montañas (la franja de abajo del paisaje). */
+  agua: string
   /** Luna de noche, sol de día. */
   astro: string
 }
@@ -37,13 +39,23 @@ const SOL = '#ffd23f'
 const ACENTO_NOCHE = '#ffb347'
 const ACENTO_DIA = '#e8740a'
 
+const canal = (h: string, i: number): number => parseInt(h.slice(i, i + 2), 16)
+/** Mezcla dos colores #rrggbb: `t` = 0 deja `a` y 1 deja `b`. */
+const mezclar = (a: string, b: string, t: number): string =>
+  '#' + [1, 3, 5].map(i => Math.round(canal(a, i) * (1 - t) + canal(b, i) * t).toString(16).padStart(2, '0')).join('')
+
+// El agua toma el tono del cielo bajo (así acompaña a cada mundo) pero tirando a azul, para que
+// se lea como agua y no como otra colina. Los tests miden que se distinga de las colinas y del cielo.
+const aguaDeNoche = (cieloBajo: string): string => mezclar(cieloBajo, '#0a3c5a', 0.78)
+const aguaDeDia = (cieloBajo: string): string => mezclar(cieloBajo, '#2a9fd0', 0.72)
+
 const noche = (cieloAlto: string, cieloBajo: string, colinas: [string, string, string], acento = ACENTO_NOCHE): Paleta =>
-  ({ cieloAlto, cieloBajo, colinas, acento, astro: LUNA })
+  ({ cieloAlto, cieloBajo, colinas, acento, agua: aguaDeNoche(cieloBajo), astro: LUNA })
 
 // De día: el mismo mundo con cielo claro y sol. Las colinas más cercanas son más oscuras que el
 // cielo bajo (el paisaje se ve) y todo está medido en src/data/mundos.test.ts.
 const dia = (cieloAlto: string, cieloBajo: string, colinas: [string, string, string]): Paleta =>
-  ({ cieloAlto, cieloBajo, colinas, acento: ACENTO_DIA, astro: SOL })
+  ({ cieloAlto, cieloBajo, colinas, acento: ACENTO_DIA, agua: aguaDeDia(cieloBajo), astro: SOL })
 
 const mundo = (id: MundoId, nombre: string, n: Paleta, d: Paleta): Mundo => ({ id, nombre, noche: n, dia: d })
 

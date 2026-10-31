@@ -11,5 +11,6 @@ export function aplicarMundo(mundo: Mundo, cielo: Cielo): void {
   s.setProperty('--colina-2', p.colinas[1])
   s.setProperty('--colina-3', p.colinas[2])
   s.setProperty('--acento', p.acento)
+  s.setProperty('--agua', p.agua)
   s.setProperty('--astro', p.astro)
 }

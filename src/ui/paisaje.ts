@@ -53,6 +53,34 @@ function capa(i: number, animado: boolean): HTMLElement {
   return d
 }
 
+/** La laguna: franja de agua al pie de las montañas, con la orilla ondulada y, si se anima, tres reflejos. */
+function laguna(animado: boolean): HTMLElement {
+  const d = document.createElement('div')
+  d.className = 'pa-agua'
+  const svg = document.createElementNS(NS, 'svg')
+  svg.setAttribute('viewBox', '0 0 1000 100')
+  svg.setAttribute('preserveAspectRatio', 'none')
+  svg.setAttribute('aria-hidden', 'true')
+  const p = document.createElementNS(NS, 'path')
+  p.setAttribute('d', 'M0 22 Q 62 6 125 22 T 250 22 T 375 22 T 500 22 T 625 22 T 750 22 T 875 22 T 1000 22 L1000 100 L0 100 Z')
+  svg.appendChild(p)
+  d.appendChild(svg)
+  if (animado) {
+    // Posiciones fijas por índice (sin azar), como las partículas.
+    ;[[18, 40, 22], [52, 62, 30], [30, 82, 18]].forEach(([izq, arriba, ancho], i) => {
+      const o = document.createElement('span')
+      o.className = 'pa-onda'
+      o.style.left = `${izq}%`
+      o.style.top = `${arriba}%`
+      o.style.width = `${ancho}%`
+      o.style.setProperty('--d', `${4 + i * 1.3}s`)
+      o.style.animationDelay = `${-i * 1.7}s`
+      d.appendChild(o)
+    })
+  }
+  return d
+}
+
 function particula(clase: string, i: number, n: number): HTMLElement {
   const d = document.createElement('div')
   d.className = clase
@@ -80,6 +108,7 @@ export function montarPaisaje(el: HTMLElement, mundo: Mundo, op: OpcionesPaisaje
     astro.className = 'pa-astro ' + (op.cielo === 'dia' ? 'pa-sol' : 'pa-luna')
     el.appendChild(astro)
     for (let i = 0; i < CAPAS.length; i++) el.appendChild(capa(i, op.animado))
+    el.appendChild(laguna(op.animado))
     if (op.animado && op.particulas) {
       const [clase, n] = op.cielo === 'dia' ? ['pa-destello', N_DESTELLOS] as const : ['pa-luci', N_LUCIERNAGAS] as const
       for (let i = 0; i < n; i++) el.appendChild(particula(clase, i, n))

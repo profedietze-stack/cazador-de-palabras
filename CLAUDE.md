@@ -108,7 +108,13 @@ ssh -i C:\Users\nicod\.ssh\id_ed25519 root@aulaplay.duckdns.org \
 
 # 4. Check: PocketBase must be reachable from the duel container
 curl -s https://aulaplay.duckdns.org/duel/health     # -> "pocketbase":"ok"
+
+# 5. Save the deployed state as a NEW image tag (docker cp changes the container, not its image;
+#    without this, recreating the container from the old tag reverts the code). Last one: t5.
+ssh -i C:\Users\nicod\.ssh\id_ed25519 root@aulaplay.duckdns.org "docker commit cazador-duelo cazador-duelo:t6"
 ```
+Before step 3: check `salas`/`sockets` are 0 in `/duel/health` and back up the running dist
+(`docker cp cazador-duelo:/app/dist /root/backups/dist-duelo-antes-<fecha>`).
 
 **Docker network rule:** `cazador-duelo` and `pocketbase` must be on the same Docker network
 (`aulaplay`); the duel server reaches PocketBase by the name `pocketbase`. If they are not, duel

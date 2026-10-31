@@ -57,7 +57,7 @@ guion y no un `docker run` suelto:
 
 ```bash
 bash recrear-contenedores.sh pocketbase --si    # copia de los datos + recrea en la red correcta
-bash recrear-contenedores.sh duelo t4 --si      # recrea el servidor de duelos desde cazador-duelo:t4
+bash recrear-contenedores.sh duelo t5 --si      # recrea el servidor de duelos desde cazador-duelo:t5 (la última)
 ```
 
 Estos dos cortan el servicio unos segundos: hacerlo con las aulas vacías. `pocketbase` conserva la
@@ -66,7 +66,17 @@ imagen actual (no actualiza PocketBase sin querer) y publica el puerto solo en `
 
 ## Desplegar el servidor de duelos
 
-Ver `CLAUDE.md` (compilar, copiar los `.js` y reiniciar). Reiniciar corta los duelos en curso.
+Ver `CLAUDE.md` (compilar, copiar los `.js` y reiniciar). Antes, mirar que no haya partidas:
+`curl -s https://aulaplay.duckdns.org/duel/health` (`salas` y `sockets` en 0). Reiniciar corta los
+duelos en curso. Guardar antes una copia de lo que corre:
+`docker cp cazador-duelo:/app/dist /root/backups/dist-duelo-antes-$(date +%Y%m%d-%H%M%S)`.
+
+**Después de verificar, guardar el estado como imagen nueva** (`docker commit cazador-duelo
+cazador-duelo:t6`, con la etiqueta siguiente). `docker cp` cambia el contenedor pero no su imagen: si
+no se hace, recrear el contenedor desde la imagen vieja (por ejemplo con
+`recrear-contenedores.sh duelo <etiqueta>`) vuelve al código anterior. La última guardada hoy es `t5`
+(31-oct-2026, incluye el aviso de PocketBase inalcanzable).
+
 Después de desplegar: `curl -s https://aulaplay.duckdns.org/duel/health` debe mostrar
 `"pocketbase":"ok"` (puede tardar unos segundos en la primera comprobación).
 

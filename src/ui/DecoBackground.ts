@@ -4,7 +4,7 @@ import { iniciarStickersMenu, limpiarStickersMenu } from './StickerSystem'
 import { getTotalCombosJugador } from '../storage/GameStorage'
 import { ajustes } from '../storage/ajustes'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, DT_MAX_MS } from '../game/caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, yDelChapuzon, DT_MAX_MS } from '../game/caida'
 
 // Fondo decorativo del menú.
 //
@@ -131,7 +131,7 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
     if (!hundida && debeHundirse(y, lineaAgua)) {
       hundida = true
       el.classList.add('se-hunde')
-      lanzarChapuzon(bg, x + dx + el.offsetWidth / 2, lineaAgua)
+      lanzarChapuzon(bg, x + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight))
     }
     if (y > H + 40) { terminar(); return }
     animaciones.set(el, requestAnimationFrame(animar))

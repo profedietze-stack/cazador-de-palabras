@@ -60,6 +60,11 @@ export function debeHundirse(y: number, lineaAgua: number): boolean {
   return y >= lineaAgua + ENTRADA_AGUA_PX
 }
 
+/** Altura de la onda del chapuzón: el borde de abajo de la palabra, ya sumergida (no la línea de la orilla). */
+export function yDelChapuzon(yPalabra: number, altoPalabra: number): number {
+  return yPalabra + altoPalabra
+}
+
 const MAX_CHISPAS = 16
 
 /** Más chispas cuanto más alto el combo, con tope. */

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { debeHundirse, ENTRADA_AGUA_PX } from '../game/caida'
+import { debeHundirse, ENTRADA_AGUA_PX, yDelChapuzon } from '../game/caida'
 
 // El efecto de la palabra que se hunde pasaba «demasiado arriba»: la laguna era una franja baja
 // (14 %) y la palabra empezaba a desvanecerse sobre las montañas, 30 px antes del agua. Ahora la
@@ -52,5 +52,21 @@ describe('quien calcula la línea del agua usa el agua real y la nueva función'
     expect(f).toContain('.pa-agua')
     expect(f).not.toMatch(/lineaAgua - 30/)
     expect(f).not.toMatch(/H \* 0\.86/)
+  })
+})
+
+describe('la onda del chapuzón se abre dentro del agua, no en la orilla', () => {
+  it('yDelChapuzon: el borde de abajo de la palabra, que ya está sumergida', () => {
+    const agua = 500, alto = 40
+    const y = yDelChapuzon(agua + ENTRADA_AGUA_PX, alto)
+    expect(y).toBe(agua + ENTRADA_AGUA_PX + alto)
+    expect(y - agua).toBeGreaterThanOrEqual(30)      // bien por debajo de la línea del agua (de la orilla y de las montañas)
+  })
+  it('la partida y el menú abren la onda ahí y no en la línea del agua', () => {
+    for (const f of ['src/game/WordPhysics.ts', 'src/ui/DecoBackground.ts']) {
+      const t = readFileSync(f, 'utf8')
+      expect(t, f).toContain('yDelChapuzon(')
+      expect(t, f).not.toMatch(/lanzarChapuzon\([^)]*,\s*(agua|lineaAgua)\)/)
+    }
   })
 })

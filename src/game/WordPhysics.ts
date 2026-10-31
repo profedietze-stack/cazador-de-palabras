@@ -1,6 +1,6 @@
 import { G } from './state'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, DT_MAX_MS } from './caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, yDelChapuzon, DT_MAX_MS } from './caida'
 
 let _alSalirSinTocar: ((el: HTMLElement) => void) | null = null
 export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
@@ -60,7 +60,7 @@ export function animarCaida(el: HTMLElement, size: number): void {
     if (!hundida && debeHundirse(y, agua) && el.dataset.cazada !== '1') {
       hundida = true
       el.classList.add('se-hunde')
-      lanzarChapuzon(area, (parseFloat(el.style.left) || 0) + dx + el.offsetWidth / 2, agua)
+      lanzarChapuzon(area, (parseFloat(el.style.left) || 0) + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight))
     }
 
     if (y > areaHeight + 20) {

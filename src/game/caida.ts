@@ -97,6 +97,48 @@ export function lanzarChispas(contenedor: HTMLElement, cx: number, cy: number, c
   retirarLuego(contenedor, nodos, 700)
 }
 
+/** Cómo aterriza una palabra que se escapa: en el agua (onda) o entre el follaje (hojas). */
+export type TipoAterrizaje = 'agua' | 'hojas'
+
+/** El aterrizaje de la escena que está en pantalla dentro de `raiz` (un selector); sin escena, agua. */
+export function aterrizajeDe(raiz: string): TipoAterrizaje {
+  return document.querySelector<HTMLElement>(`${raiz} .paisaje`)?.dataset['aterrizaje'] === 'hojas' ? 'hojas' : 'agua'
+}
+
+/** La línea donde aterrizan las palabras (px desde arriba de `raiz`): la marca de la escena o, si no hay, la laguna. */
+export function lineaDeAterrizaje(raiz: string): number | null {
+  const marca = document.querySelector(`${raiz} .pa-linea`) ?? document.querySelector(`${raiz} .pa-agua`)
+  return marca ? marca.getBoundingClientRect().top : null
+}
+
+/** Hojas que saltan donde la palabra se pierde entre el follaje. Sin «reducir movimiento». */
+export function lanzarHojas(contenedor: HTMLElement, cx: number, cy: number): void {
+  if (reducirMovimientoActivo()) return
+  const colores = ['#7fd08a', '#4fa86a', '#c9dd45', '#e0c24a']
+  const nodos: HTMLElement[] = []
+  for (let i = 0; i < 8; i++) {
+    const h = document.createElement('div')
+    h.className = 'hoja-aterriza'
+    const ang = -Math.PI / 2 + ((i - 3.5) / 3.5) * 1.1
+    const dist = 20 + (i % 3) * 9
+    h.style.left = `${cx}px`
+    h.style.top = `${cy}px`
+    h.style.background = colores[i % colores.length]!
+    h.style.setProperty('--dx', `${r2(Math.cos(ang) * dist)}px`)
+    h.style.setProperty('--dy', `${r2(Math.sin(ang) * dist)}px`)
+    h.style.setProperty('--rot', `${(i % 2 ? 1 : -1) * (40 + i * 18)}deg`)
+    contenedor.appendChild(h)
+    nodos.push(h)
+  }
+  retirarLuego(contenedor, nodos, 900)
+}
+
+/** Efecto de aterrizaje según la escena. */
+export function lanzarAterrizaje(contenedor: HTMLElement, cx: number, cy: number, tipo: TipoAterrizaje): void {
+  if (tipo === 'hojas') lanzarHojas(contenedor, cx, cy)
+  else lanzarChapuzon(contenedor, cx, cy)
+}
+
 /** Onda que se abre en el agua donde cae una palabra. Sin «reducir movimiento». */
 export function lanzarChapuzon(contenedor: HTMLElement, cx: number, cy: number): void {
   if (reducirMovimientoActivo()) return

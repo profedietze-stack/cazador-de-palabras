@@ -45,7 +45,7 @@ describe('aplicarMundo escribe el agua', () => {
 
 describe('montarPaisaje dibuja la laguna', () => {
   it('hay una franja de agua con su orilla (SVG) por encima de las colinas', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op())
+    montarPaisaje(el, MUNDOS.verbos, op())
     const agua = el.querySelector('.pa-agua')
     expect(agua).not.toBeNull()
     expect(agua!.querySelector('svg path')).not.toBeNull()
@@ -55,21 +55,21 @@ describe('montarPaisaje dibuja la laguna', () => {
   })
 
   it('animado: hay reflejos que brillan; quieto: el agua queda pero sin reflejos animados', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op({ animado: true }))
+    montarPaisaje(el, MUNDOS.verbos, op({ animado: true }))
     expect(el.querySelectorAll('.pa-onda').length).toBe(3)
-    montarPaisaje(el, MUNDOS.sustantivos, op({ animado: false }))
+    montarPaisaje(el, MUNDOS.verbos, op({ animado: false }))
     expect(el.querySelector('.pa-agua')).not.toBeNull()
     expect(el.querySelectorAll('.pa-onda').length).toBe(0)
   })
 
   it('con alto contraste no hay agua (fondo liso)', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op({ apagarTodo: true }))
+    montarPaisaje(el, MUNDOS.verbos, op({ apagarTodo: true }))
     expect(el.querySelector('.pa-agua')).toBeNull()
   })
 
   it('montar dos veces no duplica el agua', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op())
-    montarPaisaje(el, MUNDOS.sustantivos, op())
+    montarPaisaje(el, MUNDOS.verbos, op())
+    montarPaisaje(el, MUNDOS.verbos, op())
     expect(el.querySelectorAll('.pa-agua').length).toBe(1)
   })
 })

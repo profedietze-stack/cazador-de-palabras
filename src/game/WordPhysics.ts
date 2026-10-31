@@ -1,18 +1,18 @@
 import { G } from './state'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, yDelChapuzon, DT_MAX_MS } from './caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarAterrizaje, aterrizajeDe, lineaDeAterrizaje, debeHundirse, yDelChapuzon, DT_MAX_MS } from './caida'
 
 let _alSalirSinTocar: ((el: HTMLElement) => void) | null = null
 export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
   _alSalirSinTocar = fn
 }
 
-/** Línea del agua (en px desde arriba del área de juego): ahí se hunde la palabra que se escapa. */
+/** Línea de aterrizaje (en px desde arriba del área de juego): la orilla del agua o el suelo de la escena, donde se pierde la palabra que se escapa. */
 function lineaDelAgua(area: HTMLElement): number {
-  const agua = document.querySelector('#gameScreen .pa-agua')
+  const top = lineaDeAterrizaje('#gameScreen')
   const alto = area.clientHeight
-  if (!agua) return alto * 0.78
-  const y = agua.getBoundingClientRect().top - area.getBoundingClientRect().top
+  if (top === null) return alto * 0.78
+  const y = top - area.getBoundingClientRect().top
   return Math.min(alto, Math.max(alto * 0.6, y))
 }
 
@@ -20,6 +20,7 @@ export function animarCaida(el: HTMLElement, size: number): void {
   const area = document.getElementById('gameArea')!
   const areaHeight = area.clientHeight
   const agua = lineaDelAgua(area)
+  const aterrizaje = aterrizajeDe('#gameScreen')
   let y = -60
   // Misma velocidad de siempre: antes era «px por fotograma», ahora «px por segundo» (× 60), para
   // que caiga igual en pantallas de 60, 120 o 144 Hz.
@@ -60,7 +61,7 @@ export function animarCaida(el: HTMLElement, size: number): void {
     if (!hundida && debeHundirse(y, agua) && el.dataset.cazada !== '1') {
       hundida = true
       el.classList.add('se-hunde')
-      lanzarChapuzon(area, (parseFloat(el.style.left) || 0) + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight))
+      lanzarAterrizaje(area, (parseFloat(el.style.left) || 0) + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight), aterrizaje)
     }
 
     if (y > areaHeight + 20) {

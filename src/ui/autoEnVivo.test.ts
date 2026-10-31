@@ -30,19 +30,20 @@ describe('«Auto»: el sistema cambia de esquema con el juego abierto', () => {
     actualizarFondo(document.getElementById('menuPrincipal')!)
     const f = document.querySelector('#menuPrincipal .fondo-mundo')!
     expect(document.documentElement.dataset['cielo']).toBe('noche')
-    expect(f.querySelector('.pa-luna')).not.toBeNull()
+    expect((f as HTMLElement).dataset['hora']).toBe('noche')   // el menú es un campamento: de noche con el tema oscuro
+    expect(f.querySelector('svg.pa-escena')).not.toBeNull()
 
     oscuro = false
     oyentes.forEach(fn => fn())   // el navegador avisa el cambio
 
     expect(document.documentElement.dataset['cielo']).toBe('dia')
     expect(document.documentElement.style.getPropertyValue('--cielo-alto')).toBe(MUNDOS.inicio.dia.cieloAlto)
-    expect(f.querySelector('.pa-sol')).not.toBeNull()
-    expect(f.querySelector('.pa-luna')).toBeNull()
+    expect((f as HTMLElement).dataset['hora']).toBe('dia')
+    expect(f.querySelectorAll('svg.pa-escena').length).toBe(1)
 
     oscuro = true
     oyentes.forEach(fn => fn())
     expect(document.documentElement.style.getPropertyValue('--cielo-alto')).toBe(MUNDOS.inicio.noche.cieloAlto)
-    expect(f.querySelector('.pa-luna')).not.toBeNull()
+    expect((f as HTMLElement).dataset['hora']).toBe('noche')
   })
 })

@@ -4,7 +4,7 @@ import { iniciarStickersMenu, limpiarStickersMenu } from './StickerSystem'
 import { getTotalCombosJugador } from '../storage/GameStorage'
 import { ajustes } from '../storage/ajustes'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, yDelChapuzon, DT_MAX_MS } from '../game/caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarAterrizaje, aterrizajeDe, lineaDeAterrizaje, debeHundirse, yDelChapuzon, DT_MAX_MS } from '../game/caida'
 
 // Fondo decorativo del menú.
 //
@@ -102,9 +102,9 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
   let y = startY
   let ultimo: number | null = null
   let hundida = false
-  // Línea del agua: el borde de arriba de la laguna dibujada (si no hay paisaje, el 22 % de abajo).
-  const agua = document.querySelector('#menuPrincipal .pa-agua')
-  const lineaAgua = agua ? agua.getBoundingClientRect().top : H * 0.78
+  // Línea de aterrizaje: la orilla del lago (o el suelo) de la escena dibujada; sin paisaje, el 22 % de abajo.
+  const lineaAgua = lineaDeAterrizaje('#menuPrincipal') ?? H * 0.78
+  const aterrizaje = aterrizajeDe('#menuPrincipal')
 
   aplicarPosicion(el, { y, escala: inicial ? 1 : entrada(y).escala })
   if (!inicial) el.style.opacity = '0'
@@ -127,11 +127,11 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
     aplicarPosicion(el, { x: dx, y, rot, escala: inicial ? 1 : e.escala })
     if (!inicial && e.opacidad < 1) el.style.opacity = String(e.opacidad)
     else if (el.style.opacity) el.style.opacity = ''
-    // Al llegar a la laguna se hunde con una onda, como las de la partida.
+    // Al llegar a la línea de aterrizaje se hunde, como las de la partida.
     if (!hundida && debeHundirse(y, lineaAgua)) {
       hundida = true
       el.classList.add('se-hunde')
-      lanzarChapuzon(bg, x + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight))
+      lanzarAterrizaje(bg, x + dx + el.offsetWidth / 2, yDelChapuzon(y, el.offsetHeight), aterrizaje)
     }
     if (y > H + 40) { terminar(); return }
     animaciones.set(el, requestAnimationFrame(animar))

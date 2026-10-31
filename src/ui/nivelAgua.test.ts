@@ -46,10 +46,10 @@ describe('quien calcula la línea del agua usa el agua real y la nueva función'
     expect(f).toContain('debeHundirse(')
     expect(f).not.toMatch(/agua - 30/)
   })
-  it('el menú calcula la línea desde la laguna dibujada y también usa debeHundirse', () => {
+  it('el menú calcula la línea desde la escena o la laguna dibujada y también usa debeHundirse', () => {
     const f = readFileSync('src/ui/DecoBackground.ts', 'utf8')
     expect(f).toContain('debeHundirse(')
-    expect(f).toContain('.pa-agua')
+    expect(f).toContain("lineaDeAterrizaje('#menuPrincipal')")
     expect(f).not.toMatch(/lineaAgua - 30/)
     expect(f).not.toMatch(/H \* 0\.86/)
   })

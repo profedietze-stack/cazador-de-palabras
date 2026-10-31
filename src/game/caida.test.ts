@@ -174,7 +174,7 @@ describe('el motor usa el movimiento nuevo', () => {
     expect(f).toContain('avanzar(')
     expect(f).toContain('aplicarPosicion(')
     expect(f).toContain('balanceo(')
-    expect(f).toContain('lanzarChapuzon(')
+    expect(f).toContain('lanzarAterrizaje(')
     expect(f).not.toMatch(/style\.top\s*=/)
   })
 })

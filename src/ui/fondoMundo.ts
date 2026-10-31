@@ -4,6 +4,7 @@ import { ajustes, alCambiarAjustes } from '../storage/ajustes'
 import { cieloActual } from './aplicarAjustes'
 import { aplicarMundo } from './aplicarMundo'
 import { montarPaisaje, opcionesDesdeAjustes } from './paisaje'
+import { cieloDeHora, horaDeNivel, type Hora } from './escenas'
 
 // El fondo de cada pantalla: el paisaje del mundo que le toca, dentro del `.fondo-mundo` de la
 // pantalla (las que todavía no lo tienen conservan su fondo anterior).
@@ -13,6 +14,15 @@ const DE_CATEGORIA = new Set(['preNivel', 'gameScreen', 'resultadoScreen'])
 
 export function mundoDePantalla(id: string): Mundo {
   return mundoDe(DE_CATEGORIA.has(id) ? G.cat : null)
+}
+
+/**
+ * La hora del día: en una partida la fija el nivel (1 amanecer, 2 día, 3 noche); en el resto de
+ * las pantallas sigue el tema (oscuro = noche, claro = día).
+ */
+export function horaDePantalla(id: string): Hora {
+  if (DE_CATEGORIA.has(id)) return horaDeNivel(G.nivel)
+  return cieloActual() === 'dia' ? 'dia' : 'noche'
 }
 
 function sistemaReduce(): boolean {
@@ -27,10 +37,11 @@ export function actualizarFondo(pantalla: HTMLElement): void {
   desmontarActual = null
   const cont = pantalla.querySelector<HTMLElement>('.fondo-mundo')
   if (!cont) return
-  const cielo = cieloActual()
+  const hora = horaDePantalla(pantalla.id)
+  const cielo = cieloDeHora(hora)
   const mundo = mundoDePantalla(pantalla.id)
   aplicarMundo(mundo, cielo)
-  desmontarActual = montarPaisaje(cont, mundo, opcionesDesdeAjustes(ajustes(), sistemaReduce(), cielo))
+  desmontarActual = montarPaisaje(cont, mundo, opcionesDesdeAjustes(ajustes(), sistemaReduce(), cielo, hora))
 }
 
 function refrescarFondoActivo(): void {

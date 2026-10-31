@@ -34,12 +34,12 @@ describe('montarPaisaje', () => {
   })
 
   it('sin partículas no hay luciérnagas ni destellos (la partida no las lleva)', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op({ particulas: false }))
+    montarPaisaje(el, MUNDOS.verbos, op({ particulas: false }))
     expect(el.querySelectorAll('.pa-luci, .pa-destello').length).toBe(0)
   })
 
   it('con animado:false todas las capas quedan quietas y no hay partículas, aunque se pidan', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op({ animado: false, particulas: true }))
+    montarPaisaje(el, MUNDOS.verbos, op({ animado: false, particulas: true }))
     const capas = [...el.querySelectorAll('.pa-colina')]
     expect(capas.length).toBe(3)
     for (const c of capas) {
@@ -50,7 +50,7 @@ describe('montarPaisaje', () => {
   })
 
   it('con apagarTodo (alto contraste) no hay paisaje: el contenedor queda sin hijos y liso', () => {
-    montarPaisaje(el, MUNDOS.sustantivos, op({ apagarTodo: true }))
+    montarPaisaje(el, MUNDOS.verbos, op({ apagarTodo: true }))
     expect(el.children.length).toBe(0)
     expect(el.classList.contains('liso')).toBe(true)
   })

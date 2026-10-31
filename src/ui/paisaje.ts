@@ -1,6 +1,7 @@
 import type { Mundo } from '../data/mundos'
 import type { Ajustes } from '../storage/ajustes'
 import type { Cielo } from './aplicarAjustes'
+import { ESCENAS, cieloDeHora, type Hora } from './escenas'
 
 // Dibuja el paisaje de un mundo: astro, tres capas de colinas (SVG) y partículas. Los colores
 // no están acá: salen de las variables CSS que escribe `aplicarMundo`, así cambiar de mundo o
@@ -12,14 +13,16 @@ export interface OpcionesPaisaje {
   /** Luciérnagas (noche) o destellos (día). Solo se dibujan si además está animado. */
   particulas: boolean
   cielo: Cielo
+  /** Hora del día de la escena de caza (si el mundo tiene una); sin ella, la que corresponde al cielo. */
+  hora?: Hora
   /** Alto contraste: sin paisaje, fondo liso. */
   apagarTodo?: boolean
 }
 
 /** Qué opciones pide el alumno en Ajustes (o el sistema con «reducir movimiento»). */
-export function opcionesDesdeAjustes(a: Readonly<Ajustes>, sistemaReduce: boolean, cielo: Cielo): OpcionesPaisaje {
+export function opcionesDesdeAjustes(a: Readonly<Ajustes>, sistemaReduce: boolean, cielo: Cielo, hora?: Hora): OpcionesPaisaje {
   const animado = !a.reducirMovimiento && !sistemaReduce && a.fondoDecorativo
-  return { animado, particulas: animado, cielo, apagarTodo: a.altoContraste }
+  return { animado, particulas: animado, cielo, apagarTodo: a.altoContraste, ...(hora ? { hora } : {}) }
 }
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -103,6 +106,16 @@ export function montarPaisaje(el: HTMLElement, mundo: Mundo, op: OpcionesPaisaje
 
   if (op.apagarTodo) {
     el.classList.add('liso')
+  } else if (mundo.escena) {
+    // Escena de caza: SVG ancho al centro y un SVG por borde; la hora sale del nivel (o del tema).
+    const escena = ESCENAS[mundo.escena]
+    const hora = op.hora ?? (op.cielo === 'dia' ? 'dia' : 'noche')
+    const d = escena.dibujar(hora, op.animado && op.particulas)
+    el.insertAdjacentHTML('beforeend', d.fondo + d.izq + d.der)
+    el.dataset['escena'] = mundo.escena
+    el.dataset['hora'] = hora
+    el.dataset['aterrizaje'] = escena.aterrizaje
+    el.dataset['cielo'] = cieloDeHora(hora)
   } else {
     const astro = document.createElement('div')
     astro.className = 'pa-astro ' + (op.cielo === 'dia' ? 'pa-sol' : 'pa-luna')
@@ -120,6 +133,9 @@ export function montarPaisaje(el: HTMLElement, mundo: Mundo, op: OpcionesPaisaje
     el.classList.remove('paisaje', 'liso')
     delete el.dataset['mundo']
     delete el.dataset['cielo']
+    delete el.dataset['escena']
+    delete el.dataset['hora']
+    delete el.dataset['aterrizaje']
   }
 }
 

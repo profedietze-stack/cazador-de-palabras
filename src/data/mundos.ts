@@ -10,6 +10,9 @@ import { CATS } from './categories'
 
 export type MundoId = CategoryKey | 'inicio'
 
+/** Escenas de caza dibujadas aparte (ui/escenas). Los mundos sin escena usan el paisaje de colinas. */
+export type EscenaId = 'campamento' | 'bosque'
+
 export interface Paleta {
   cieloAlto: string
   cieloBajo: string
@@ -27,6 +30,8 @@ export interface Mundo {
   nombre: string
   noche: Paleta
   dia: Paleta
+  /** Escena de caza de este mundo; sin ella se dibuja el paisaje de colinas con la laguna. */
+  escena?: EscenaId
 }
 
 /** Placas de interfaz, iguales en todos los mundos: oscura translúcida (texto blanco) y crema (texto marrón). */
@@ -57,14 +62,15 @@ const noche = (cieloAlto: string, cieloBajo: string, colinas: [string, string, s
 const dia = (cieloAlto: string, cieloBajo: string, colinas: [string, string, string]): Paleta =>
   ({ cieloAlto, cieloBajo, colinas, acento: ACENTO_DIA, agua: aguaDeDia(cieloBajo), astro: SOL })
 
-const mundo = (id: MundoId, nombre: string, n: Paleta, d: Paleta): Mundo => ({ id, nombre, noche: n, dia: d })
+const mundo = (id: MundoId, nombre: string, n: Paleta, d: Paleta, escena?: EscenaId): Mundo =>
+  escena ? { id, nombre, noche: n, dia: d, escena } : { id, nombre, noche: n, dia: d }
 
 const selvaNoche = noche('#0e3b43', '#1c6b5f', ['#14564f', '#1d7a5f', '#2a9a6a'])
 const selvaDia = dia('#4fb6d6', '#b3e3cd', ['#5fb98f', '#3fa070', '#1f7a48'])
 
 export const MUNDOS: Record<MundoId, Mundo> = {
-  inicio:         mundo('inicio', 'Inicio', selvaNoche, selvaDia),
-  sustantivos:    mundo('sustantivos', CATS.sustantivos.nombre, selvaNoche, selvaDia),
+  inicio:         mundo('inicio', 'Inicio', selvaNoche, selvaDia, 'campamento'),
+  sustantivos:    mundo('sustantivos', CATS.sustantivos.nombre, selvaNoche, selvaDia, 'bosque'),
   adjetivos:      mundo('adjetivos', CATS.adjetivos.nombre,
     noche('#5b2a6e', '#e0568a', ['#6b2f6e', '#a63d7a', '#d45a8a'], '#ffd23f'),
     dia('#ff9ec8', '#ffd9ea', ['#e58fb5', '#d46fa0', '#a83a76'])),

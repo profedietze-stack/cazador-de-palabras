@@ -229,6 +229,8 @@ html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px
   border-radius:50%;pointer-events:none;z-index:4;animation:ondaChapuzon .8s ease-out forwards;
 }
 @keyframes ondaChapuzon{from{transform:scale(.3);opacity:.9}to{transform:scale(1.7);opacity:0}}
+.hoja-aterriza{position:absolute;width:7px;height:11px;margin:-5px 0 0 -3px;border-radius:0 100% 0 100%;pointer-events:none;z-index:6;animation:hojaVuela .9s ease-out forwards}
+@keyframes hojaVuela{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-20px)) rotate(var(--rot,90deg))}}
 .palabra.se-hunde,.deco-palabra.se-hunde{animation:palabraHunde .5s ease-in forwards}
 @keyframes palabraHunde{
   from{opacity:1;transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--r,0deg)) scale(var(--s,1))}
@@ -236,7 +238,8 @@ html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px
 }
 /* Menos movimiento: sin chispas ni ondas (las palabras ya no se balancean; ver WordPhysics) */
 @media (prefers-reduced-motion: reduce){
-  .chispa,.onda-chapuzon{display:none}
+  .chispa,.onda-chapuzon,.hoja-aterriza{display:none}
 }
 html[data-movimiento="reducido"] .chispa,
-html[data-movimiento="reducido"] .onda-chapuzon{display:none}
+html[data-movimiento="reducido"] .onda-chapuzon,
+html[data-movimiento="reducido"] .hoja-aterriza{display:none}

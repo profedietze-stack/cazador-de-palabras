@@ -31,6 +31,8 @@ const MAX_REPORTES_POR_MINUTO = 20
 export interface EstadoServidor {
   salas: () => number
   sockets: () => number
+  /** «ok», «inalcanzable» o «sin_verificar»: si desde este contenedor se llega a PocketBase. */
+  pocketbase?: () => string
 }
 
 export function crearManejadorHttp(estado: EstadoServidor, ipDe: (req: IncomingMessage) => string) {
@@ -50,6 +52,7 @@ export function crearManejadorHttp(estado: EstadoServidor, ipDe: (req: IncomingM
         uptimeSeg: Math.round((Date.now() - arranque) / 1000),
         salas: estado.salas(),
         sockets: estado.sockets(),
+        pocketbase: estado.pocketbase?.() ?? 'sin_verificar',
         contadores,
       })
       return

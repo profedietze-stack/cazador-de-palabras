@@ -98,13 +98,24 @@ To redeploy server after changes:
 # 1. Compile locally
 cd server && npx tsc
 
-# 2. Copy compiled JS to VPS (use absolute key path — $env:USERPROFILE doesn't work in Bash)
-scp -i C:\Users\nicod\.ssh\id_ed25519 server/dist/*.js root@aulaplay.duckdns.org:/tmp/
+# 2. Copy ALL compiled JS to the VPS (the old per-file list went stale: ranking.js and
+#    observabilidad.js were missing). Use the absolute key path.
+scp -i C:\Users\nicod\.ssh\id_ed25519 -r server/dist root@aulaplay.duckdns.org:/tmp/dist-duelo
 
-# 3. Inject into running container and restart
+# 3. Inject into the running container and restart (this cuts the duels in progress)
 ssh -i C:\Users\nicod\.ssh\id_ed25519 root@aulaplay.duckdns.org \
-  "for f in index DuelRoom DuelRoom PowerManager DebugBot types; do docker cp /tmp/\$f.js cazador-duelo:/app/dist/\$f.js; done && docker restart cazador-duelo"
+  "docker cp /tmp/dist-duelo/. cazador-duelo:/app/dist/ && docker restart cazador-duelo"
+
+# 4. Check: PocketBase must be reachable from the duel container
+curl -s https://aulaplay.duckdns.org/duel/health     # -> "pocketbase":"ok"
 ```
+
+**Docker network rule:** `cazador-duelo` and `pocketbase` must be on the same Docker network
+(`aulaplay`); the duel server reaches PocketBase by the name `pocketbase`. If they are not, duel
+results silently never reach the teacher's ranking (it happened until 31-oct-2026). The server now
+logs `POCKETBASE INALCANZABLE` and `/duel/health` shows `"pocketbase":"inalcanzable"`. To recreate any
+container use `docs/operaciones/recrear-contenedores.sh`, never a bare `docker run`. Full guide:
+`docs/operaciones/servidor-docker.md`.
 
 Notes: VPS has no git, no source files — only the Docker image with compiled `dist/`. The container name is `cazador-duelo`, port 3001.
 

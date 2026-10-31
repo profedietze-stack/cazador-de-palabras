@@ -12,7 +12,7 @@ import {
   codigoSala, nombreJugador, categorias, codigoDeAula,
   numeroEnRango, MIN_DURACION, MAX_DURACION, generateCode,
 } from './validate'
-import { publicarResultado } from './ranking'
+import { publicarResultado, estadoPocketBase, vigilarPocketBase } from './ranking'
 import { contar, crearManejadorHttp } from './observabilidad'
 import {
   crearLimitadorCaptura, ipDelCliente, MAX_SALAS_POR_IP,
@@ -35,7 +35,7 @@ const DEBUG_BOT = process.env.DEBUG_BOT === '1'
 // socket.io pasa por acá; sin manejador, esos pedidos quedaban colgados.
 let conectados = 0
 const httpServer = createServer(crearManejadorHttp(
-  { salas: () => rooms.size, sockets: () => conectados },
+  { salas: () => rooms.size, sockets: () => conectados, pocketbase: estadoPocketBase },
   (req) => ipDelCliente(req.headers, req.socket.remoteAddress ?? ''),
 ))
 const io = new Server(httpServer, {
@@ -513,4 +513,5 @@ process.on('unhandledRejection', (e) => {
 
 httpServer.listen(PORT, () => {
   console.log(`Duelo server listening on port ${PORT}`)
+  vigilarPocketBase()
 })

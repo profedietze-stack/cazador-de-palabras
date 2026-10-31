@@ -48,7 +48,7 @@ export function mostrarDuelLobby(): void {
   // Info
   document.getElementById('lobbyInfo')!.textContent = mySlot === 'A' && !D.rivalNombre
     ? 'Esperando al segundo jugador...'
-    : '¡Presioná ¡Listo! cuando estés preparado!'
+    : '¡Presioná «¡Listo!» cuando estés preparado!'
 
   // Hide countdown overlay in case of rematch
   document.getElementById('duelCountdownOverlay')!.style.display = 'none'
@@ -65,7 +65,7 @@ export function initDuelLobbyScreen(): void {
     D.rivalNombre = nombre
     document.getElementById('lobbyNombreB')!.textContent = nombre
     document.getElementById('lobbySlotB')!.classList.add('connected')
-    document.getElementById('lobbyInfo')!.textContent = '¡Presioná ¡Listo! cuando estés preparado!'
+    document.getElementById('lobbyInfo')!.textContent = '¡Presioná «¡Listo!» cuando estés preparado!'
     ;(document.getElementById('btnLobbyReady') as HTMLButtonElement).disabled = false
   })
 

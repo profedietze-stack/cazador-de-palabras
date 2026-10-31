@@ -1,5 +1,5 @@
 import { mostrar } from './ScreenManager'
-import { crearSala, verificarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, eliminarSala, contarSalasActivas, type SalaInfo } from '../services/LeaderboardService'
+import { crearSala, buscarSala, fetchMisSalas, limpiarScoresSala, desactivarSala, eliminarSala, contarSalasActivas, type SalaInfo } from '../services/LeaderboardService'
 import { showAlert, showConfirm } from '../ui/Dialog'
 import { tieneClaveDocente, crearClaveDocente, guardarClaveDocente } from '../lib/pocketbase'
 import { mostrarRanking } from './RankingScreen'
@@ -15,6 +15,14 @@ export function getSalaActual(): { code: string; nombre: string } | null {
   const code = lsGet(SALA_KEY)
   const nombre = lsGet(SALA_NOMBRE_KEY) ?? code ?? ''
   return code ? { code, nombre } : null
+}
+
+/** Si `code` es la sala en la que está este dispositivo, la olvida (por ejemplo, porque se eliminó). */
+export function olvidarSalaSiEs(code: string): boolean {
+  if (lsGet(SALA_KEY)?.toUpperCase() !== code.toUpperCase()) return false
+  lsRemove(SALA_KEY)
+  lsRemove(SALA_NOMBRE_KEY)
+  return true
 }
 
 // ── Estado actual (alumno unido / sin sala) ───────────────────────────────────
@@ -123,7 +131,7 @@ async function handleUnirse(): Promise<void> {
   btn.disabled = true
   btn.textContent = '⏳ Verificando...'
 
-  const existe = await verificarSala(code)
+  const existe = await unirseASala(code)
   btn.disabled = false
   btn.textContent = '✅ Unirme'
 
@@ -136,10 +144,22 @@ async function handleUnirse(): Promise<void> {
     return
   }
 
-  lsSet(SALA_KEY, code)
-  lsSet(SALA_NOMBRE_KEY, code)
   codeInput.value = ''
   renderEstado()
+}
+
+/**
+ * Busca la sala y, si existe y está activa, queda unido: guarda el código y el NOMBRE que le puso el
+ * docente (antes se guardaba el código como nombre y el alumno veía «ZZREV1 ZZREV1»).
+ */
+export async function unirseASala(entrada: string): Promise<'si' | 'no' | 'red'> {
+  const code = entrada.trim().toUpperCase()
+  const r = await buscarSala(code)
+  if (r.estado === 'si') {
+    lsSet(SALA_KEY, code)
+    lsSet(SALA_NOMBRE_KEY, r.nombre ?? code)
+  }
+  return r.estado
 }
 
 // ── Crear sala ────────────────────────────────────────────────────────────────
@@ -233,8 +253,9 @@ async function loadMisSalas(): Promise<void> {
   })
 }
 
-function renderSalaDocente(s: SalaInfo): string {
-  const fecha = s.created_at ? new Date(s.created_at).toLocaleDateString('es-AR') : '—'
+export function renderSalaDocente(s: SalaInfo): string {
+  // La colección de salas no guarda la fecha de creación: sin fecha no se pone la línea (antes decía «Creada: —»).
+  const fecha = s.created_at ? new Date(s.created_at).toLocaleDateString('es-AR') : ''
   const estadoBadge = s.activa
     ? '<span class="sala-estado activa">activa</span>'
     : '<span class="sala-estado inactiva">inactiva</span>'
@@ -246,7 +267,7 @@ function renderSalaDocente(s: SalaInfo): string {
       </div>
       <div class="sala-docente-nombre" data-sin-emoji>${escapeHtml(s.nombre)}</div>
       ${s.descripcion ? `<div class="sala-docente-desc" data-sin-emoji>${escapeHtml(s.descripcion)}</div>` : ''}
-      <div class="sala-docente-fecha">Creada: ${fecha}</div>
+      ${fecha ? `<div class="sala-docente-fecha">Creada: ${escapeHtml(fecha)}</div>` : ''}
       <div class="sala-docente-btns">
         <button class="btn btn-outline btn-xs" id="btnVerSala_${escapeHtml(s.code)}">🏆 Ver ranking</button>
         <button class="btn btn-outline btn-xs" id="btnResultadosSala_${escapeHtml(s.code)}">📊 Resultados</button>
@@ -310,7 +331,13 @@ Esta acción no se puede deshacer.`)
   const exito = await eliminarSala(code)
   if (exito) {
     await showAlert(`Sala "${nombre}" eliminada.`)
-    await loadMisSalas()
+    // Si era la sala en la que está este dispositivo, el panel no puede seguir diciendo «Sala activa».
+    if (olvidarSalaSiEs(code)) {
+      renderEstado()
+      document.getElementById('btnModoCrear')?.click()   // sigue en «Mis salas», que se recarga sola
+    } else {
+      await loadMisSalas()
+    }
   } else {
     await showAlert('No se pudo eliminar. Verificá tu conexión.')
     if (btn) { btn.disabled = false; btn.textContent = '🗑️ Eliminar sala' }

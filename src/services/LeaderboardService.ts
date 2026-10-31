@@ -135,16 +135,29 @@ export async function crearSala(code: string, nombre: string, descripcion?: stri
  * 'si' | 'no' | 'red'. Antes todo fallo daba `false`, y sin internet el alumno leía
  * «No se encontró una sala activa»: se culpaba al código de un problema de red.
  */
-export async function verificarSala(code: string): Promise<'si' | 'no' | 'red'> {
+export interface BusquedaSala {
+  estado: 'si' | 'no' | 'red'
+  /** Nombre que le puso el docente; null si la sala no existe, no trae nombre o no hubo red. */
+  nombre: string | null
+}
+
+/** Busca una sala activa por su código y trae también su nombre (para mostrarlo en vez del código). */
+export async function buscarSala(code: string): Promise<BusquedaSala> {
   try {
     setSalaContexto(code)
-    await pb.collection('cdp_salas').getFirstListItem(
-      pb.filter('code = {:code} && activa = true', { code: code.toUpperCase() })
+    const r = await pb.collection('cdp_salas').getFirstListItem(
+      pb.filter('code = {:code} && activa = true', { code: code.toUpperCase() }),
+      { fields: 'id,code,nombre' },
     )
-    return 'si'
+    const nombre = typeof r['nombre'] === 'string' ? r['nombre'].trim() : ''
+    return { estado: 'si', nombre: nombre || null }
   } catch (e) {
-    return e instanceof ClientResponseError && e.status === 404 ? 'no' : 'red'
+    return { estado: e instanceof ClientResponseError && e.status === 404 ? 'no' : 'red', nombre: null }
   }
+}
+
+export async function verificarSala(code: string): Promise<'si' | 'no' | 'red'> {
+  return (await buscarSala(code)).estado
 }
 
 export async function fetchMisSalas(): Promise<SalaInfo[]> {

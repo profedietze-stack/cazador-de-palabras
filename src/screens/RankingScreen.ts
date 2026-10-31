@@ -2,6 +2,7 @@ import { mostrar } from './ScreenManager'
 import { getRankingGlobal } from '../storage/GameStorage'
 import { fetchSalaRanking } from '../services/LeaderboardService'
 import { formatFecha, escapeHtml } from '../utils'
+import { celdaPrecision } from '../utils/rankingFormato'
 
 type TabMode = 'local' | 'sala'
 
@@ -42,7 +43,7 @@ function renderTabla(vacio: string, scores: { jugador: string; pts: number; cat_
     return `<tr${s.sospechoso ? ' class="rk-fila-sospechosa"' : ''}>
       <td>${i + 1}</td><td><span data-sin-emoji>${escapeHtml(s.jugador)}</span>${aviso}</td>
       <td>${escapeHtml(s.pts)} ${med}</td>
-      <td>${escapeHtml(s.precision)}%</td>
+      <td>${escapeHtml(celdaPrecision(s.precision, cat))}</td>
       <td>${escapeHtml(cat)}</td><td>${escapeHtml(s.nivel)}</td><td>${escapeHtml(formatFecha(s.fecha))}</td>
     </tr>`
   }).join('')

@@ -2,7 +2,7 @@
    ui/aplicarMundo.ts; acá solo está la forma y el movimiento. */
 
 .paisaje{
-  position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+  position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;
   background:linear-gradient(var(--cielo-alto),var(--cielo-bajo));
 }
 /* Alto contraste: sin paisaje, fondo liso y bien oscuro. */

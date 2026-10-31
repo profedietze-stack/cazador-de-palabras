@@ -52,6 +52,14 @@ export function alturaDe(el: HTMLElement): number {
   return alturas.get(el) ?? 0
 }
 
+/** Cuántos píxeles debe haber entrado la palabra en el agua (borde de arriba) para empezar a hundirse. */
+export const ENTRADA_AGUA_PX = 6
+
+/** La palabra se hunde cuando su borde de arriba ya pasó la línea del agua: se hunde DENTRO de la laguna. */
+export function debeHundirse(y: number, lineaAgua: number): boolean {
+  return y >= lineaAgua + ENTRADA_AGUA_PX
+}
+
 const MAX_CHISPAS = 16
 
 /** Más chispas cuanto más alto el combo, con tope. */

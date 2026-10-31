@@ -4,7 +4,7 @@ import { iniciarStickersMenu, limpiarStickersMenu } from './StickerSystem'
 import { getTotalCombosJugador } from '../storage/GameStorage'
 import { ajustes } from '../storage/ajustes'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, DT_MAX_MS } from '../game/caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, DT_MAX_MS } from '../game/caida'
 
 // Fondo decorativo del menú.
 //
@@ -102,7 +102,9 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
   let y = startY
   let ultimo: number | null = null
   let hundida = false
-  const lineaAgua = H * 0.86   // el agua ocupa el 14 % de abajo del paisaje
+  // Línea del agua: el borde de arriba de la laguna dibujada (si no hay paisaje, el 22 % de abajo).
+  const agua = document.querySelector('#menuPrincipal .pa-agua')
+  const lineaAgua = agua ? agua.getBoundingClientRect().top : H * 0.78
 
   aplicarPosicion(el, { y, escala: inicial ? 1 : entrada(y).escala })
   if (!inicial) el.style.opacity = '0'
@@ -126,7 +128,7 @@ function lanzarDecoWord(bg: HTMLElement, gen: number, inicial: boolean, progreso
     if (!inicial && e.opacidad < 1) el.style.opacity = String(e.opacidad)
     else if (el.style.opacity) el.style.opacity = ''
     // Al llegar a la laguna se hunde con una onda, como las de la partida.
-    if (!hundida && y >= lineaAgua - 30) {
+    if (!hundida && debeHundirse(y, lineaAgua)) {
       hundida = true
       el.classList.add('se-hunde')
       lanzarChapuzon(bg, x + dx + el.offsetWidth / 2, lineaAgua)

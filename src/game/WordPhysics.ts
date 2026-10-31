@@ -1,6 +1,6 @@
 import { G } from './state'
 import { reducirMovimientoActivo } from '../utils/movimiento'
-import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, DT_MAX_MS } from './caida'
+import { avanzar, balanceo, entrada, aplicarPosicion, lanzarChapuzon, debeHundirse, DT_MAX_MS } from './caida'
 
 let _alSalirSinTocar: ((el: HTMLElement) => void) | null = null
 export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
@@ -11,9 +11,9 @@ export function setAlSalirSinTocar(fn: typeof _alSalirSinTocar): void {
 function lineaDelAgua(area: HTMLElement): number {
   const agua = document.querySelector('#gameScreen .pa-agua')
   const alto = area.clientHeight
-  if (!agua) return alto * 0.86
+  if (!agua) return alto * 0.78
   const y = agua.getBoundingClientRect().top - area.getBoundingClientRect().top
-  return Math.min(alto, Math.max(alto * 0.7, y))
+  return Math.min(alto, Math.max(alto * 0.6, y))
 }
 
 export function animarCaida(el: HTMLElement, size: number): void {
@@ -57,7 +57,7 @@ export function animarCaida(el: HTMLElement, size: number): void {
 
     // Cae en la laguna: se hunde con una onda. La lógica del juego no cambia: sigue contando como
     // «se escapó» recién al salir por abajo, como siempre.
-    if (!hundida && y >= agua - 30 && el.dataset.cazada !== '1') {
+    if (!hundida && debeHundirse(y, agua) && el.dataset.cazada !== '1') {
       hundida = true
       el.classList.add('se-hunde')
       lanzarChapuzon(area, (parseFloat(el.style.left) || 0) + dx + el.offsetWidth / 2, agua)

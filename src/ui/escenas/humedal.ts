@@ -63,7 +63,7 @@ function juncos(p: Paleta, semilla: number, x0: number, x1: number, n: number): 
   return s
 }
 
-export function dibujarHumedal(hora: Hora, animado: boolean): Dibujo {
+export function dibujarHumedal(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const r = rng(71)
@@ -93,7 +93,7 @@ export function dibujarHumedal(hora: Hora, animado: boolean): Dibujo {
     `<rect x="${X0}" y="${COSTA}" width="${X1 - X0}" height="22" fill="${hora === 'noche' ? '#8aa0d0' : '#ffd9c0'}" opacity=".24"/>` +
     (hora === 'noche' ? `<ellipse cx="${a.x}" cy="${COSTA + 60}" rx="12" ry="2" fill="${a.color}" opacity=".45"/><ellipse cx="${a.x}" cy="${COSTA + 82}" rx="18" ry="2" fill="${a.color}" opacity=".3"/>` : '') +
     brillos + patos + nenufares +
-    (p.pajaros ? pajaros([[90, 130, 1.4], [116, 118, 1.2], [140, 134, 1.3], [66, 142, 1], [190, 100, 1.1], [214, 110, 1], [-100, 120, 1.2], [-70, 132, 1], [400, 110, 1.2]], p.pajaros) : '') +
+    (p.pajaros ? pajaros([[90, 130, 1.4], [116, 118, 1.2], [140, 134, 1.3], [66, 142, 1], [190, 100, 1.1], [214, 110, 1], [-100, 120, 1.2], [-70, 132, 1], [400, 110, 1.2]], p.pajaros, animado) : '') +
     ridge(516, 6, 77, p.orilla) + marcaLinea(LAGO) +
     (animado ? motas(p.motas.n, 73, 340, 450, p.motas.color) : ''))
   const borde = (lado: 'izq' | 'der', semilla: number): string =>

@@ -50,7 +50,7 @@ const PALETAS: Record<Hora, Paleta> = {
 /** Y de la orilla del lago: ahí se hunden las palabras. */
 const ORILLA = 388
 
-export function dibujarCampamento(hora: Hora, animado: boolean): Dibujo {
+export function dibujarCampamento(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const reflejos = [0, 1, 2, 3, 4, 5, 6]

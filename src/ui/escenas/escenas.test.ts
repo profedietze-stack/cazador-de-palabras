@@ -82,10 +82,10 @@ describe('cada escena y cada hora', () => {
   it('sin animación no hay luciérnagas ni fuego animado', () => {
     for (const id of ids) for (const hora of HORAS) {
       const d = ESCENAS[id].dibujar(hora, false)
-      expect(d.fondo + d.izq + d.der, `${id} ${hora}`).not.toMatch(/esc-luci|esc-fuego/)
+      expect(d.fondo + d.izq + d.der, `${id} ${hora}`).not.toMatch(/esc-luci|esc-fuego|esc-vuelo|esc-rayo|esc-lluvia|esc-aurora|esc-nieve|viva-/)
     }
     const con = ESCENAS.campamento.dibujar('noche', true)
-    expect(con.fondo).toContain('esc-luci')
+    expect(con.viva).toContain('viva-luci')
     expect(con.izq).toContain('esc-fuego')
   })
 
@@ -102,6 +102,41 @@ describe('cada escena y cada hora', () => {
       const todos = [...(d.fondo + d.izq + d.der).matchAll(/ id="([^"]+)"/g)].map(m => m[1])
       expect(new Set(todos).size, id).toBe(todos.length)
     }
+  })
+})
+
+describe('la capa animada va aparte del fondo', () => {
+  const ANIMADOS = /esc-(luci|nieve|vuelo|rayo|lluvia|aurora)/
+  const VIVA = /viva-(luci|cae|vuelo|rayo|lluvia|aurora)/
+  it('el fondo nunca lleva elementos animados: se pinta una sola vez', () => {
+    for (const id of ids) for (const hora of HORAS) {
+      expect(ESCENAS[id].dibujar(hora, true).fondo, `${id} ${hora}`).not.toMatch(ANIMADOS)
+    }
+  })
+  it('lo animado está en `viva`, con el mismo encuadre que el fondo, y solo si hay animación', () => {
+    for (const id of ids) for (const hora of HORAS) {
+      const d = ESCENAS[id].dibujar(hora, true)
+      if (d.viva) {
+        expect(d.viva, `${id} ${hora}`).toContain('class="pa-escena pa-viva')
+        expect(d.viva).toContain('viewBox="-350 0 1000 520"')
+        expect(d.viva).toContain('preserveAspectRatio="xMidYMax slice"')
+        expect(d.viva).toMatch(VIVA)
+        expect(d.viva, 'dentro de las capas ya no se anima cada elemento').not.toMatch(ANIMADOS)
+      }
+      expect(ESCENAS[id].dibujar(hora, false).viva, `${id} ${hora} sin animación`).toBe('')
+    }
+  })
+  it('cada escena tiene algo animado de noche (luciérnagas, nieve, aurora, rayo o fuego)', () => {
+    for (const id of ids) {
+      const d = ESCENAS[id].dibujar('noche', true)
+      expect(d.viva !== '' || /esc-fuego/.test(d.izq), id).toBe(true)
+    }
+  })
+  it('la capa animada se dibuja encima del fondo y debajo de los bordes', () => {
+    document.body.innerHTML = '<div id="fondo"></div>'
+    montarPaisaje(document.getElementById('fondo')!, MUNDOS.sustantivos, { animado: true, particulas: true, cielo: 'noche', hora: 'noche' })
+    const orden = [...document.querySelectorAll('#fondo > svg')].map(s => (s.classList.contains('pa-viva') ? 'viva' : s.classList.contains('pa-borde') ? 'borde' : 'fondo'))
+    expect(orden).toEqual(['fondo', 'viva', 'viva', 'borde', 'borde'])   // las luciérnagas van en dos capas que titilan a destiempo
   })
 })
 
@@ -127,7 +162,8 @@ describe('montaje de la escena', () => {
 
   it('deja un SVG ancho y dos de borde, con la escena, la hora y el aterrizaje anotados', () => {
     montarPaisaje(el(), MUNDOS.sustantivos, op('dia'))
-    expect(el().querySelectorAll('svg').length).toBe(3)
+    expect(el().querySelectorAll('svg.pa-escena:not(.pa-viva)').length).toBe(1)
+    expect(el().querySelectorAll('svg.pa-viva').length).toBe(2)   // luciérnagas en dos capas
     expect(el().querySelectorAll('svg.pa-borde.izq, svg.pa-borde.der').length).toBe(2)
     expect([el().dataset['escena'], el().dataset['hora'], el().dataset['aterrizaje']]).toEqual(['bosque', 'dia', 'hojas'])
     expect(el().querySelector('.pa-colina')).toBeNull()
@@ -146,7 +182,7 @@ describe('montaje de la escena', () => {
   it('montar dos veces no duplica y desmontar limpia todo', () => {
     montarPaisaje(el(), MUNDOS.sustantivos, op('noche'))
     const desmontar = montarPaisaje(el(), MUNDOS.sustantivos, op('amanecer'))
-    expect(el().querySelectorAll('svg').length).toBe(3)
+    expect(el().querySelectorAll('svg').length).toBe(5)   // fondo, dos capas de luciérnagas y los dos bordes
     expect(el().dataset['hora']).toBe('amanecer')
     desmontar()
     expect(el().children.length).toBe(0)
@@ -207,10 +243,10 @@ describe('estilos de las escenas', () => {
     expect(css).toMatch(/\.pa-borde\.izq\{left:0\}/)
     expect(css).toMatch(/\.pa-borde\.der\{right:0\}/)
   })
-  it('luciérnagas y fuego se apagan con menos movimiento (sistema y Ajustes) y se pausan con la pestaña oculta', () => {
-    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-luci[^}]*\.esc-fuego[^}]*\{animation:none\}/)
-    expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-luci/)
-    expect(css).toMatch(/html\.pestana-oculta \.esc-luci/)
+  it('el fuego se apaga con menos movimiento (sistema y Ajustes) y se pausa con la pestaña oculta', () => {
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-fuego[^}]*\{animation:none\}/)
+    expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-fuego/)
+    expect(css).toMatch(/html\.pestana-oculta \.esc-fuego/)
   })
   it('hojas, briznas y copos también se ocultan con menos movimiento', () => {
     const comp = leer('src/styles/componentes.css')
@@ -219,18 +255,24 @@ describe('estilos de las escenas', () => {
       expect(comp, clase).toMatch(new RegExp(String.raw`html\[data-movimiento="reducido"\] \.${clase}[,{]`))
     }
   })
-  it('rayo, lluvia y aurora se apagan con menos movimiento y se pausan con la pestaña oculta', () => {
-    for (const clase of ['esc-rayo', 'esc-lluvia', 'esc-aurora']) {
-      expect(css, clase).toMatch(new RegExp(String.raw`\.${clase}\{animation:${clase}`))
+  it('cada capa animada se mueve entera (GPU), se apaga con menos movimiento y se pausa con la pestaña oculta', () => {
+    for (const clase of ['viva-luci', 'viva-vuelo', 'viva-rayo', 'viva-lluvia', 'viva-aurora', 'viva-cae']) {
+      expect(css, clase).toMatch(new RegExp(String.raw`\.${clase}\{[^}]*animation:${clase}`))
       expect(css, clase).toMatch(new RegExp(String.raw`prefers-reduced-motion: reduce\)\{[^}]*\.${clase}[,{]`))
       expect(css, clase).toMatch(new RegExp(String.raw`html\[data-movimiento="reducido"\] \.${clase}[,{]`))
       expect(css, clase).toMatch(new RegExp(String.raw`html\.pestana-oculta \.${clase}[,{]`))
     }
   })
-  it('la nieve que cae también se apaga con menos movimiento y se pausa con la pestaña oculta', () => {
-    expect(css).toMatch(/\.esc-nieve\{animation:esc-nieve/)
-    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-nieve/)
-    expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-nieve/)
-    expect(css).toMatch(/html\.pestana-oculta \.esc-nieve/)
+  it('las animaciones de las capas solo tocan transform y opacity (lo único que la GPU hace sin repintar)', () => {
+    const bloque = (n: string): string => { const i = css.indexOf(`@keyframes ${n}`); return css.slice(i, css.indexOf('\n', i)) }
+    for (const n of ['viva-luci', 'viva-vuelo', 'viva-rayo', 'viva-lluvia', 'viva-aurora', 'viva-cae']) {
+      const props = [...bloque(n).matchAll(/([a-z-]+)\s*:/g)].map(m => m[1])
+      expect(props.length, n).toBeGreaterThan(0)
+      for (const prop of props) expect(['opacity', 'transform'], `${n}: ${prop}`).toContain(prop)
+    }
+  })
+  it('la lámina de nieve tiene su copia de arriba para que la caída no se corte', () => {
+    expect(css).toMatch(/\.viva-arriba\{[^}]*top:-100%/)
+    expect(css).toMatch(/@keyframes viva-cae\{from\{transform:translateY\(0\)\}to\{transform:translateY\(100%\)\}\}/)
   })
 })

@@ -73,7 +73,7 @@ function estratos(x0: number, x1: number, y0: number, semilla: number, colores: 
   return s
 }
 
-export function dibujarCanon(hora: Hora, animado: boolean): Dibujo {
+export function dibujarCanon(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('can-cielo', [[0, p.cielo[0]], [0.55, p.cielo[1]], [1, p.cielo[2]]]) + rad('can-luz', a.luz, a.luzOp) +
@@ -91,7 +91,7 @@ export function dibujarCanon(hora: Hora, animado: boolean): Dibujo {
     `<rect x="${X0}" y="0" width="${X1 - X0}" height="${ALTO}" fill="url(#can-cielo)"/>` +
     (p.estrellas ? estrellas(p.estrellas, 108, 220) : '') +
     `<circle cx="150" cy="${a.y}" r="100" fill="url(#can-luz)"/><circle cx="150" cy="${a.y}" r="${a.r}" fill="${a.color}"/>` + nubes +
-    (p.pajaros ? pajaros([[130, 150, 1.6], [168, 132, 1.3], [-80, 140, 1.4], [380, 130, 1.4]], p.pajaros) : '') +
+    (p.pajaros ? pajaros([[130, 150, 1.6], [168, 132, 1.3], [-80, 140, 1.4], [380, 130, 1.4]], p.pajaros, animado) : '') +
     `<path d="M${X0} 330 L-300 316 L-200 316 L-100 330 L-40 330 L0 316 L70 316 L88 330 L112 330 L130 312 L190 312 L212 330 L250 330 L270 318 L350 318 L420 330 L520 316 L650 316 L650 400 L${X0} 400 Z" fill="${p.mesetas[0]}" opacity=".7"/>` +
     `<path d="M${X0} 360 L-280 340 L-180 340 L-100 360 L40 340 L80 340 L100 360 L140 360 L160 346 L220 346 L240 360 L330 340 L440 340 L500 360 L650 340 L650 420 L${X0} 420 Z" fill="${p.mesetas[1]}" opacity=".85"/>` +
     `<rect x="${X0}" y="330" width="${X1 - X0}" height="70" fill="#ffe2c0" opacity="${hora === 'noche' ? 0.06 : 0.18}"/>` +

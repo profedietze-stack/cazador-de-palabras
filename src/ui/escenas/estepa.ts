@@ -44,7 +44,7 @@ const PALETAS: Record<Hora, Paleta> = {
 /** Y donde empieza el pasto alto: ahí se pierden las palabras. */
 const PASTO = 452
 
-export function dibujarEstepa(hora: Hora, animado: boolean): Dibujo {
+export function dibujarEstepa(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('est-cielo', [[0, p.cielo[0]], [0.35, p.cielo[1]], [0.62, p.cielo[2]], [0.7, p.cielo[3]]]) + rad('est-luz', a.luz, a.luzOp)
@@ -56,7 +56,7 @@ export function dibujarEstepa(hora: Hora, animado: boolean): Dibujo {
     (p.estrellas ? estrellas(p.estrellas, 91, 300) : '') +
     `<circle cx="${a.x}" cy="${a.y}" r="110" fill="url(#est-luz)"/><circle cx="${a.x}" cy="${a.y}" r="${a.r}" fill="${a.color}"/>` +
     nubes +
-    (p.pajaros ? pajaros([[70, 120, 1.2], [92, 108, 1], [112, 124, 1.1], [180, 90, 0.9], [200, 98, 0.8], [-120, 100, 1.1], [-98, 112, 1], [380, 110, 1], [402, 100, 1.1]], p.pajaros) : '') +
+    (p.pajaros ? pajaros([[70, 120, 1.2], [92, 108, 1], [112, 124, 1.1], [180, 90, 0.9], [200, 98, 0.8], [-120, 100, 1.1], [-98, 112, 1], [380, 110, 1], [402, 100, 1.1]], p.pajaros, animado) : '') +
     ridge(356, 6, 41, p.lejos, 0.6) + ridge(384, 12, 42, p.pasto[0], 0.9) + ridge(424, 14, 43, p.pasto[1], 0.8) + ridge(470, 12, 44, p.pasto[2], 1) +
     acacia +
     pastos(380, 9, X0, X1, 430, 520, 14, 40, p.matas) + ridge(510, 6, 45, p.pasto[3]) +

@@ -10,8 +10,10 @@ export const X1 = 650
 export const ALTO = 520
 
 export interface Dibujo {
-  /** SVG ancho (viewBox `-350 0 1000 520`), anclado abajo al centro. */
+  /** SVG ancho (viewBox `-350 0 1000 520`), anclado abajo al centro. Todo quieto: el navegador lo pinta una sola vez. */
   fondo: string
+  /** Lo animado (luciérnagas, nieve, pájaros, rayo, lluvia, aurora) en un SVG propio encima del fondo; vacío si no hay nada. */
+  viva: string
   /** SVG anclado al borde izquierdo (viewBox `0 0 140 520`). */
   izq: string
   /** SVG anclado al borde derecho (viewBox `0 0 140 520`). */
@@ -96,6 +98,40 @@ export const rad = (id: string, color: string, op = 1): string =>
 /** Envuelve el contenido en el SVG ancho de la escena. */
 export function svgFondo(defs: string, cuerpo: string): string {
   return `<svg class="pa-escena" viewBox="${X0} 0 ${X1 - X0} ${ALTO}" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><defs>${defs}</defs>${cuerpo}</svg>`
+}
+
+/** Elementos animados que las escenas dejan marcados en el fondo con una clase `esc-*`. */
+const ANIMADOS = /<circle class="esc-(luci|nieve)"[^>]*\/>|<g class="esc-(vuelo|rayo|lluvia|aurora)"[^>]*>.*?<\/g>/g
+
+const ENCUADRE = `viewBox="${X0} 0 ${X1 - X0} ${ALTO}" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"`
+const capa = (clase: string, cuerpo: string): string => `<svg class="pa-escena pa-viva ${clase}" ${ENCUADRE}>${cuerpo}</svg>`
+/** Quita la marca de animación: ahora se anima la capa entera, no cada elemento. */
+const limpiar = (m: string): string => m.replace(/ class="esc-\w+"/, '').replace(/ style="animation-[^"]*"/, '')
+
+/**
+ * Saca del `fondo` todo lo animado y lo reparte en capas propias, una por tipo de animación.
+ * Animar un elemento DENTRO de un SVG obliga a repintarlo; en cambio mover o desvanecer el SVG
+ * entero lo hace la GPU sin repintar nada. Con la CPU frenada 6× esto devolvía el juego de
+ * 36–41 a ~58 cuadros por segundo. El fondo queda quieto y se pinta una sola vez.
+ */
+export function separarViva(d: Omit<Dibujo, 'viva'>): Dibujo {
+  const g: Record<string, string[]> = { luci: [], nieve: [], vuelo: [], rayo: [], lluvia: [], aurora: [] }
+  const fondo = d.fondo.replace(ANIMADOS, (m, circulo: string | undefined, grupo: string | undefined) => {
+    g[(circulo ?? grupo)!]!.push(limpiar(m))
+    return ''
+  })
+  const luciA = g['luci']!.filter((_, i) => i % 2 === 0).join('')
+  const luciB = g['luci']!.filter((_, i) => i % 2 === 1).join('')
+  const nieve = g['nieve']!.join('')
+  const viva =
+    (g['aurora']!.length ? capa('viva-aurora', g['aurora']!.join('')) : '') +
+    (g['rayo']!.length ? capa('viva-rayo', g['rayo']!.join('')) : '') +
+    (g['vuelo']!.length ? capa('viva-vuelo', g['vuelo']!.join('')) : '') +
+    (luciA ? capa('viva-luci', luciA) : '') + (luciB ? capa('viva-luci viva-luci-b', luciB) : '') +
+    // La nieve cae como una lámina que baja una pantalla entera; la copia de arriba tapa el hueco: no se nota el salto.
+    (nieve ? `<div class="viva-cae">${capa('', nieve)}${capa('viva-arriba', nieve)}</div>` : '') +
+    (g['lluvia']!.length ? capa('viva-lluvia', g['lluvia']!.join('')) : '')
+  return { ...d, fondo, viva }
 }
 
 /** Envuelve el contenido en un SVG de borde (izquierdo o derecho). */

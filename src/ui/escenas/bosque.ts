@@ -44,7 +44,7 @@ const PALETAS: Record<Hora, Paleta> = {
 /** Y del suelo del bosque: ahí se pierden las palabras. */
 const SUELO = 462
 
-export function dibujarBosque(hora: Hora, animado: boolean): Dibujo {
+export function dibujarBosque(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const s = p.sol
   const rayos = [0, 1, 2, 3, 4, 5]

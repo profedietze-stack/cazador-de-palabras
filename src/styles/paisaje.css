@@ -41,16 +41,23 @@
 .pa-borde{position:absolute;bottom:0;height:100%;width:auto;display:block}
 .pa-borde.izq{left:0}
 .pa-borde.der{right:0}
-.esc-luci{animation:esc-luci 4s ease-in-out infinite}
-@keyframes esc-luci{0%,100%{opacity:.15}50%{opacity:1}}
-.esc-nieve{animation:esc-nieve 7s linear infinite}
-@keyframes esc-nieve{from{transform:translateY(-14px);opacity:0}15%{opacity:.9}to{transform:translateY(46px);opacity:0}}
-.esc-rayo{animation:esc-rayo 7s linear infinite;opacity:0}
-@keyframes esc-rayo{0%,60%,100%{opacity:0}61%{opacity:1}62%{opacity:.15}63%{opacity:1}66%{opacity:0}}
-.esc-lluvia{animation:esc-lluvia .7s linear infinite}
-@keyframes esc-lluvia{from{transform:translateY(-26px)}to{transform:translateY(0)}}
-.esc-aurora{animation:esc-aurora 9s ease-in-out infinite}
-@keyframes esc-aurora{0%,100%{opacity:.75;transform:translateX(0)}50%{opacity:1;transform:translateX(14px)}}
+/* Capas animadas (ui/escenas/dibujo.ts · separarViva): cada animación mueve o desvanece un SVG entero,
+   que hace la GPU sin repintar. El fondo grande no se anima nunca. */
+.pa-viva{will-change:transform,opacity}
+.viva-luci{animation:viva-luci 4s ease-in-out infinite alternate}
+.viva-luci-b{animation-delay:-2s;animation-duration:5.5s}
+@keyframes viva-luci{from{opacity:.12}to{opacity:1}}
+.viva-vuelo{animation:viva-vuelo 16s ease-in-out infinite alternate}
+@keyframes viva-vuelo{from{transform:translate(-34px,4px)}to{transform:translate(38px,-6px)}}
+.viva-rayo{opacity:0;animation:viva-rayo 7s linear infinite}
+@keyframes viva-rayo{0%,60%,100%{opacity:0}61%{opacity:1}62%{opacity:.15}63%{opacity:1}66%{opacity:0}}
+.viva-lluvia{animation:viva-lluvia .7s linear infinite}
+@keyframes viva-lluvia{from{transform:translateY(-30px)}to{transform:translateY(0)}}
+.viva-aurora{animation:viva-aurora 9s ease-in-out infinite}
+@keyframes viva-aurora{0%,100%{opacity:.75;transform:translateX(0)}50%{opacity:1;transform:translateX(16px)}}
+.viva-cae{position:absolute;inset:0;animation:viva-cae 18s linear infinite;will-change:transform}
+.viva-arriba{top:-100%;bottom:auto}
+@keyframes viva-cae{from{transform:translateY(0)}to{transform:translateY(100%)}}
 .esc-fuego{transform-box:fill-box;transform-origin:50% 100%;animation:esc-fuego 1.6s ease-in-out infinite}
 @keyframes esc-fuego{0%,100%{transform:scale(1)}40%{transform:scale(1.05,.96)}70%{transform:scale(.97,1.04)}}
 
@@ -59,27 +66,29 @@
 
 /* Menos movimiento: del sistema y de Ajustes */
 @media (prefers-reduced-motion: reduce){
-  .pa-colina,.pa-luci,.pa-destello,.pa-onda,.esc-luci,.esc-nieve,.esc-fuego,.esc-rayo,.esc-lluvia,.esc-aurora{animation:none}
+  .pa-colina,.pa-luci,.pa-destello,.pa-onda,.esc-fuego,.viva-luci,.viva-vuelo,.viva-rayo,.viva-lluvia,.viva-aurora,.viva-cae{animation:none}
 }
 html[data-movimiento="reducido"] .pa-colina,
 html[data-movimiento="reducido"] .pa-luci,
 html[data-movimiento="reducido"] .pa-destello,
 html[data-movimiento="reducido"] .pa-onda,
-html[data-movimiento="reducido"] .esc-luci,
-html[data-movimiento="reducido"] .esc-nieve,
-html[data-movimiento="reducido"] .esc-rayo,
-html[data-movimiento="reducido"] .esc-lluvia,
-html[data-movimiento="reducido"] .esc-aurora,
-html[data-movimiento="reducido"] .esc-fuego{animation:none}
+html[data-movimiento="reducido"] .esc-fuego,
+html[data-movimiento="reducido"] .viva-luci,
+html[data-movimiento="reducido"] .viva-vuelo,
+html[data-movimiento="reducido"] .viva-rayo,
+html[data-movimiento="reducido"] .viva-lluvia,
+html[data-movimiento="reducido"] .viva-aurora,
+html[data-movimiento="reducido"] .viva-cae{animation:none}
 
 /* Pestaña oculta: pausa (se reanuda sola al volver) */
 html.pestana-oculta .pa-colina,
 html.pestana-oculta .pa-luci,
 html.pestana-oculta .pa-destello,
 html.pestana-oculta .pa-onda,
-html.pestana-oculta .esc-luci,
-html.pestana-oculta .esc-nieve,
-html.pestana-oculta .esc-rayo,
-html.pestana-oculta .esc-lluvia,
-html.pestana-oculta .esc-aurora,
-html.pestana-oculta .esc-fuego{animation-play-state:paused}
+html.pestana-oculta .esc-fuego,
+html.pestana-oculta .viva-luci,
+html.pestana-oculta .viva-vuelo,
+html.pestana-oculta .viva-rayo,
+html.pestana-oculta .viva-lluvia,
+html.pestana-oculta .viva-aurora,
+html.pestana-oculta .viva-cae{animation-play-state:paused}

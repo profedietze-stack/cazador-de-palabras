@@ -3,8 +3,9 @@ import { X0, X1, f, rng } from './dibujo'
 // Formas que usan varias escenas: pájaros, picos nevados, arboledas de copa redonda y nubes.
 
 /** Bandada de pájaros: cada uno una «v» fina. `pts` = [x, y, escala]. */
-export function pajaros(pts: ReadonlyArray<readonly [number, number, number]>, color: string): string {
-  return pts.map(([x, y, s]) => `<path d="M${x - 6 * s} ${y} Q${x - 3 * s} ${y - 4 * s} ${x} ${y} Q${x + 3 * s} ${y - 4 * s} ${x + 6 * s} ${y}" fill="none" stroke="${color}" stroke-width="1.3" stroke-linecap="round"/>`).join('')
+export function pajaros(pts: ReadonlyArray<readonly [number, number, number]>, color: string, animado = false): string {
+  const aves = pts.map(([x, y, s]) => `<path d="M${x - 6 * s} ${y} Q${x - 3 * s} ${y - 4 * s} ${x} ${y} Q${x + 3 * s} ${y - 4 * s} ${x + 6 * s} ${y}" fill="none" stroke="${color}" stroke-width="1.3" stroke-linecap="round"/>`).join('')
+  return animado ? `<g class="esc-vuelo">${aves}</g>` : aves
 }
 
 /** Pico de montaña de dos tonos (lado con luz y lado en sombra) y, si se pide, la nieve de la cima. */

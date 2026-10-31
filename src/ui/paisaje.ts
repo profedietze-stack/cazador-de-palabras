@@ -111,7 +111,7 @@ export function montarPaisaje(el: HTMLElement, mundo: Mundo, op: OpcionesPaisaje
     const escena = ESCENAS[mundo.escena]
     const hora = op.hora ?? (op.cielo === 'dia' ? 'dia' : 'noche')
     const d = escena.dibujar(hora, op.animado && op.particulas)
-    el.insertAdjacentHTML('beforeend', d.fondo + d.izq + d.der)
+    el.insertAdjacentHTML('beforeend', d.fondo + d.viva + d.izq + d.der)
     el.dataset['escena'] = mundo.escena
     el.dataset['hora'] = hora
     el.dataset['aterrizaje'] = escena.aterrizaje

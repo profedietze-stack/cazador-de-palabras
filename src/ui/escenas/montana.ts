@@ -24,7 +24,7 @@ const PALETAS: Record<Hora, Paleta> = {
     nubes: ['#ffffff', '#e4eef8', 0.75],
     picos: { claro: ['#e8f3ff', '#f4faff', '#ffffff'], oscuro: ['#8aa7cc', '#7d9cc4', '#6f8fbb'], nieve: '#ffffff' },
     lejos: '#a9c1de', pinos: ['#2c5a66', '#9cc8d4'], laderas: ['#e9f3fc', '#d2e3f4', '#f6fbff'], linea: '#9db8d8',
-    copos: { n: 90, color: '#ffffff' },
+    copos: { n: 44, color: '#ffffff' },
   },
   amanecer: {
     cielo: ['#4a5a9e', '#f4a090', '#ffe0b8'], estrellas: 0,
@@ -40,14 +40,14 @@ const PALETAS: Record<Hora, Paleta> = {
     nubes: ['#2a3a68', '#1c2a58', 0.5],
     picos: { claro: ['#6f88c0', '#7a94cc', '#8aa4d8'], oscuro: ['#2a3a68', '#243464', '#1e2c58'], nieve: '#c8dcff' },
     lejos: '#22346a', pinos: ['#0a1a30', '#4a6a9a'], laderas: ['#8fa6d4', '#7088b8', '#a6bce4'], linea: '#5a74a8',
-    copos: { n: 60, color: '#dfe9ff' },
+    copos: { n: 34, color: '#dfe9ff' },
   },
 }
 
 /** Y de la ladera de nieve: ahí se entierran las palabras. */
 const NIEVE = 446
 
-export function dibujarMontana(hora: Hora, animado: boolean): Dibujo {
+export function dibujarMontana(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('mon-cielo', [[0, p.cielo[0]], [0.6, p.cielo[1]], [1, p.cielo[2]]]) + rad('mon-luz', a.luz, a.luzOp)

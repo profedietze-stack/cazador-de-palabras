@@ -29,7 +29,9 @@ describe('el fondo de cada pantalla', () => {
     const f = pantalla.querySelector<HTMLElement>('.fondo-mundo')!
     expect(f.dataset['mundo']).toBe('inicio')
     expect(f.dataset['escena']).toBe('campamento')
-    expect(f.querySelectorAll('svg').length).toBe(3)   // el fondo ancho y un borde a cada lado
+    expect(f.querySelectorAll('svg.pa-escena:not(.pa-viva)').length).toBe(1)   // el fondo ancho quieto
+    expect(f.querySelectorAll('svg.pa-viva').length).toBe(2)                   // y las luciérnagas en dos capas propias
+    expect(f.querySelectorAll('svg.pa-borde').length).toBe(2)                  // y un borde a cada lado
     expect(f.querySelectorAll('.pa-colina').length).toBe(0)
     expect(document.documentElement.style.getPropertyValue('--cielo-alto')).not.toBe('')
   })
@@ -75,10 +77,10 @@ describe('el fondo de cada pantalla', () => {
     const a = document.getElementById('menuPrincipal')!, b = document.getElementById('preNivel')!
     G.cat = 'articulos'
     actualizarFondo(a)
-    expect(a.querySelectorAll('svg').length).toBe(3)
+    expect(a.querySelectorAll('svg.pa-borde').length).toBe(2)
     actualizarFondo(b)
     expect(a.querySelector('.fondo-mundo')!.children.length).toBe(0)
-    expect(b.querySelectorAll('svg').length).toBe(3)
+    expect(b.querySelectorAll('svg.pa-borde').length).toBe(2)
     expect(b.querySelector<HTMLElement>('.fondo-mundo')!.dataset['escena']).toBe('taiga')
   })
 })

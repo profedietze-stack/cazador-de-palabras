@@ -26,13 +26,13 @@ const PALETAS: Record<Hora, Paleta> = {
     cielo: ['#4a5a98', '#e8a0a0', '#ffe0c0'], estrellas: 0,
     astro: { x: 200, y: 330, r: 22, color: '#fff2c8', luz: '#ffd27a', luzOp: 0.9 },
     lejos: '#7a7aa8', pinosLejos: ['#3a4a72', '#f0b0b8'], pinosCerca: ['#2a3a62', '#f4c0c4'],
-    nieve: ['#f4dcdc', '#fbeaea', '#e8c8d4', '#fff2f0'], aurora: false, copos: 40, brillos: { n: 0, color: '#fff' },
+    nieve: ['#f4dcdc', '#fbeaea', '#e8c8d4', '#fff2f0'], aurora: false, copos: 26, brillos: { n: 0, color: '#fff' },
   },
   dia: {
     cielo: ['#6aa8e0', '#c8e4f5', '#f0f8fc'], estrellas: 0,
     astro: { x: 210, y: 100, r: 18, color: '#fffdf0', luz: '#ffffff', luzOp: 0.8 },
     lejos: '#9ab8d0', pinosLejos: ['#2c5a66', '#cfe8f0'], pinosCerca: ['#1e4a58', '#dff0f6'],
-    nieve: ['#eaf4fb', '#f4faff', '#d8e8f4', '#ffffff'], aurora: false, copos: 50, brillos: { n: 0, color: '#fff' },
+    nieve: ['#eaf4fb', '#f4faff', '#d8e8f4', '#ffffff'], aurora: false, copos: 30, brillos: { n: 0, color: '#fff' },
   },
 }
 
@@ -47,7 +47,7 @@ function cinta(y0: number, amp: number, relleno: string, op: number, fase: numbe
   return `<path d="${d}" fill="${relleno}" opacity="${op}" filter="url(#tai-difuso)"/>`
 }
 
-export function dibujarTaiga(hora: Hora, animado: boolean): Dibujo {
+export function dibujarTaiga(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('tai-cielo', [[0, p.cielo[0]], [0.6, p.cielo[1]], [1, p.cielo[2]]]) +

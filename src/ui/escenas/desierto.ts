@@ -52,7 +52,7 @@ function saguaro(x: number, y: number, h: number, c: string): string {
   return `<g transform="translate(${x} ${y})" fill="none" stroke="${c}" stroke-linecap="round"><path d="M0 0 L0 ${-h}" stroke-width="9"/><path d="M0 ${-h * 0.45} q-16 0 -16 ${-h * 0.2} L-16 ${-h * 0.55}" stroke-width="7"/><path d="M0 ${-h * 0.6} q14 0 14 ${-h * 0.15} L14 ${-h * 0.78}" stroke-width="7"/></g>`
 }
 
-export function dibujarDesierto(hora: Hora, animado: boolean): Dibujo {
+export function dibujarDesierto(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('des-cielo', [[0, p.cielo[0]], [0.55, p.cielo[1]], [1, p.cielo[2]]]) + rad('des-luz', a.luz, a.luzOp)
@@ -70,7 +70,7 @@ export function dibujarDesierto(hora: Hora, animado: boolean): Dibujo {
     `<rect x="${X0}" y="0" width="${X1 - X0}" height="${ALTO}" fill="url(#des-cielo)"/>` +
     (p.estrellas ? estrellas(p.estrellas, 133, 300) : '') +
     `<circle cx="${a.x}" cy="${a.y}" r="110" fill="url(#des-luz)"/><circle cx="${a.x}" cy="${a.y}" r="${a.r}" fill="${a.color}"/>` + nubes +
-    (p.pajaros ? pajaros([[90, 130, 1.3], [112, 120, 1.1], [-100, 120, 1.2], [380, 110, 1.2]], p.pajaros) : '') +
+    (p.pajaros ? pajaros([[90, 130, 1.3], [112, 120, 1.1], [-100, 120, 1.2], [380, 110, 1.2]], p.pajaros, animado) : '') +
     ridge(352, 8, 134, p.rocas, 0.5) +
     `<path d="M120 352 L132 322 L146 322 L158 352 Z M-90 352 L-76 318 L-58 318 L-44 352 Z M330 352 L344 326 L360 326 L372 352 Z" fill="${p.rocas}"/>` +
     ridge(368, 14, 135, p.dunas[0], 0.5) + caravana +

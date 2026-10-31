@@ -101,7 +101,7 @@ function hexMezcla(a: string, b: string): string {
   return '#' + [1, 3, 5].map(i => Math.round(c(a, i) * 0.75 + c(b, i) * 0.25).toString(16).padStart(2, '0')).join('')
 }
 
-export function dibujarParamo(hora: Hora, animado: boolean): Dibujo {
+export function dibujarParamo(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const r = rng(81)
   let lluvia = ''
@@ -118,7 +118,7 @@ export function dibujarParamo(hora: Hora, animado: boolean): Dibujo {
   const fondo = svgFondo(defs,
     `<rect x="${X0}" y="0" width="${X1 - X0}" height="${ALTO}" fill="url(#par-cielo)"/>` + nubes +
     `<circle cx="232" cy="190" r="90" fill="url(#par-luz)" opacity=".35"/>` +
-    `<g class="${animado ? 'esc-rayo' : ''}"><path d="${rayo}" fill="${p.rayo}" opacity=".95"/><path d="${rayo}" fill="${p.rayo}" filter="url(#par-brillo)" opacity=".9"/></g>` +
+    `<g class="${animado ? 'esc-rayo' : ''}">${animado ? `<rect x="${X0}" y="0" width="${X1 - X0}" height="${ALTO}" fill="#dfeaff" opacity=".2"/>` : ''}<path d="${rayo}" fill="${p.rayo}" opacity=".95"/><path d="${rayo}" fill="${p.rayo}" filter="url(#par-brillo)" opacity=".9"/></g>` +
     ridge(300, 22, 82, p.colinas[0], 0.8) +
     `<rect x="${X0}" y="290" width="${X1 - X0}" height="50" fill="#b9c6d6" opacity=".3"/>` +
     ridge(338, 18, 83, p.colinas[1], 0.9) + matorral(342, 201, 14, 0.55, p, 0) + ciervo(168, 337, 0.55, p.ciervo) +

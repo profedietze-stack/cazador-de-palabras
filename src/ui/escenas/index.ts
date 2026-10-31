@@ -10,7 +10,7 @@ import { dibujarValle } from './valle'
 import { dibujarEstepa } from './estepa'
 import { dibujarHumedal } from './humedal'
 import { dibujarMontana } from './montana'
-import type { Dibujo, Hora } from './dibujo'
+import { separarViva, type Dibujo, type Hora } from './dibujo'
 
 export type { Dibujo, Hora } from './dibujo'
 
@@ -23,16 +23,16 @@ interface Escena {
 }
 
 export const ESCENAS: Record<EscenaId, Escena> = {
-  campamento: { dibujar: dibujarCampamento, aterrizaje: 'agua' },
-  bosque: { dibujar: dibujarBosque, aterrizaje: 'hojas' },
-  estepa: { dibujar: dibujarEstepa, aterrizaje: 'pasto' },
-  montana: { dibujar: dibujarMontana, aterrizaje: 'nieve' },
-  humedal: { dibujar: dibujarHumedal, aterrizaje: 'agua' },
-  paramo: { dibujar: dibujarParamo, aterrizaje: 'pasto' },
-  canon: { dibujar: dibujarCanon, aterrizaje: 'polvo' },
-  taiga: { dibujar: dibujarTaiga, aterrizaje: 'nieve' },
-  desierto: { dibujar: dibujarDesierto, aterrizaje: 'polvo' },
-  valle: { dibujar: dibujarValle, aterrizaje: 'agua' },
+  campamento: { dibujar: (h, a) => separarViva(dibujarCampamento(h, a)), aterrizaje: 'agua' },
+  bosque: { dibujar: (h, a) => separarViva(dibujarBosque(h, a)), aterrizaje: 'hojas' },
+  estepa: { dibujar: (h, a) => separarViva(dibujarEstepa(h, a)), aterrizaje: 'pasto' },
+  montana: { dibujar: (h, a) => separarViva(dibujarMontana(h, a)), aterrizaje: 'nieve' },
+  humedal: { dibujar: (h, a) => separarViva(dibujarHumedal(h, a)), aterrizaje: 'agua' },
+  paramo: { dibujar: (h, a) => separarViva(dibujarParamo(h, a)), aterrizaje: 'pasto' },
+  canon: { dibujar: (h, a) => separarViva(dibujarCanon(h, a)), aterrizaje: 'polvo' },
+  taiga: { dibujar: (h, a) => separarViva(dibujarTaiga(h, a)), aterrizaje: 'nieve' },
+  desierto: { dibujar: (h, a) => separarViva(dibujarDesierto(h, a)), aterrizaje: 'polvo' },
+  valle: { dibujar: (h, a) => separarViva(dibujarValle(h, a)), aterrizaje: 'agua' },
 }
 
 const HORAS: readonly Hora[] = ['amanecer', 'dia', 'noche']

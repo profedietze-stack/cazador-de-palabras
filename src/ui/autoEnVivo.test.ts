@@ -39,7 +39,7 @@ describe('«Auto»: el sistema cambia de esquema con el juego abierto', () => {
     expect(document.documentElement.dataset['cielo']).toBe('dia')
     expect(document.documentElement.style.getPropertyValue('--cielo-alto')).toBe(MUNDOS.inicio.dia.cieloAlto)
     expect((f as HTMLElement).dataset['hora']).toBe('dia')
-    expect(f.querySelectorAll('svg.pa-escena').length).toBe(1)
+    expect(f.querySelectorAll('svg.pa-escena:not(.pa-viva)').length).toBe(1)
 
     oscuro = true
     oyentes.forEach(fn => fn())

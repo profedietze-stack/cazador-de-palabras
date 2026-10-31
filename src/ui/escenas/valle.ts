@@ -39,10 +39,30 @@ const PALETAS: Record<Hora, Paleta> = {
   },
 }
 
+/** Cinta de río: una curva de Bézier que se ensancha de `w0` a `w1`, como polígono. */
+function cinta(p0: readonly [number, number], p1: readonly [number, number], p2: readonly [number, number], p3: readonly [number, number], w0: number, w1: number): string {
+  const N = 28
+  const izq: string[] = []
+  const der: string[] = []
+  for (let i = 0; i <= N; i++) {
+    const t = i / N
+    const m = 1 - t
+    const x = m * m * m * p0[0] + 3 * m * m * t * p1[0] + 3 * m * t * t * p2[0] + t * t * t * p3[0]
+    const y = m * m * m * p0[1] + 3 * m * m * t * p1[1] + 3 * m * t * t * p2[1] + t * t * t * p3[1]
+    const dx = 3 * m * m * (p1[0] - p0[0]) + 6 * m * t * (p2[0] - p1[0]) + 3 * t * t * (p3[0] - p2[0])
+    const dy = 3 * m * m * (p1[1] - p0[1]) + 6 * m * t * (p2[1] - p1[1]) + 3 * t * t * (p3[1] - p2[1])
+    const largo = Math.hypot(dx, dy) || 1
+    const w = (w0 + (w1 - w0) * t) / 2
+    izq.push(`${f(x - (dy / largo) * w)} ${f(y + (dx / largo) * w)}`)
+    der.push(`${f(x + (dy / largo) * w)} ${f(y - (dx / largo) * w)}`)
+  }
+  return `M${izq.join(' L')} L${der.reverse().join(' L')} Z`
+}
+
 /** Y donde se hunden las palabras: en el río ya ensanchado. */
 const RIO = 490
 
-export function dibujarValle(hora: Hora, animado: boolean): Dibujo {
+export function dibujarValle(hora: Hora, animado: boolean): Omit<Dibujo, 'viva'> {
   const p = PALETAS[hora]
   const a = p.astro
   const defs = grad('val-cielo', [[0, p.cielo[0]], [0.5, p.cielo[1]], [1, p.cielo[2]]]) + rad('val-luz', a.luz, a.luzOp) +
@@ -56,14 +76,14 @@ export function dibujarValle(hora: Hora, animado: boolean): Dibujo {
   }
   const nubes = p.nubes ? [[60, 110, 70], [210, 80, 80], [-120, 130, 80], [400, 110, 80]].map(([x, y, w]) => nube(x!, y!, w! / 2, 8, p.nubes!, p.nubes!, 0.6)).join('') : ''
   // Dos afluentes que bajan desde el horizonte y se encuentran, y el río único que se ensancha hacia el frente.
-  const afluenteIzq = 'M36 384 L68 384 C104 414 150 440 184 474 L120 474 C94 446 60 414 36 384 Z'
-  const afluenteDer = 'M264 384 L232 384 C196 414 150 440 116 474 L180 474 C206 446 240 414 264 384 Z'
+  const afluenteIzq = cinta([48, 382], [118, 392], [88, 440], [148, 476], 12, 50)
+  const afluenteDer = cinta([252, 382], [182, 392], [212, 440], [152, 476], 12, 50)
   const rio = `M126 470 L174 470 L650 520 L-350 520 Z`
   const fondo = svgFondo(defs,
     `<rect x="${X0}" y="0" width="${X1 - X0}" height="${ALTO}" fill="url(#val-cielo)"/>` +
     (p.estrellas ? estrellas(p.estrellas, 153, 280) : '') +
     `<circle cx="${a.x}" cy="${a.y}" r="110" fill="url(#val-luz)"/><circle cx="${a.x}" cy="${a.y}" r="${a.r}" fill="${a.color}"/>` + nubes +
-    (p.pajaros ? pajaros([[70, 140, 1.3], [92, 128, 1.1], [114, 144, 1.2], [-100, 120, 1.2], [380, 110, 1.2]], p.pajaros) : '') +
+    (p.pajaros ? pajaros([[70, 140, 1.3], [92, 128, 1.1], [114, 144, 1.2], [-100, 120, 1.2], [380, 110, 1.2]], p.pajaros, animado) : '') +
     ridge(336, 26, 154, p.montes[0], 0.7) + ridge(352, 20, 155, p.montes[1], 0.9) +
     ridge(374, 14, 156, p.lomas[0], 0.8) + arboleda(386, 157, p.arboles[0], 18, 30, 12, p.arboles[1]) +
     ridge(392, 12, 158, p.lomas[1], 1) + ridge(430, 10, 160, p.lomas[2], 1.1) +

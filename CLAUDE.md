@@ -95,8 +95,8 @@ server/src/
 
 To redeploy server after changes:
 ```bash
-# 1. Compile locally
-cd server && npx tsc
+# 1. Compile locally (build config excludes the tests; clean first so no stale files travel)
+cd server && rm -rf dist && npx tsc -p tsconfig.build.json
 
 # 2. Copy ALL compiled JS to the VPS (the old per-file list went stale: ranking.js and
 #    observabilidad.js were missing). Use the absolute key path.

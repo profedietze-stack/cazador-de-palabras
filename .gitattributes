@@ -1,0 +1,2 @@
+# Los guiones de shell se ejecutan en Linux: con saltos de linea de Windows (CRLF) fallan.
+*.sh text eol=lf

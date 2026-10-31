@@ -11,7 +11,7 @@ import { CATS } from './categories'
 export type MundoId = CategoryKey | 'inicio'
 
 /** Escenas de caza dibujadas aparte (ui/escenas). Los mundos sin escena usan el paisaje de colinas. */
-export type EscenaId = 'campamento' | 'bosque' | 'estepa' | 'montana' | 'humedal'
+export type EscenaId = 'campamento' | 'bosque' | 'estepa' | 'montana' | 'humedal' | 'paramo' | 'canon' | 'taiga' | 'desierto' | 'valle'
 
 export interface Paleta {
   cieloAlto: string
@@ -82,19 +82,19 @@ export const MUNDOS: Record<MundoId, Mundo> = {
     dia('#5fd0e8', '#b4ecf5', ['#7fd8e0', '#2fb5c8', '#0f7f94']), 'humedal'),
   articulos:      mundo('articulos', CATS.articulos.nombre,
     noche('#2a2470', '#6d5dfc', ['#3b3590', '#5a4fd0', '#7c70f0']),
-    dia('#a899ff', '#e2dcff', ['#8a78ef', '#7260d8', '#4a38b0'])),
+    dia('#a899ff', '#e2dcff', ['#8a78ef', '#7260d8', '#4a38b0']), 'taiga'),
   pronombres:     mundo('pronombres', CATS.pronombres.nombre,
     noche('#6e1b4a', '#d23d85', ['#7d2456', '#a83272', '#d65b97'], '#ffd23f'),
-    dia('#ff93c1', '#ffd9ea', ['#e56aa0', '#d14d88', '#a02a66'])),
+    dia('#ff93c1', '#ffd9ea', ['#e56aa0', '#d14d88', '#a02a66']), 'desierto'),
   preposiciones:  mundo('preposiciones', CATS.preposiciones.nombre,
     noche('#1f6b3a', '#52b788', ['#2c8a4e', '#3fa468', '#74cf9b']),
-    dia('#86dc90', '#c6ecb8', ['#6bc27a', '#4eab62', '#2f8645'])),
+    dia('#86dc90', '#c6ecb8', ['#6bc27a', '#4eab62', '#2f8645']), 'canon'),
   conjunciones:   mundo('conjunciones', CATS.conjunciones.nombre,
     noche('#5a1409', '#f4511e', ['#7a1f0c', '#a8310f', '#e0561f'], '#ffe66d'),
-    dia('#ffa273', '#ffe0c4', ['#e8704a', '#d4562f', '#a8381a'])),
+    dia('#ffa273', '#ffe0c4', ['#e8704a', '#d4562f', '#a8381a']), 'valle'),
   interjecciones: mundo('interjecciones', CATS.interjecciones.nombre,
     noche('#15532a', '#c0d62d', ['#1f7a3d', '#59a82f', '#c9dd45'], '#ffe66d'),
-    dia('#c8dc44', '#d9e878', ['#8fc83a', '#6fb02a', '#4c8a1f'])),
+    dia('#c8dc44', '#d9e878', ['#8fc83a', '#6fb02a', '#4c8a1f']), 'paramo'),
 }
 
 /** El mundo de una categoría; sin categoría (menú, ajustes, ranking…) es el de inicio. */

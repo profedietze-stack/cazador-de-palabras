@@ -3,8 +3,11 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { montarPaisaje, opcionesDesdeAjustes, iniciarPausaPorVisibilidad, type OpcionesPaisaje } from './paisaje'
 import { aplicarMundo } from './aplicarMundo'
-import { MUNDOS } from '../data/mundos'
+import { MUNDOS, type Mundo } from '../data/mundos'
 import { AJUSTES_DE_FABRICA as F } from '../storage/ajustes'
+
+/** Todos los mundos tienen escena de caza; el paisaje de colinas sigue siendo el plan B y se prueba sin ella. */
+const colinas = (m: Mundo): Mundo => { const { escena: _escena, ...resto } = m; return resto }
 
 let el: HTMLElement
 const op = (o: Partial<OpcionesPaisaje> = {}): OpcionesPaisaje => ({ animado: true, particulas: true, cielo: 'noche', ...o })
@@ -17,29 +20,29 @@ beforeEach(() => {
 
 describe('montarPaisaje', () => {
   it('dibuja tres capas de colinas (SVG) y un astro', () => {
-    montarPaisaje(el, MUNDOS.articulos, op())
+    montarPaisaje(el, colinas(MUNDOS.articulos), op())
     expect(el.querySelectorAll('.pa-colina svg').length).toBe(3)
     expect(el.querySelectorAll('.pa-astro').length).toBe(1)
     expect(el.dataset['mundo']).toBe('articulos')
   })
 
   it('de noche el astro es la luna y salen luciérnagas; de día es el sol y salen destellos', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ cielo: 'noche' }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ cielo: 'noche' }))
     expect(el.querySelector('.pa-astro')!.classList.contains('pa-luna')).toBe(true)
     expect(el.querySelectorAll('.pa-luci').length).toBe(12)
-    montarPaisaje(el, MUNDOS.articulos, op({ cielo: 'dia' }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ cielo: 'dia' }))
     expect(el.querySelector('.pa-astro')!.classList.contains('pa-sol')).toBe(true)
     expect(el.querySelectorAll('.pa-luci').length).toBe(0)
     expect(el.querySelectorAll('.pa-destello').length).toBe(8)
   })
 
   it('sin partículas no hay luciérnagas ni destellos (la partida no las lleva)', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ particulas: false }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ particulas: false }))
     expect(el.querySelectorAll('.pa-luci, .pa-destello').length).toBe(0)
   })
 
   it('con animado:false todas las capas quedan quietas y no hay partículas, aunque se pidan', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ animado: false, particulas: true }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ animado: false, particulas: true }))
     const capas = [...el.querySelectorAll('.pa-colina')]
     expect(capas.length).toBe(3)
     for (const c of capas) {
@@ -50,14 +53,14 @@ describe('montarPaisaje', () => {
   })
 
   it('con apagarTodo (alto contraste) no hay paisaje: el contenedor queda sin hijos y liso', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ apagarTodo: true }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ apagarTodo: true }))
     expect(el.children.length).toBe(0)
     expect(el.classList.contains('liso')).toBe(true)
   })
 
   it('desmontar lo vacía, y montar dos veces no duplica las capas', () => {
-    const desmontar = montarPaisaje(el, MUNDOS.pronombres, op())
-    montarPaisaje(el, MUNDOS.pronombres, op())
+    const desmontar = montarPaisaje(el, colinas(MUNDOS.pronombres), op())
+    montarPaisaje(el, colinas(MUNDOS.pronombres), op())
     expect(el.querySelectorAll('.pa-colina').length).toBe(3)
     desmontar()
     expect(el.children.length).toBe(0)

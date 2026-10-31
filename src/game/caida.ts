@@ -97,10 +97,10 @@ export function lanzarChispas(contenedor: HTMLElement, cx: number, cy: number, c
   retirarLuego(contenedor, nodos, 700)
 }
 
-/** Cómo aterriza una palabra que se escapa: en el agua (onda), entre el follaje (hojas), en el pasto alto (briznas) o en la nieve (copos). */
-export type TipoAterrizaje = 'agua' | 'hojas' | 'pasto' | 'nieve'
+/** Cómo aterriza una palabra que se escapa: en el agua (onda), entre el follaje (hojas), en el pasto alto (briznas), en la nieve (copos) o en la arena (polvo). */
+export type TipoAterrizaje = 'agua' | 'hojas' | 'pasto' | 'nieve' | 'polvo'
 
-const TIPOS: readonly TipoAterrizaje[] = ['agua', 'hojas', 'pasto', 'nieve']
+const TIPOS: readonly TipoAterrizaje[] = ['agua', 'hojas', 'pasto', 'nieve', 'polvo']
 
 /** El aterrizaje de la escena que está en pantalla dentro de `raiz` (un selector); sin escena, agua. */
 export function aterrizajeDe(raiz: string): TipoAterrizaje {
@@ -176,11 +176,32 @@ export function lanzarCopos(contenedor: HTMLElement, cx: number, cy: number): vo
   retirarLuego(contenedor, nodos, 900)
 }
 
+/** Nube de arena que se levanta donde la palabra cae. Sin «reducir movimiento». */
+export function lanzarPolvo(contenedor: HTMLElement, cx: number, cy: number): void {
+  if (reducirMovimientoActivo()) return
+  const colores = ['#d9b27a', '#c99a62', '#e6c690']
+  const nodos: HTMLElement[] = []
+  for (let i = 0; i < 7; i++) {
+    const p = document.createElement('div')
+    p.className = 'polvo-aterriza'
+    p.style.left = `${r2(cx + (i - 3) * 7)}px`
+    p.style.top = `${cy}px`
+    p.style.width = p.style.height = `${10 + (i % 3) * 5}px`
+    p.style.background = colores[i % colores.length]!
+    p.style.setProperty('--dx', `${r2((i - 3) * 6)}px`)
+    p.style.setProperty('--dy', `${-(8 + (i % 3) * 5)}px`)
+    contenedor.appendChild(p)
+    nodos.push(p)
+  }
+  retirarLuego(contenedor, nodos, 900)
+}
+
 /** Efecto de aterrizaje según la escena. */
 export function lanzarAterrizaje(contenedor: HTMLElement, cx: number, cy: number, tipo: TipoAterrizaje): void {
   if (tipo === 'hojas') lanzarHojas(contenedor, cx, cy)
   else if (tipo === 'pasto') lanzarBriznas(contenedor, cx, cy)
   else if (tipo === 'nieve') lanzarCopos(contenedor, cx, cy)
+  else if (tipo === 'polvo') lanzarPolvo(contenedor, cx, cy)
   else lanzarChapuzon(contenedor, cx, cy)
 }
 

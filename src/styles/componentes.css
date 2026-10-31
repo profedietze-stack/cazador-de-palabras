@@ -235,6 +235,8 @@ html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px
 @keyframes triBrizna{0%{opacity:0;transform:translate(0,0) rotate(0) scaleY(.3)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-16px)) rotate(var(--rot,0deg)) scaleY(1)}}
 .copo-aterriza{position:absolute;margin:-3px 0 0 -3px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.8);pointer-events:none;z-index:6;animation:copoSale .9s ease-out forwards}
 @keyframes copoSale{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-16px)) scale(1)}}
+.polvo-aterriza{position:absolute;margin:-5px 0 0 -5px;border-radius:50%;opacity:0;pointer-events:none;z-index:6;animation:polvoSube .9s ease-out forwards}
+@keyframes polvoSube{0%{opacity:0;transform:translate(0,0) scale(.3)}25%{opacity:.7}100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-10px)) scale(1.7)}}
 .palabra.se-hunde,.deco-palabra.se-hunde{animation:palabraHunde .5s ease-in forwards}
 @keyframes palabraHunde{
   from{opacity:1;transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--r,0deg)) scale(var(--s,1))}
@@ -242,10 +244,11 @@ html[data-contraste="alto"]{--sobre-cielo:#ffffff;--sombra-sobre-cielo:0 1px 3px
 }
 /* Menos movimiento: sin chispas ni ondas (las palabras ya no se balancean; ver WordPhysics) */
 @media (prefers-reduced-motion: reduce){
-  .chispa,.onda-chapuzon,.hoja-aterriza,.brizna-aterriza,.copo-aterriza{display:none}
+  .chispa,.onda-chapuzon,.hoja-aterriza,.brizna-aterriza,.copo-aterriza,.polvo-aterriza{display:none}
 }
 html[data-movimiento="reducido"] .chispa,
 html[data-movimiento="reducido"] .onda-chapuzon,
 html[data-movimiento="reducido"] .hoja-aterriza,
 html[data-movimiento="reducido"] .brizna-aterriza,
-html[data-movimiento="reducido"] .copo-aterriza{display:none}
+html[data-movimiento="reducido"] .copo-aterriza,
+html[data-movimiento="reducido"] .polvo-aterriza{display:none}

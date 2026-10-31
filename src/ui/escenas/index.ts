@@ -2,6 +2,11 @@ import type { EscenaId } from '../../data/mundos'
 import type { TipoAterrizaje } from '../../game/caida'
 import { dibujarBosque } from './bosque'
 import { dibujarCampamento } from './campamento'
+import { dibujarCanon } from './canon'
+import { dibujarDesierto } from './desierto'
+import { dibujarParamo } from './paramo'
+import { dibujarTaiga } from './taiga'
+import { dibujarValle } from './valle'
 import { dibujarEstepa } from './estepa'
 import { dibujarHumedal } from './humedal'
 import { dibujarMontana } from './montana'
@@ -9,7 +14,7 @@ import type { Dibujo, Hora } from './dibujo'
 
 export type { Dibujo, Hora } from './dibujo'
 
-/** Cómo aterriza una palabra que se escapa: agua (onda), hojas (follaje), pasto (briznas) o nieve (copos). */
+/** Cómo aterriza una palabra que se escapa: agua (onda), hojas (follaje), pasto (briznas), nieve (copos) o polvo (arena). */
 export type Aterrizaje = TipoAterrizaje
 
 interface Escena {
@@ -23,6 +28,11 @@ export const ESCENAS: Record<EscenaId, Escena> = {
   estepa: { dibujar: dibujarEstepa, aterrizaje: 'pasto' },
   montana: { dibujar: dibujarMontana, aterrizaje: 'nieve' },
   humedal: { dibujar: dibujarHumedal, aterrizaje: 'agua' },
+  paramo: { dibujar: dibujarParamo, aterrizaje: 'pasto' },
+  canon: { dibujar: dibujarCanon, aterrizaje: 'polvo' },
+  taiga: { dibujar: dibujarTaiga, aterrizaje: 'nieve' },
+  desierto: { dibujar: dibujarDesierto, aterrizaje: 'polvo' },
+  valle: { dibujar: dibujarValle, aterrizaje: 'agua' },
 }
 
 const HORAS: readonly Hora[] = ['amanecer', 'dia', 'noche']

@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { MUNDOS } from '../data/mundos'
+import { MUNDOS, type Mundo } from '../data/mundos'
 import { razonContraste } from './contraste'
 import { montarPaisaje, type OpcionesPaisaje } from './paisaje'
 import { aplicarMundo } from './aplicarMundo'
+
+/** Todos los mundos tienen escena de caza; el paisaje de colinas sigue siendo el plan B y se prueba sin ella. */
+const colinas = (m: Mundo): Mundo => { const { escena: _escena, ...resto } = m; return resto }
 
 // La laguna: el bloque verde de abajo del paisaje es agua, al pie de las montañas. Se ve en
 // todos los mundos, de noche y de día, y es quieta con «reducir movimiento».
@@ -45,7 +48,7 @@ describe('aplicarMundo escribe el agua', () => {
 
 describe('montarPaisaje dibuja la laguna', () => {
   it('hay una franja de agua con su orilla (SVG) por encima de las colinas', () => {
-    montarPaisaje(el, MUNDOS.articulos, op())
+    montarPaisaje(el, colinas(MUNDOS.articulos), op())
     const agua = el.querySelector('.pa-agua')
     expect(agua).not.toBeNull()
     expect(agua!.querySelector('svg path')).not.toBeNull()
@@ -55,21 +58,21 @@ describe('montarPaisaje dibuja la laguna', () => {
   })
 
   it('animado: hay reflejos que brillan; quieto: el agua queda pero sin reflejos animados', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ animado: true }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ animado: true }))
     expect(el.querySelectorAll('.pa-onda').length).toBe(3)
-    montarPaisaje(el, MUNDOS.articulos, op({ animado: false }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ animado: false }))
     expect(el.querySelector('.pa-agua')).not.toBeNull()
     expect(el.querySelectorAll('.pa-onda').length).toBe(0)
   })
 
   it('con alto contraste no hay agua (fondo liso)', () => {
-    montarPaisaje(el, MUNDOS.articulos, op({ apagarTodo: true }))
+    montarPaisaje(el, colinas(MUNDOS.articulos), op({ apagarTodo: true }))
     expect(el.querySelector('.pa-agua')).toBeNull()
   })
 
   it('montar dos veces no duplica el agua', () => {
-    montarPaisaje(el, MUNDOS.articulos, op())
-    montarPaisaje(el, MUNDOS.articulos, op())
+    montarPaisaje(el, colinas(MUNDOS.articulos), op())
+    montarPaisaje(el, colinas(MUNDOS.articulos), op())
     expect(el.querySelectorAll('.pa-agua').length).toBe(1)
   })
 })

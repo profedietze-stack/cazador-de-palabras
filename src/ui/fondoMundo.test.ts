@@ -43,24 +43,18 @@ describe('el fondo de cada pantalla', () => {
     expect(mundoDePantalla('seleccionCategoria').id).toBe('inicio')
   })
 
-  it('con el fondo apagado el paisaje queda quieto, no liso (Review Focus 4)', () => {
+  it('con el fondo apagado la escena queda quieta, no lisa (Review Focus 4)', () => {
     cambiarAjustes({ fondoDecorativo: false })
-    G.cat = 'articulos'
-    pantalla = enPartida()
     actualizarFondo(pantalla)
-    const capas = [...pantalla.querySelectorAll('.pa-colina')]
-    expect(capas.length).toBe(3)
-    expect(capas.every(c => c.classList.contains('quieto'))).toBe(true)
-    expect(pantalla.querySelectorAll('.pa-luci').length).toBe(0)
+    expect(pantalla.querySelectorAll('svg').length).toBe(3)
+    expect(pantalla.querySelectorAll('.esc-luci, .esc-fuego').length).toBe(0)
   })
 
   it('con «reducir movimiento» queda quieto y sin luciérnagas', () => {
     cambiarAjustes({ reducirMovimiento: true })
-    G.cat = 'articulos'
-    pantalla = enPartida()
     actualizarFondo(pantalla)
-    expect([...pantalla.querySelectorAll('.pa-colina')].every(c => c.classList.contains('quieto'))).toBe(true)
-    expect(pantalla.querySelectorAll('.pa-luci').length).toBe(0)
+    expect(pantalla.querySelectorAll('svg').length).toBe(3)
+    expect(pantalla.querySelectorAll('.esc-luci, .esc-fuego').length).toBe(0)
   })
 
   it('con alto contraste no hay paisaje: fondo liso', () => {
@@ -84,7 +78,8 @@ describe('el fondo de cada pantalla', () => {
     expect(a.querySelectorAll('svg').length).toBe(3)
     actualizarFondo(b)
     expect(a.querySelector('.fondo-mundo')!.children.length).toBe(0)
-    expect(b.querySelectorAll('.pa-colina').length).toBe(3)
+    expect(b.querySelectorAll('svg').length).toBe(3)
+    expect(b.querySelector<HTMLElement>('.fondo-mundo')!.dataset['escena']).toBe('taiga')
   })
 })
 

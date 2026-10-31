@@ -45,6 +45,12 @@
 @keyframes esc-luci{0%,100%{opacity:.15}50%{opacity:1}}
 .esc-nieve{animation:esc-nieve 7s linear infinite}
 @keyframes esc-nieve{from{transform:translateY(-14px);opacity:0}15%{opacity:.9}to{transform:translateY(46px);opacity:0}}
+.esc-rayo{animation:esc-rayo 7s linear infinite;opacity:0}
+@keyframes esc-rayo{0%,60%,100%{opacity:0}61%{opacity:1}62%{opacity:.15}63%{opacity:1}66%{opacity:0}}
+.esc-lluvia{animation:esc-lluvia .7s linear infinite}
+@keyframes esc-lluvia{from{transform:translateY(-26px)}to{transform:translateY(0)}}
+.esc-aurora{animation:esc-aurora 9s ease-in-out infinite}
+@keyframes esc-aurora{0%,100%{opacity:.75;transform:translateX(0)}50%{opacity:1;transform:translateX(14px)}}
 .esc-fuego{transform-box:fill-box;transform-origin:50% 100%;animation:esc-fuego 1.6s ease-in-out infinite}
 @keyframes esc-fuego{0%,100%{transform:scale(1)}40%{transform:scale(1.05,.96)}70%{transform:scale(.97,1.04)}}
 
@@ -53,7 +59,7 @@
 
 /* Menos movimiento: del sistema y de Ajustes */
 @media (prefers-reduced-motion: reduce){
-  .pa-colina,.pa-luci,.pa-destello,.pa-onda,.esc-luci,.esc-nieve,.esc-fuego{animation:none}
+  .pa-colina,.pa-luci,.pa-destello,.pa-onda,.esc-luci,.esc-nieve,.esc-fuego,.esc-rayo,.esc-lluvia,.esc-aurora{animation:none}
 }
 html[data-movimiento="reducido"] .pa-colina,
 html[data-movimiento="reducido"] .pa-luci,
@@ -61,6 +67,9 @@ html[data-movimiento="reducido"] .pa-destello,
 html[data-movimiento="reducido"] .pa-onda,
 html[data-movimiento="reducido"] .esc-luci,
 html[data-movimiento="reducido"] .esc-nieve,
+html[data-movimiento="reducido"] .esc-rayo,
+html[data-movimiento="reducido"] .esc-lluvia,
+html[data-movimiento="reducido"] .esc-aurora,
 html[data-movimiento="reducido"] .esc-fuego{animation:none}
 
 /* Pestaña oculta: pausa (se reanuda sola al volver) */
@@ -70,4 +79,7 @@ html.pestana-oculta .pa-destello,
 html.pestana-oculta .pa-onda,
 html.pestana-oculta .esc-luci,
 html.pestana-oculta .esc-nieve,
+html.pestana-oculta .esc-rayo,
+html.pestana-oculta .esc-lluvia,
+html.pestana-oculta .esc-aurora,
 html.pestana-oculta .esc-fuego{animation-play-state:paused}

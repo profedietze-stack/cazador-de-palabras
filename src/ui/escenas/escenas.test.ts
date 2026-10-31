@@ -3,10 +3,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { ESCENAS, horaDeNivel, cieloDeHora } from './index'
 import type { Hora } from './dibujo'
-import { MUNDOS } from '../../data/mundos'
+import { MUNDOS, type Mundo } from '../../data/mundos'
 import { montarPaisaje } from '../paisaje'
 import { aterrizajeDe, lanzarHojas, lanzarAterrizaje } from '../../game/caida'
 import { cambiarAjustes, restablecerAjustes } from '../../storage/ajustes'
+
+/** Todos los mundos tienen escena de caza; el paisaje de colinas sigue siendo el plan B y se prueba sin ella. */
+const colinas = (m: Mundo): Mundo => { const { escena: _escena, ...resto } = m; return resto }
 
 const HORAS: Hora[] = ['amanecer', 'dia', 'noche']
 const ids = Object.keys(ESCENAS) as Array<keyof typeof ESCENAS>
@@ -68,10 +71,10 @@ describe('cada escena y cada hora', () => {
     }
   })
 
-  it('de noche hay estrellas y de día no', () => {
+  it('de noche hay estrellas y de día no (salvo la tormenta del páramo, que tapa el cielo)', () => {
     for (const id of ids) {
       const estrellas = (h: Hora): number => (ESCENAS[id].dibujar(h, false).fondo.match(/<circle [^>]*fill="#fff" opacity=/g) ?? []).length
-      expect(estrellas('noche'), id).toBeGreaterThan(20)
+      if (id !== 'paramo') expect(estrellas('noche'), id).toBeGreaterThan(20)
       expect(estrellas('dia'), id).toBe(0)
     }
   })
@@ -103,15 +106,17 @@ describe('cada escena y cada hora', () => {
 })
 
 describe('qué mundos tienen escena', () => {
-  it('cada mundo con escena tiene la suya; el resto sigue con colinas hasta las próximas tandas', () => {
-    const esperadas = { inicio: 'campamento', sustantivos: 'bosque', adjetivos: 'estepa', verbos: 'montana', adverbios: 'humedal' }
-    for (const [id, m] of Object.entries(MUNDOS)) {
-      expect(m.escena, id).toBe((esperadas as Record<string, string>)[id])
+  it('cada mundo tiene su escena de caza', () => {
+    const esperadas = {
+      inicio: 'campamento', sustantivos: 'bosque', adjetivos: 'estepa', verbos: 'montana', adverbios: 'humedal',
+      articulos: 'taiga', pronombres: 'desierto', preposiciones: 'canon', conjunciones: 'valle', interjecciones: 'paramo',
     }
+    expect(Object.fromEntries(Object.entries(MUNDOS).map(([id, m]) => [id, m.escena]))).toEqual(esperadas)
   })
   it('cada aterrizaje es el que corresponde a la escena', () => {
     expect(Object.fromEntries(ids.map(i => [i, ESCENAS[i].aterrizaje]))).toEqual({
       campamento: 'agua', bosque: 'hojas', estepa: 'pasto', montana: 'nieve', humedal: 'agua',
+      paramo: 'pasto', canon: 'polvo', taiga: 'nieve', desierto: 'polvo', valle: 'agua',
     })
   })
 })
@@ -130,9 +135,10 @@ describe('montaje de la escena', () => {
   it('el campamento aterriza en el agua; un mundo sin escena también', () => {
     montarPaisaje(el(), MUNDOS.inicio, op('noche'))
     expect(aterrizajeDe('body')).toBe('agua')
-    montarPaisaje(el(), MUNDOS.articulos, op('noche'))
+    montarPaisaje(el(), colinas(MUNDOS.articulos), op('noche'))
     expect(aterrizajeDe('body')).toBe('agua')
-    for (const [mundo, tipo] of [[MUNDOS.sustantivos, 'hojas'], [MUNDOS.adjetivos, 'pasto'], [MUNDOS.verbos, 'nieve'], [MUNDOS.adverbios, 'agua']] as const) {
+    for (const [mundo, tipo] of [[MUNDOS.sustantivos, 'hojas'], [MUNDOS.adjetivos, 'pasto'], [MUNDOS.verbos, 'nieve'], [MUNDOS.adverbios, 'agua'],
+      [MUNDOS.articulos, 'nieve'], [MUNDOS.pronombres, 'polvo'], [MUNDOS.preposiciones, 'polvo'], [MUNDOS.conjunciones, 'agua'], [MUNDOS.interjecciones, 'pasto']] as const) {
       montarPaisaje(el(), mundo, op('noche'))
       expect(aterrizajeDe('body'), mundo.id).toBe(tipo)
     }
@@ -176,15 +182,17 @@ describe('hojas del aterrizaje', () => {
     expect(c.querySelectorAll('.brizna-aterriza').length).toBe(9)
     lanzarAterrizaje(c, 1, 1, 'nieve')
     expect(c.querySelectorAll('.copo-aterriza').length).toBe(10)
+    lanzarAterrizaje(c, 1, 1, 'polvo')
+    expect(c.querySelectorAll('.polvo-aterriza').length).toBe(7)
     c.innerHTML = ''
     cambiarAjustes({ reducirMovimiento: true })
-    for (const t of ['agua', 'hojas', 'pasto', 'nieve'] as const) lanzarAterrizaje(c, 1, 1, t)
+    for (const t of ['agua', 'hojas', 'pasto', 'nieve', 'polvo'] as const) lanzarAterrizaje(c, 1, 1, t)
     expect(c.children.length).toBe(0)
   })
   it('briznas y copos se retiran solos', () => {
     vi.useFakeTimers()
     const c = document.getElementById('fondo')!
-    lanzarAterrizaje(c, 5, 5, 'pasto'); lanzarAterrizaje(c, 5, 5, 'nieve')
+    for (const t of ['pasto', 'nieve', 'polvo'] as const) lanzarAterrizaje(c, 5, 5, t)
     vi.advanceTimersByTime(2000)
     expect(c.children.length).toBe(0)
     vi.useRealTimers()
@@ -200,15 +208,23 @@ describe('estilos de las escenas', () => {
     expect(css).toMatch(/\.pa-borde\.der\{right:0\}/)
   })
   it('luciérnagas y fuego se apagan con menos movimiento (sistema y Ajustes) y se pausan con la pestaña oculta', () => {
-    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-luci[^}]*\.esc-fuego\{animation:none\}/)
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-luci[^}]*\.esc-fuego[^}]*\{animation:none\}/)
     expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-luci/)
     expect(css).toMatch(/html\.pestana-oculta \.esc-luci/)
   })
   it('hojas, briznas y copos también se ocultan con menos movimiento', () => {
     const comp = leer('src/styles/componentes.css')
-    for (const clase of ['hoja-aterriza', 'brizna-aterriza', 'copo-aterriza']) {
+    for (const clase of ['hoja-aterriza', 'brizna-aterriza', 'copo-aterriza', 'polvo-aterriza']) {
       expect(comp, clase).toMatch(new RegExp(String.raw`prefers-reduced-motion: reduce\)\s*\{[^}]*\.${clase}[,{]`))
       expect(comp, clase).toMatch(new RegExp(String.raw`html\[data-movimiento="reducido"\] \.${clase}[,{]`))
+    }
+  })
+  it('rayo, lluvia y aurora se apagan con menos movimiento y se pausan con la pestaña oculta', () => {
+    for (const clase of ['esc-rayo', 'esc-lluvia', 'esc-aurora']) {
+      expect(css, clase).toMatch(new RegExp(String.raw`\.${clase}\{animation:${clase}`))
+      expect(css, clase).toMatch(new RegExp(String.raw`prefers-reduced-motion: reduce\)\{[^}]*\.${clase}[,{]`))
+      expect(css, clase).toMatch(new RegExp(String.raw`html\[data-movimiento="reducido"\] \.${clase}[,{]`))
+      expect(css, clase).toMatch(new RegExp(String.raw`html\.pestana-oculta \.${clase}[,{]`))
     }
   })
   it('la nieve que cae también se apaga con menos movimiento y se pausa con la pestaña oculta', () => {

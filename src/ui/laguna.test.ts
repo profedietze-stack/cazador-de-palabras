@@ -36,16 +36,16 @@ describe('el agua es un dato de cada mundo', () => {
 
 describe('aplicarMundo escribe el agua', () => {
   it('fija --agua con el color del mundo y del cielo', () => {
-    aplicarMundo(MUNDOS.verbos, 'noche')
-    expect(document.documentElement.style.getPropertyValue('--agua')).toBe(MUNDOS.verbos.noche.agua)
-    aplicarMundo(MUNDOS.verbos, 'dia')
-    expect(document.documentElement.style.getPropertyValue('--agua')).toBe(MUNDOS.verbos.dia.agua)
+    aplicarMundo(MUNDOS.articulos, 'noche')
+    expect(document.documentElement.style.getPropertyValue('--agua')).toBe(MUNDOS.articulos.noche.agua)
+    aplicarMundo(MUNDOS.articulos, 'dia')
+    expect(document.documentElement.style.getPropertyValue('--agua')).toBe(MUNDOS.articulos.dia.agua)
   })
 })
 
 describe('montarPaisaje dibuja la laguna', () => {
   it('hay una franja de agua con su orilla (SVG) por encima de las colinas', () => {
-    montarPaisaje(el, MUNDOS.verbos, op())
+    montarPaisaje(el, MUNDOS.articulos, op())
     const agua = el.querySelector('.pa-agua')
     expect(agua).not.toBeNull()
     expect(agua!.querySelector('svg path')).not.toBeNull()
@@ -55,21 +55,21 @@ describe('montarPaisaje dibuja la laguna', () => {
   })
 
   it('animado: hay reflejos que brillan; quieto: el agua queda pero sin reflejos animados', () => {
-    montarPaisaje(el, MUNDOS.verbos, op({ animado: true }))
+    montarPaisaje(el, MUNDOS.articulos, op({ animado: true }))
     expect(el.querySelectorAll('.pa-onda').length).toBe(3)
-    montarPaisaje(el, MUNDOS.verbos, op({ animado: false }))
+    montarPaisaje(el, MUNDOS.articulos, op({ animado: false }))
     expect(el.querySelector('.pa-agua')).not.toBeNull()
     expect(el.querySelectorAll('.pa-onda').length).toBe(0)
   })
 
   it('con alto contraste no hay agua (fondo liso)', () => {
-    montarPaisaje(el, MUNDOS.verbos, op({ apagarTodo: true }))
+    montarPaisaje(el, MUNDOS.articulos, op({ apagarTodo: true }))
     expect(el.querySelector('.pa-agua')).toBeNull()
   })
 
   it('montar dos veces no duplica el agua', () => {
-    montarPaisaje(el, MUNDOS.verbos, op())
-    montarPaisaje(el, MUNDOS.verbos, op())
+    montarPaisaje(el, MUNDOS.articulos, op())
+    montarPaisaje(el, MUNDOS.articulos, op())
     expect(el.querySelectorAll('.pa-agua').length).toBe(1)
   })
 })

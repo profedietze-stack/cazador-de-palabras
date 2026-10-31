@@ -103,12 +103,16 @@ describe('cada escena y cada hora', () => {
 })
 
 describe('qué mundos tienen escena', () => {
-  it('inicio es el campamento y sustantivos el bosque; el resto sigue con colinas hasta las próximas tandas', () => {
-    expect(MUNDOS.inicio.escena).toBe('campamento')
-    expect(MUNDOS.sustantivos.escena).toBe('bosque')
+  it('cada mundo con escena tiene la suya; el resto sigue con colinas hasta las próximas tandas', () => {
+    const esperadas = { inicio: 'campamento', sustantivos: 'bosque', adjetivos: 'estepa', verbos: 'montana', adverbios: 'humedal' }
     for (const [id, m] of Object.entries(MUNDOS)) {
-      if (id !== 'inicio' && id !== 'sustantivos') expect(m.escena, id).toBeUndefined()
+      expect(m.escena, id).toBe((esperadas as Record<string, string>)[id])
     }
+  })
+  it('cada aterrizaje es el que corresponde a la escena', () => {
+    expect(Object.fromEntries(ids.map(i => [i, ESCENAS[i].aterrizaje]))).toEqual({
+      campamento: 'agua', bosque: 'hojas', estepa: 'pasto', montana: 'nieve', humedal: 'agua',
+    })
   })
 })
 
@@ -126,10 +130,12 @@ describe('montaje de la escena', () => {
   it('el campamento aterriza en el agua; un mundo sin escena también', () => {
     montarPaisaje(el(), MUNDOS.inicio, op('noche'))
     expect(aterrizajeDe('body')).toBe('agua')
-    montarPaisaje(el(), MUNDOS.verbos, op('noche'))
+    montarPaisaje(el(), MUNDOS.articulos, op('noche'))
     expect(aterrizajeDe('body')).toBe('agua')
-    montarPaisaje(el(), MUNDOS.sustantivos, op('noche'))
-    expect(aterrizajeDe('body')).toBe('hojas')
+    for (const [mundo, tipo] of [[MUNDOS.sustantivos, 'hojas'], [MUNDOS.adjetivos, 'pasto'], [MUNDOS.verbos, 'nieve'], [MUNDOS.adverbios, 'agua']] as const) {
+      montarPaisaje(el(), mundo, op('noche'))
+      expect(aterrizajeDe('body'), mundo.id).toBe(tipo)
+    }
   })
   it('montar dos veces no duplica y desmontar limpia todo', () => {
     montarPaisaje(el(), MUNDOS.sustantivos, op('noche'))
@@ -160,16 +166,28 @@ describe('hojas del aterrizaje', () => {
     expect(c.querySelectorAll('.hoja-aterriza').length).toBe(0)
     vi.useRealTimers()
   })
-  it('lanzarAterrizaje elige: agua → onda, hojas → hojas; y con «reducir movimiento» no hay nada', () => {
+  it('lanzarAterrizaje elige el efecto de cada escena; con «reducir movimiento» no hay nada', () => {
     const c = document.getElementById('fondo')!
     lanzarAterrizaje(c, 1, 1, 'agua')
     expect(c.querySelectorAll('.onda-chapuzon').length).toBe(1)
     lanzarAterrizaje(c, 1, 1, 'hojas')
     expect(c.querySelectorAll('.hoja-aterriza').length).toBe(8)
+    lanzarAterrizaje(c, 1, 1, 'pasto')
+    expect(c.querySelectorAll('.brizna-aterriza').length).toBe(9)
+    lanzarAterrizaje(c, 1, 1, 'nieve')
+    expect(c.querySelectorAll('.copo-aterriza').length).toBe(10)
     c.innerHTML = ''
     cambiarAjustes({ reducirMovimiento: true })
-    lanzarAterrizaje(c, 1, 1, 'hojas'); lanzarAterrizaje(c, 1, 1, 'agua')
+    for (const t of ['agua', 'hojas', 'pasto', 'nieve'] as const) lanzarAterrizaje(c, 1, 1, t)
     expect(c.children.length).toBe(0)
+  })
+  it('briznas y copos se retiran solos', () => {
+    vi.useFakeTimers()
+    const c = document.getElementById('fondo')!
+    lanzarAterrizaje(c, 5, 5, 'pasto'); lanzarAterrizaje(c, 5, 5, 'nieve')
+    vi.advanceTimersByTime(2000)
+    expect(c.children.length).toBe(0)
+    vi.useRealTimers()
   })
 })
 
@@ -186,9 +204,17 @@ describe('estilos de las escenas', () => {
     expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-luci/)
     expect(css).toMatch(/html\.pestana-oculta \.esc-luci/)
   })
-  it('las hojas también se ocultan con menos movimiento', () => {
+  it('hojas, briznas y copos también se ocultan con menos movimiento', () => {
     const comp = leer('src/styles/componentes.css')
-    expect(comp).toMatch(/prefers-reduced-motion: reduce\)\s*\{[^}]*\.hoja-aterriza\{display:none\}/)
-    expect(comp).toMatch(/html\[data-movimiento="reducido"\] \.hoja-aterriza\{display:none\}/)
+    for (const clase of ['hoja-aterriza', 'brizna-aterriza', 'copo-aterriza']) {
+      expect(comp, clase).toMatch(new RegExp(String.raw`prefers-reduced-motion: reduce\)\s*\{[^}]*\.${clase}[,{]`))
+      expect(comp, clase).toMatch(new RegExp(String.raw`html\[data-movimiento="reducido"\] \.${clase}[,{]`))
+    }
+  })
+  it('la nieve que cae también se apaga con menos movimiento y se pausa con la pestaña oculta', () => {
+    expect(css).toMatch(/\.esc-nieve\{animation:esc-nieve/)
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\{[^}]*\.esc-nieve/)
+    expect(css).toMatch(/html\[data-movimiento="reducido"\] \.esc-nieve/)
+    expect(css).toMatch(/html\.pestana-oculta \.esc-nieve/)
   })
 })

@@ -44,7 +44,7 @@ Muestras aprobadas: `.playwright-mcp/fondos*.png` (no versionadas). Se mantienen
 
 ## Tandas
 
-1. **Sistema + campamento (menú) + bosque (sustantivos)**, con las tres horas y los dos aterrizajes.
-2. Estepa, montaña, humedal (más aterrizajes: pasto, nieve).
+1. **Sistema + campamento (menú) + bosque (sustantivos)**, con las tres horas y los dos aterrizajes. ✅ hecha.
+2. Estepa, montaña, humedal (más aterrizajes: pasto, nieve). ✅ hecha.
 3. Páramo, cañón, taiga/desierto, valle.
 4. Pulido: animaciones sueltas (pájaros, nieve, lluvia), rendimiento en tablets viejas.

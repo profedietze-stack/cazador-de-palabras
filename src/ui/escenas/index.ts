@@ -1,12 +1,16 @@
 import type { EscenaId } from '../../data/mundos'
+import type { TipoAterrizaje } from '../../game/caida'
 import { dibujarBosque } from './bosque'
 import { dibujarCampamento } from './campamento'
+import { dibujarEstepa } from './estepa'
+import { dibujarHumedal } from './humedal'
+import { dibujarMontana } from './montana'
 import type { Dibujo, Hora } from './dibujo'
 
 export type { Dibujo, Hora } from './dibujo'
 
-/** Cómo aterriza una palabra que se escapa: se hunde con una onda (agua) o se pierde entre el follaje (hojas). */
-export type Aterrizaje = 'agua' | 'hojas'
+/** Cómo aterriza una palabra que se escapa: agua (onda), hojas (follaje), pasto (briznas) o nieve (copos). */
+export type Aterrizaje = TipoAterrizaje
 
 interface Escena {
   dibujar: (hora: Hora, animado: boolean) => Dibujo
@@ -16,6 +20,9 @@ interface Escena {
 export const ESCENAS: Record<EscenaId, Escena> = {
   campamento: { dibujar: dibujarCampamento, aterrizaje: 'agua' },
   bosque: { dibujar: dibujarBosque, aterrizaje: 'hojas' },
+  estepa: { dibujar: dibujarEstepa, aterrizaje: 'pasto' },
+  montana: { dibujar: dibujarMontana, aterrizaje: 'nieve' },
+  humedal: { dibujar: dibujarHumedal, aterrizaje: 'agua' },
 }
 
 const HORAS: readonly Hora[] = ['amanecer', 'dia', 'noche']

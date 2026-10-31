@@ -97,12 +97,15 @@ export function lanzarChispas(contenedor: HTMLElement, cx: number, cy: number, c
   retirarLuego(contenedor, nodos, 700)
 }
 
-/** Cómo aterriza una palabra que se escapa: en el agua (onda) o entre el follaje (hojas). */
-export type TipoAterrizaje = 'agua' | 'hojas'
+/** Cómo aterriza una palabra que se escapa: en el agua (onda), entre el follaje (hojas), en el pasto alto (briznas) o en la nieve (copos). */
+export type TipoAterrizaje = 'agua' | 'hojas' | 'pasto' | 'nieve'
+
+const TIPOS: readonly TipoAterrizaje[] = ['agua', 'hojas', 'pasto', 'nieve']
 
 /** El aterrizaje de la escena que está en pantalla dentro de `raiz` (un selector); sin escena, agua. */
 export function aterrizajeDe(raiz: string): TipoAterrizaje {
-  return document.querySelector<HTMLElement>(`${raiz} .paisaje`)?.dataset['aterrizaje'] === 'hojas' ? 'hojas' : 'agua'
+  const t = document.querySelector<HTMLElement>(`${raiz} .paisaje`)?.dataset['aterrizaje']
+  return TIPOS.find(x => x === t) ?? 'agua'
 }
 
 /** La línea donde aterrizan las palabras (px desde arriba de `raiz`): la marca de la escena o, si no hay, la laguna. */
@@ -133,9 +136,51 @@ export function lanzarHojas(contenedor: HTMLElement, cx: number, cy: number): vo
   retirarLuego(contenedor, nodos, 900)
 }
 
+/** Briznas de pasto que se sacuden donde la palabra se pierde en el pastizal. Sin «reducir movimiento». */
+export function lanzarBriznas(contenedor: HTMLElement, cx: number, cy: number): void {
+  if (reducirMovimientoActivo()) return
+  const colores = ['#e8b350', '#f3c870', '#d99a3a', '#c9a050']
+  const nodos: HTMLElement[] = []
+  for (let i = 0; i < 9; i++) {
+    const b = document.createElement('div')
+    b.className = 'brizna-aterriza'
+    b.style.left = `${r2(cx + (i - 4) * 5)}px`
+    b.style.top = `${cy}px`
+    b.style.background = colores[i % colores.length]!
+    b.style.setProperty('--dx', `${r2((i - 4) * 3)}px`)
+    b.style.setProperty('--dy', `${-(14 + (i % 3) * 8)}px`)
+    b.style.setProperty('--rot', `${(i - 4) * 9}deg`)
+    contenedor.appendChild(b)
+    nodos.push(b)
+  }
+  retirarLuego(contenedor, nodos, 800)
+}
+
+/** Copos de nieve que se levantan donde la palabra se entierra. Sin «reducir movimiento». */
+export function lanzarCopos(contenedor: HTMLElement, cx: number, cy: number): void {
+  if (reducirMovimientoActivo()) return
+  const nodos: HTMLElement[] = []
+  for (let i = 0; i < 10; i++) {
+    const c = document.createElement('div')
+    c.className = 'copo-aterriza'
+    const ang = -Math.PI / 2 + ((i - 4.5) / 4.5) * 1.3
+    const dist = 14 + (i % 4) * 7
+    c.style.left = `${cx}px`
+    c.style.top = `${cy}px`
+    c.style.width = c.style.height = `${4 + (i % 3) * 2}px`
+    c.style.setProperty('--dx', `${r2(Math.cos(ang) * dist)}px`)
+    c.style.setProperty('--dy', `${r2(Math.sin(ang) * dist)}px`)
+    contenedor.appendChild(c)
+    nodos.push(c)
+  }
+  retirarLuego(contenedor, nodos, 900)
+}
+
 /** Efecto de aterrizaje según la escena. */
 export function lanzarAterrizaje(contenedor: HTMLElement, cx: number, cy: number, tipo: TipoAterrizaje): void {
   if (tipo === 'hojas') lanzarHojas(contenedor, cx, cy)
+  else if (tipo === 'pasto') lanzarBriznas(contenedor, cx, cy)
+  else if (tipo === 'nieve') lanzarCopos(contenedor, cx, cy)
   else lanzarChapuzon(contenedor, cx, cy)
 }
 

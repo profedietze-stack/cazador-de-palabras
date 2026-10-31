@@ -11,7 +11,7 @@ import { CATS } from './categories'
 export type MundoId = CategoryKey | 'inicio'
 
 /** Escenas de caza dibujadas aparte (ui/escenas). Los mundos sin escena usan el paisaje de colinas. */
-export type EscenaId = 'campamento' | 'bosque'
+export type EscenaId = 'campamento' | 'bosque' | 'estepa' | 'montana' | 'humedal'
 
 export interface Paleta {
   cieloAlto: string
@@ -73,13 +73,13 @@ export const MUNDOS: Record<MundoId, Mundo> = {
   sustantivos:    mundo('sustantivos', CATS.sustantivos.nombre, selvaNoche, selvaDia, 'bosque'),
   adjetivos:      mundo('adjetivos', CATS.adjetivos.nombre,
     noche('#5b2a6e', '#e0568a', ['#6b2f6e', '#a63d7a', '#d45a8a'], '#ffd23f'),
-    dia('#ff9ec8', '#ffd9ea', ['#e58fb5', '#d46fa0', '#a83a76'])),
+    dia('#ff9ec8', '#ffd9ea', ['#e58fb5', '#d46fa0', '#a83a76']), 'estepa'),
   verbos:         mundo('verbos', CATS.verbos.nombre,
     noche('#123a7a', '#2e6fd6', ['#1d4fa0', '#2a66c4', '#4a8be0']),
-    dia('#5aa9ff', '#c8e4ff', ['#4a8fd8', '#3577c0', '#1f5a9e'])),
+    dia('#5aa9ff', '#c8e4ff', ['#4a8fd8', '#3577c0', '#1f5a9e']), 'montana'),
   adverbios:      mundo('adverbios', CATS.adverbios.nombre,
     noche('#0b5c6b', '#18a5b5', ['#0f7a86', '#1aa3a8', '#e8d28a']),
-    dia('#5fd0e8', '#b4ecf5', ['#7fd8e0', '#2fb5c8', '#0f7f94'])),
+    dia('#5fd0e8', '#b4ecf5', ['#7fd8e0', '#2fb5c8', '#0f7f94']), 'humedal'),
   articulos:      mundo('articulos', CATS.articulos.nombre,
     noche('#2a2470', '#6d5dfc', ['#3b3590', '#5a4fd0', '#7c70f0']),
     dia('#a899ff', '#e2dcff', ['#8a78ef', '#7260d8', '#4a38b0'])),

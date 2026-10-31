@@ -35,17 +35,17 @@ describe('el fondo de cada pantalla', () => {
   })
 
   it('las pantallas de una categoría usan el mundo de G.cat; el menú, el de inicio', () => {
-    G.cat = 'verbos'
-    expect(mundoDePantalla('preNivel').id).toBe('verbos')
-    expect(mundoDePantalla('gameScreen').id).toBe('verbos')
-    expect(mundoDePantalla('resultadoScreen').id).toBe('verbos')
+    G.cat = 'articulos'
+    expect(mundoDePantalla('preNivel').id).toBe('articulos')
+    expect(mundoDePantalla('gameScreen').id).toBe('articulos')
+    expect(mundoDePantalla('resultadoScreen').id).toBe('articulos')
     expect(mundoDePantalla('menuPrincipal').id).toBe('inicio')
     expect(mundoDePantalla('seleccionCategoria').id).toBe('inicio')
   })
 
   it('con el fondo apagado el paisaje queda quieto, no liso (Review Focus 4)', () => {
     cambiarAjustes({ fondoDecorativo: false })
-    G.cat = 'verbos'
+    G.cat = 'articulos'
     pantalla = enPartida()
     actualizarFondo(pantalla)
     const capas = [...pantalla.querySelectorAll('.pa-colina')]
@@ -56,7 +56,7 @@ describe('el fondo de cada pantalla', () => {
 
   it('con «reducir movimiento» queda quieto y sin luciérnagas', () => {
     cambiarAjustes({ reducirMovimiento: true })
-    G.cat = 'verbos'
+    G.cat = 'articulos'
     pantalla = enPartida()
     actualizarFondo(pantalla)
     expect([...pantalla.querySelectorAll('.pa-colina')].every(c => c.classList.contains('quieto'))).toBe(true)
@@ -79,7 +79,7 @@ describe('el fondo de cada pantalla', () => {
   it('al pasar a otra pantalla se desmonta el paisaje de la anterior', () => {
     document.body.innerHTML = '<div id="menuPrincipal" class="screen"><div class="fondo-mundo"></div></div><div id="preNivel" class="screen"><div class="fondo-mundo"></div></div>'
     const a = document.getElementById('menuPrincipal')!, b = document.getElementById('preNivel')!
-    G.cat = 'verbos'
+    G.cat = 'articulos'
     actualizarFondo(a)
     expect(a.querySelectorAll('svg').length).toBe(3)
     actualizarFondo(b)

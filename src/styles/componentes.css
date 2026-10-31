@@ -62,22 +62,6 @@
 #menuPrincipal .footer-credit{margin-top:1.2rem;text-align:center;color:var(--sobre-cielo);font-size:.85rem;font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 @media (max-width:420px){.titulo-cartel{font-size:2.2rem}}
 
-/* ─── Botón ⚙️ (solo en el menú de inicio) ─── redondo, con el mismo volumen que los botones 3D */
-.aj-btn{
-  position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));right:calc(1rem + env(safe-area-inset-right));z-index:999;
-  width:52px;height:52px;border-radius:50%;border:0;border-bottom:5px solid var(--btn-sec-borde);
-  background:var(--btn-sec-bg);box-shadow:var(--sombra-placa);font-size:1.5rem;
-  cursor:pointer;display:none;align-items:center;justify-content:center;
-  transition:transform .08s,border-bottom-width .08s,filter .15s;
-}
-.aj-btn:hover{filter:brightness(1.1)}
-.aj-btn:active{transform:translateY(3px);border-bottom-width:2px}
-.aj-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
-.aj-btn .emo{width:1.2em;height:1.2em}
-body[data-pantalla="menuPrincipal"] .aj-btn{display:flex}
-/* El menú deja lugar abajo para que el ⚙️ no tape el último botón */
-#menuPrincipal{padding-bottom:5rem}
-
 /* Alto contraste: sin palabras flotantes detrás del título (ensucian la lectura) */
 html[data-contraste="alto"] #menuBg{display:none}
 

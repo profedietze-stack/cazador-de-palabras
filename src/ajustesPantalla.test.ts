@@ -24,17 +24,15 @@ describe('pantalla de ajustes', () => {
     }
   })
 
-  it('hay un solo botón flotante (⚙️) y no quedan los de sonido y tema', () => {
+  it('el botón ⚙️ es un botón más del menú, encima de «Borrar Progreso», y no queda el flotante ni los de sonido y tema', () => {
     expect(html).toContain('id="ajustesBtn"')
     expect(html).not.toContain('id="volBtn"')
     expect(html).not.toContain('id="themeBtn"')
-    expect(leer('src/styles/componentes.css')).toMatch(/body\[data-pantalla="menuPrincipal"\] \.aj-btn/)
-  })
-
-  it('el botón ⚙️ solo se muestra en el menú de inicio', () => {
-    const css = leer('src/styles/componentes.css')
-    expect(css).toMatch(/\.aj-btn\{[^}]*display:none/)
-    expect(leer('src/screens/ScreenManager.ts')).toContain("document.body.dataset['pantalla'] = id")
+    expect(html).not.toContain('aj-btn')
+    expect(html).toMatch(/<button class="btn3d" id="ajustesBtn">[^<]*<\/button>\s*<button[^>]*id="btnBorrar"/)
+    const menu = html.slice(html.indexOf('id="menuPrincipal"'), html.indexOf('id="seleccionCategoria"'))
+    expect(menu).toContain('id="ajustesBtn"')
+    expect(leer('src/styles/componentes.css')).not.toContain('.aj-btn')
   })
 
   it('el sonido ya no usa el interruptor viejo y respeta los volúmenes', () => {

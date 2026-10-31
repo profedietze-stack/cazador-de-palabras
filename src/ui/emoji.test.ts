@@ -123,11 +123,34 @@ describe('el texto de otros jugadores nunca se convierte en imágenes', () => {
     expect(sueltas).toEqual([])
   })
 
-  it('los nombres de jugador del HTML estático están en zonas marcadas', () => {
-    const html = readFileSync('index.html', 'utf8')
+  it('los nombres de jugador del HTML estático están en zonas marcadas (mide dónde cae, no el orden de los atributos)', () => {
+    const doc = new DOMParser().parseFromString(readFileSync('index.html', 'utf8'), 'text/html')
     for (const id of ['lobbyNombreA', 'lobbyNombreB', 'duelHudNombreMe', 'duelHudNombreRival', 'duelRsNombreMe', 'duelRsNombreRival', 'perfilNombre']) {
-      expect(html, id).toMatch(new RegExp(`id="${id}" data-sin-emoji`))
+      expect(doc.getElementById(id)!.closest('[data-sin-emoji]'), id).not.toBeNull()
     }
+  })
+
+  // La hidratación es «todo menos lo marcado»: cada lugar donde el código escribe un nombre de
+  // jugador tiene que apuntar a una zona marcada. Se barre todo src y se busca el elemento en el
+  // HTML por su id (revisión final: el aviso del lobby con el nombre del rival quedó sin marcar).
+  it('todo elemento al que el código le escribe un nombre de jugador está en una zona marcada', () => {
+    const doc = new DOMParser().parseFromString(readFileSync('index.html', 'utf8'), 'text/html')
+    // `cat.nombre` es el nombre de una categoría (dato del juego), no de un jugador.
+    const NOMBRE = /rivalNombre|myNombre|G\.jugador|(?<!cat\.)\bnombre\b/
+    const sin: string[] = []
+    for (const f of archivos) {
+      const lineas = readFileSync(f, 'utf8').split(String.fromCharCode(10))
+      lineas.forEach((l, i) => {
+        const m = /getElementById\('(\w+)'\)!?\.(?:textContent|innerHTML)\s*=(.*)/.exec(l)
+        // La sentencia puede seguir en las líneas de abajo (un ternario con la plantilla).
+        let sentencia = m?.[2] ?? ''
+        for (let j = i + 1; j < lineas.length && /^\s*(\?|:|\+|&&|\|\|)/.test(lineas[j]!); j++) sentencia += ' ' + lineas[j]
+        if (!m || !NOMBRE.test(sentencia)) return
+        const el = doc.getElementById(m[1]!)
+        if (!el || !el.closest('[data-sin-emoji]')) sin.push(`${f}:${i + 1} #${m[1]}`)
+      })
+    }
+    expect(sin).toEqual([])
   })
 
   it('la hidratación arranca en main.ts antes de inicializar las pantallas', () => {

@@ -33,10 +33,21 @@ export function actualizarFondo(pantalla: HTMLElement): void {
   desmontarActual = montarPaisaje(cont, mundo, opcionesDesdeAjustes(ajustes(), sistemaReduce(), cielo))
 }
 
-/** Rehace el fondo de la pantalla activa cuando cambia un ajuste (tema, fondo, movimiento, contraste). */
+function refrescarFondoActivo(): void {
+  const activa = document.querySelector<HTMLElement>('.screen.active')
+  if (activa) actualizarFondo(activa)
+}
+
+/**
+ * Rehace el fondo de la pantalla activa cuando cambia un ajuste (tema, fondo, movimiento,
+ * contraste) y cuando el sistema cambia entre claro y oscuro con el tema en «Auto»: si solo
+ * cambiara el color del texto y no el cielo, el texto suelto quedaría ilegible hasta el
+ * próximo cambio de pantalla. Debe registrarse DESPUÉS de `iniciarAjustes()`: así, cuando
+ * llega el aviso del sistema, `data-cielo` ya se actualizó.
+ */
 export function iniciarFondoReactivo(): void {
-  alCambiarAjustes(() => {
-    const activa = document.querySelector<HTMLElement>('.screen.active')
-    if (activa) actualizarFondo(activa)
-  })
+  alCambiarAjustes(refrescarFondoActivo)
+  if (typeof matchMedia === 'function') {
+    matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', refrescarFondoActivo)
+  }
 }

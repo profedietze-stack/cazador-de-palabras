@@ -79,8 +79,8 @@ function mostrarResumenPractica(): void {
   document.getElementById('resTitle')!.textContent = 'Práctica terminada'
   document.getElementById('resPts')!.textContent = `${G.cazadas} correctas`
   document.getElementById('resStats')!.innerHTML = `
-    <div class="sg-row"><span>Palabras correctas:</span><strong>${G.cazadas}</strong></div>
-    <div class="sg-row"><span>Palabras incorrectas:</span><strong>${G.erradas}</strong></div>
+    <div class="sg-row"><span>Correctas:</span><strong>${G.cazadas}</strong></div>
+    <div class="sg-row"><span>Incorrectas:</span><strong>${G.erradas}</strong></div>
     <div class="sg-row"><span>Precisión:</span><strong>${calcularPrecision(G.cazadas, G.erradas)}%</strong></div>
     <p class="sg-aviso">La práctica no da medallas ni sube al ranking: es para entender sin apuro.</p>`
   pintarRepaso()
@@ -116,8 +116,8 @@ function mostrarResultado(p: GameRecord, logrosNuevos: typeof LOGROS_DEF): void 
 
   const m = Math.floor(p.tiempoUsado / 60), s = p.tiempoUsado % 60
   document.getElementById('resStats')!.innerHTML = `
-    <div class="sg-row"><span>Palabras correctas:</span><strong>${p.cazadas}</strong></div>
-    <div class="sg-row"><span>Palabras incorrectas:</span><strong>${p.erradas}</strong></div>
+    <div class="sg-row"><span>Correctas:</span><strong>${p.cazadas}</strong></div>
+    <div class="sg-row"><span>Incorrectas:</span><strong>${p.erradas}</strong></div>
     <div class="sg-row"><span>Precisión:</span><strong>${p.precision}%</strong></div>
     <div class="sg-row"><span>Tiempo:</span><strong>${m}:${s.toString().padStart(2, '0')}</strong></div>
     ${sinPrecision ? `<p class="sg-aviso">${sinPrecision}</p>` : ''}

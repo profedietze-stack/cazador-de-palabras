@@ -78,7 +78,7 @@ export function initAjustesScreen(): void {
         const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.aj-op')
         if (!b || b.disabled) return
         const v = b.dataset['valor']!
-        cambiarAjustes({ [clave]: clave === 'porQueSeg' ? Number(v) : v } as Partial<Ajustes>)
+        cambiarAjustes({ [clave]: v } as Partial<Ajustes>)
       })
     }
   }

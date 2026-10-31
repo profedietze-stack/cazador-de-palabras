@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   AJUSTES_DE_FABRICA as F, normalizarAjustes, leerAjustes, ganancia, patronVibracion,
-  oscuroEfectivo, MULTIPLICADOR_TAMANO, CLAVE_AJUSTES, POR_QUE_OPCIONES,
+  oscuroEfectivo, MULTIPLICADOR_TAMANO, CLAVE_AJUSTES,
 } from './ajustes'
 
 describe('ajustes: lectura campo por campo', () => {
@@ -27,12 +27,6 @@ describe('ajustes: lectura campo por campo', () => {
     expect(normalizarAjustes({ volMusica: 33.6 }).volMusica).toBe(34)
     expect(normalizarAjustes({ volMusica: NaN }).volMusica).toBe(F.volMusica)
     expect(normalizarAjustes({ volMusica: Infinity }).volMusica).toBe(F.volMusica)
-  })
-
-  it('«¿Por qué?» solo admite las duraciones ofrecidas', () => {
-    for (const s of POR_QUE_OPCIONES) expect(normalizarAjustes({ porQueSeg: s }).porQueSeg).toBe(s)
-    expect(normalizarAjustes({ porQueSeg: 4 }).porQueSeg).toBe(F.porQueSeg)
-    expect(normalizarAjustes({ porQueSeg: '8' }).porQueSeg).toBe(F.porQueSeg)
   })
 
   it('un guardado que no es JSON cae en los de fábrica', () => {

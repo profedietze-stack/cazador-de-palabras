@@ -37,12 +37,7 @@ export interface Ajustes {
   altoContraste: boolean
   fondoDecorativo: boolean
   stickers: boolean
-
-  /** Segundos que se muestra el «¿Por qué?» tras un error. 0 = no mostrarlo. */
-  porQueSeg: number
 }
-
-export const POR_QUE_OPCIONES = [0, 3, 5, 8] as const
 
 export const AJUSTES_DE_FABRICA: Readonly<Ajustes> = Object.freeze({
   sonido: true, volGeneral: 80,
@@ -54,7 +49,6 @@ export const AJUSTES_DE_FABRICA: Readonly<Ajustes> = Object.freeze({
   tamanoPalabras: 'normal' as TamanoPalabras,
   reducirMovimiento: false, altoContraste: false,
   fondoDecorativo: true, stickers: true,
-  porQueSeg: 5,
 })
 
 // Con «:» y no «_»: las claves de jugador son 'cdp_' + nombre, y un alumno llamado
@@ -75,8 +69,6 @@ const porcentaje = (v: unknown, def: number): number =>
 export function normalizarAjustes(raw: unknown): Ajustes {
   const d = AJUSTES_DE_FABRICA
   const o = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>
-  const porQue = typeof o['porQueSeg'] === 'number' && (POR_QUE_OPCIONES as readonly number[]).includes(o['porQueSeg'])
-    ? o['porQueSeg'] : d.porQueSeg
   return {
     sonido: bool(o['sonido'], d.sonido), volGeneral: porcentaje(o['volGeneral'], d.volGeneral),
     musica: bool(o['musica'], d.musica), volMusica: porcentaje(o['volMusica'], d.volMusica),
@@ -91,7 +83,6 @@ export function normalizarAjustes(raw: unknown): Ajustes {
     altoContraste: bool(o['altoContraste'], d.altoContraste),
     fondoDecorativo: bool(o['fondoDecorativo'], d.fondoDecorativo),
     stickers: bool(o['stickers'], d.stickers),
-    porQueSeg: porQue,
   }
 }
 

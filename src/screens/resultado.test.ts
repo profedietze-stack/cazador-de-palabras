@@ -19,7 +19,7 @@ describe('repasoHtml: «Palabras para repasar» plegado', () => {
     const d = cont(['saltar', 'lindo'])
     const det = d.querySelector('details.repaso')!
     expect(det).not.toBeNull()
-    expect(det.hasAttribute('open')).toBe(false)
+    expect(det.hasAttribute('open')).toBe(true)   // es el único lugar donde se explica el error
     expect(det.querySelector('summary')!.textContent).toContain('Palabras para repasar (2)')
     expect(det.querySelectorAll('li').length).toBe(2)
   })

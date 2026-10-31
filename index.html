@@ -104,15 +104,14 @@
     <div class="hud-stat placa"><div class="hud-label">Tiempo</div><div class="hud-val" id="hudTime">5:00</div></div>
     <div class="hud-stat placa"><div class="hud-label">Categoría</div><div class="hud-val" id="hudCat" style="font-size:.85rem">-</div></div>
   </div>
-  <div id="gameArea">
-    <div id="tiempoBar"><div id="tiempoBarFill" style="width:100%"></div></div>
-    <div id="comboDisplay"></div>
-    <div id="porQue" class="por-que" role="status" aria-live="polite"></div>
-    <div class="game-btns">
+  <div class="game-btns">
       <button class="btn3d btn3d--chico" id="btnVolver">🔙 Salir</button>
       <button class="btn3d btn3d--chico" id="btnPausa">⏸ Pausa</button>
       <button class="btn3d btn3d--chico" id="btnFs" aria-label="Pantalla completa" title="Pantalla completa">⛶</button>
-    </div>
+  </div>
+  <div id="gameArea">
+    <div id="tiempoBar"><div id="tiempoBarFill" style="width:100%"></div></div>
+    <div id="comboDisplay"></div>
   </div>
 </div>
 
@@ -584,11 +583,6 @@
       <label class="aj-fila"><span class="aj-txt">Reducir movimiento<small>Palabras sin vaivén y sin animaciones. Si tu dispositivo ya lo pide, se respeta igual.</small></span><input type="checkbox" class="aj-switch" data-aj="reducirMovimiento" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Fondo con palabras flotantes<small>En el menú de inicio.</small></span><input type="checkbox" class="aj-switch" data-aj="fondoDecorativo" role="switch"></label>
       <label class="aj-fila"><span class="aj-txt">Stickers y emojis<small>Los que aparecen al hacer combos y en el menú.</small></span><input type="checkbox" class="aj-switch" data-aj="stickers" role="switch"></label>
-    </section>
-
-    <section class="aj-sec placa placa--crema" aria-labelledby="ajh-ayuda">
-      <h2 id="ajh-ayuda">💡 Ayuda al jugar</h2>
-      <div class="aj-fila aj-fila-seg"><span class="aj-txt" id="ajl-porQueSeg">Explicación después de un error («¿Por qué?»)</span><div class="aj-seg" data-aj="porQueSeg" role="radiogroup" aria-labelledby="ajl-porQueSeg"><button type="button" class="aj-op" data-valor="0" role="radio" aria-checked="false">No mostrar</button><button type="button" class="aj-op" data-valor="3" role="radio" aria-checked="false">3 s</button><button type="button" class="aj-op" data-valor="5" role="radio" aria-checked="false">5 s</button><button type="button" class="aj-op" data-valor="8" role="radio" aria-checked="false">8 s</button></div></div>
     </section>
 
     <section class="aj-sec placa placa--crema" aria-labelledby="ajh-datos">

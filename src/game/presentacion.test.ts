@@ -51,11 +51,6 @@ describe('partida: las palabras que caen se leen siempre', () => {
     expect(bloque('hitMal')).toContain('background:var(--palabra-mal-bg)')
   })
 
-  it('el aviso «¿Por qué?» es una placa crema con letra oscura, medida', () => {
-    expect(todo).toMatch(/\.por-que\{[^}]*background:\s*var\(--palabra-bg\)/)
-    expect(todo).toMatch(/\.por-que\{[^}]*color:\s*var\(--palabra-fg\)/)
-  })
-
   it('los puntos flotantes llevan la tipografía de títulos y un contorno que los separa del fondo', () => {
     expect(todo).toMatch(/\.punto-flotante\{[^}]*font-family:\s*var\(--font-titulo\)/)
     expect(todo).toMatch(/\.punto-flotante\{[^}]*text-shadow:[^;}]*rgba\(0,0,0,\.[6-9]\)/)

@@ -42,12 +42,11 @@ describe('pantalla de ajustes', () => {
     expect(a).toContain("ganancia(ajustes(), 'musica')")
   })
 
-  it('el juego usa los ajustes: vibración, stickers, tamaño y duración del «¿Por qué?»', () => {
+  it('el juego usa los ajustes: vibración, stickers y tamaño', () => {
     const e = leer('src/game/GameEngine.ts')
     expect(e).toContain("vibrar('acierto')")
     expect(e).toContain("vibrar('error')")
     expect(e).toContain('ajustes().stickers')
-    expect(e).toContain('ajustes().porQueSeg')
     expect(leer('src/game/ComboSystem.ts')).toContain("vibrar('combo')")
     expect(leer('src/game/WordSpawner.ts')).toContain('MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras]')
     expect(leer('src/ui/DecoBackground.ts')).toContain('ajustes().fondoDecorativo')
@@ -61,7 +60,7 @@ describe('pantalla de ajustes', () => {
 
   it('la pantalla es accesible: switches con role, grupos de opciones con radiogroup y rótulos', () => {
     expect(html).toMatch(/class="aj-switch" data-aj="sonido" role="switch"/)
-    expect([...html.matchAll(/role="radiogroup" aria-labelledby="ajl-/g)].length).toBe(4)
+    expect([...html.matchAll(/role="radiogroup" aria-labelledby="ajl-/g)].length).toBe(3)
     expect(html).toContain('id="backFromAjustes"')
   })
 })
@@ -78,8 +77,8 @@ describe('ajustes con el estilo Aventura', () => {
     expect(pant).toMatch(/class="btn3d btn3d--volver" id="backFromAjustes"/)
   })
 
-  it('las cinco secciones son placas crema y los botones de acción son 3D', () => {
-    expect([...pant.matchAll(/<section class="aj-sec placa placa--crema"/g)].length).toBe(5)
+  it('las cuatro secciones son placas crema y los botones de acción son 3D', () => {
+    expect([...pant.matchAll(/<section class="aj-sec placa placa--crema"/g)].length).toBe(4)
     expect(pant).not.toContain('btn-outline')
     for (const id of ['ajProbarSonido', 'ajProbarVib', 'ajRestablecer']) expect(pant, id).toMatch(new RegExp(`class="btn3d btn3d--chico" id="${id}"`))
   })

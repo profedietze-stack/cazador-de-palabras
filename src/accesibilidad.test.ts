@@ -71,7 +71,6 @@ describe('lectores de pantalla y teclado', () => {
     const b = readFileSync('src/ui/Banner.ts', 'utf8')
     expect(b).toContain("'role', 'status'")
     expect(b).toContain("'aria-live', 'polite'")
-    expect(html).toContain('id="porQue" class="por-que" role="status" aria-live="polite"')
   })
   it('el diálogo atrapa el foco y lo devuelve al cerrar', () => {
     const d = readFileSync('src/ui/Dialog.ts', 'utf8')

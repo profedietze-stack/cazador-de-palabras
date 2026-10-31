@@ -8,7 +8,6 @@ import { programarPalabras, detenerWordSpawner, setWordClickHandler, esPalabraCo
 import { checkLogros } from './ScoreSystem'
 import { showBanner } from '../ui/Banner'
 import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
-import { explicarError } from './porQue'
 import { cargarRepasoJugador, guardarRepaso, falloEnRepaso, aciertoEnRepaso } from './sesionRepaso'
 import { setAlSalirSinTocar } from './WordPhysics'
 import { lanzarChispas, cantidadChispas } from './caida'
@@ -25,20 +24,6 @@ export function setOnGameEnd(fn: typeof _onGameEnd): void {
 let _onPracticaEnd: (() => void) | null = null
 export function setOnPracticaEnd(fn: typeof _onPracticaEnd): void {
   _onPracticaEnd = fn
-}
-
-let porQueTimer: ReturnType<typeof setTimeout> | null = null
-/** Explicación no bloqueante de por qué la palabra tocada no era de la categoría. */
-function mostrarPorQue(texto: string): void {
-  const el = document.getElementById('porQue')
-  if (!el) return
-  // Ajustes: 0 s = el alumno no quiere ver la explicación.
-  const seg = ajustes().porQueSeg
-  if (seg === 0) return
-  el.textContent = texto
-  el.classList.add('visible')
-  if (porQueTimer) clearTimeout(porQueTimer)
-  porQueTimer = setTimeout(() => el.classList.remove('visible'), seg * 1000)
 }
 
 const EMOJIS_LITERARIOS = ['📖','✏️','📝','🖊️','📚','🔤','🅰️','💬','🗣️','📜','🖋️','🎭','📕','📗','📘','🔡','💡','🌟','⭐','✨']
@@ -69,7 +54,6 @@ export function iniciarJuego(): void {
     // Un distractor que cayó sin que lo tocaran es un acierto de repaso.
     if (G.activo && !esPalabraCorrecta(el) && el.dataset.palabra && G.cat) aciertoEnRepaso(G.cat, el.dataset.palabra)
   })
-  document.getElementById('porQue')?.classList.remove('visible')
 
   const cat = CATS[G.cat!]
   document.getElementById('hudPts')!.textContent = '0'
@@ -205,8 +189,8 @@ function cazarPalabra(el: HTMLElement): void {
     const palabra = el.dataset.palabra
     if (palabra && G.cat) {
       G.fallosPartida[palabra] = (G.fallosPartida[palabra] ?? 0) + 1
+      // Sin cartel durante la partida (distrae): el «¿Por qué?» se lee en la pantalla final.
       falloEnRepaso(G.cat, palabra)
-      mostrarPorQue(explicarError(palabra, G.cat))
     }
     actualizarCombo(false)
     document.getElementById('hudPts')!.textContent = String(G.pts)

@@ -45,6 +45,33 @@ export type DuelEventMap = {
 
 type Manejador = (...args: unknown[]) => void
 
+/**
+ * Dónde se guarda el duelo en curso para poder volver si se recarga la página. `sessionStorage`: es de
+ * esa pestaña y se borra al cerrarla. Solo el código de la sala y el token (que el servidor ya conoce);
+ * ni nombres ni puntajes.
+ */
+export const CLAVE_DUELO_EN_CURSO = 'cdp_duelo_en_curso'
+
+export interface DueloGuardado { code: string; token: string }
+
+/** Lee y valida lo guardado; si no tiene el formato esperado lo borra (nunca se confía en lo que hay). */
+export function leerDueloGuardado(): DueloGuardado | null {
+  let crudo: string | null
+  try { crudo = sessionStorage.getItem(CLAVE_DUELO_EN_CURSO) } catch { return null }
+  if (crudo === null) return null
+  try {
+    const d = JSON.parse(crudo) as unknown
+    if (typeof d === 'object' && d !== null && !Array.isArray(d)) {
+      const { code, token } = d as Record<string, unknown>
+      if (typeof code === 'string' && /^[A-Z0-9]{4,8}$/.test(code) && typeof token === 'string' && /^[\w-]{8,64}$/.test(token)) {
+        return { code, token }
+      }
+    }
+  } catch { /* ilegible: se borra abajo */ }
+  try { sessionStorage.removeItem(CLAVE_DUELO_EN_CURSO) } catch { /* sin almacenamiento */ }
+  return null
+}
+
 class DuelService {
   private socket: Socket | null = null
   private handlers = new Map<string, Set<Manejador>>()
@@ -69,16 +96,40 @@ class DuelService {
       const d = args[0] as { code?: string; token?: string } | undefined
       if (event === 'duel_created' && d?.token) { this.token = d.token; this.code = d.code ?? '' }
       if (event === 'duel_joined' && d?.token) this.token = d.token
-      if (event === 'duel_start') this.jugando = true
-      if (event === 'duel_end' || event === 'rival_disconnected' || event === 'rejoin_failed') this.jugando = false
+      if (event === 'duel_start' || event === 'duel_resync') { this.jugando = true; this.guardar() }
+      if (event === 'duel_end' || event === 'rival_disconnected' || event === 'rejoin_failed') { this.jugando = false; this.olvidar() }
       this.handlers.get(event)?.forEach(h => h(...args))
     })
+  }
+
+  /**
+   * Después de recargar la página: si había un duelo en curso, vuelve a conectar y se presenta con el
+   * token apenas conecta. Devuelve false si no había nada (válido) guardado.
+   */
+  restaurar(): boolean {
+    const g = leerDueloGuardado()
+    if (!g) return false
+    this.code = g.code
+    this.token = g.token
+    this.jugando = true
+    this.connect()
+    return true
+  }
+
+  private guardar(): void {
+    if (!this.code || !this.token) return
+    try { sessionStorage.setItem(CLAVE_DUELO_EN_CURSO, JSON.stringify({ code: this.code, token: this.token })) } catch { /* sin almacenamiento */ }
+  }
+
+  private olvidar(): void {
+    try { sessionStorage.removeItem(CLAVE_DUELO_EN_CURSO) } catch { /* sin almacenamiento */ }
   }
 
   disconnect(): void {
     this.socket?.disconnect()
     this.socket = null
     this.token = ''; this.code = ''; this.jugando = false
+    this.olvidar()
     // handlers kept intentionally — init-time registrations must survive reconnects
   }
 

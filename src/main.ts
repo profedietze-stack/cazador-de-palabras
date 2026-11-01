@@ -30,7 +30,7 @@ import { initSalaScreen } from './screens/SalaScreen'
 import { initResultadosSalaScreen } from './screens/ResultadosSalaScreen'
 import { initDuelMenuScreen } from './screens/DuelMenuScreen'
 import { initDuelLobbyScreen } from './screens/DuelLobbyScreen'
-import { initDuelGameScreen } from './screens/DuelGameScreen'
+import { initDuelGameScreen, intentarRestaurarDuelo } from './screens/DuelGameScreen'
 import { initDuelResultScreen } from './screens/DuelResultScreen'
 import { lsGet, lsRemove } from './utils/storage'
 import { iniciarAjustes } from './ui/aplicarAjustes'
@@ -112,4 +112,6 @@ if ('serviceWorker' in navigator) {
   }
   mostrar('menuPrincipal')
   iniciarDecoMenu()
+  // Si la página se recargó en plena partida de un duelo, se vuelve a él.
+  intentarRestaurarDuelo()
 })()

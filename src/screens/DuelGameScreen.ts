@@ -2,6 +2,9 @@ import { mostrar } from './ScreenManager'
 import { textoVisible } from '../game/distractores'
 import { D, resetDuelState } from '../game/duelState'
 import { duelService } from '../services/DuelService'
+import { G } from '../game/state'
+import { CATS } from '../data/categories'
+import type { CategoryKey } from '../types'
 import { POWER_META } from '../types/duel'
 import type { PowerId, DuelScores } from '../types/duel'
 import { showAlert } from '../ui/Dialog'
@@ -202,14 +205,73 @@ export function cleanupDuelGame(): void {
   if (decoyTimeout) { clearTimeout(decoyTimeout); decoyTimeout = null }
   decoyChips.forEach(c => c.remove()); decoyChips.length = 0
   if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
+  ocultarEsperaRival()
   document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
   document.getElementById('duelFreezeOverlay')!.style.display = 'none'
   document.getElementById('duelDecoyNotice')!.style.display = 'none'
   document.getElementById('duelDisconnectOverlay')!.style.display = 'none'
 }
 
-const ESPERA_RECONEXION_MS = 20000
+// Más que la gracia del servidor (20 s): si el servidor ya se rindió, que lo diga él (rejoin_failed) antes
+// que este plazo.
+const ESPERA_RECONEXION_MS = 30000
 let reconexionFallida: ReturnType<typeof setTimeout> | null = null
+
+/** Si no se logra volver al duelo en `ESPERA_RECONEXION_MS`, se avisa y se ofrece salir. */
+function esperarReconexion(): void {
+  if (reconexionFallida) clearTimeout(reconexionFallida)
+  reconexionFallida = setTimeout(() => {
+    reconexionFallida = null
+    if (D.phase !== 'playing') return
+    stopTimer()
+    D.phase = 'ended'
+    mostrarOverlay('⚠️ No se pudo volver al duelo', false)
+  }, ESPERA_RECONEXION_MS)
+}
+
+// ── Espera por un rival que perdió la conexión ───────────────────────────────
+
+let esperaRival: ReturnType<typeof setInterval> | null = null
+
+function ocultarEsperaRival(): void {
+  if (esperaRival) { clearInterval(esperaRival); esperaRival = null }
+  const e = document.getElementById('duelRivalEstado')
+  if (e) e.style.display = 'none'
+}
+
+/** Cartel fijo con la cuenta regresiva de lo que falta para darlo por desconectado. */
+function mostrarEsperaRival(segundos: number): void {
+  ocultarEsperaRival()
+  const e = document.getElementById('duelRivalEstado')
+  if (!e) return
+  const total = Number.isFinite(segundos) ? Math.min(60, Math.max(1, Math.round(segundos))) : 20
+  const fin = Date.now() + total * 1000
+  const pintar = (): void => {
+    const falta = Math.ceil((fin - Date.now()) / 1000)
+    if (falta <= 0) { ocultarEsperaRival(); return }
+    e.textContent = `⚠️ A tu rival se le cortó la conexión. Lo esperamos ${falta} s…`
+  }
+  e.style.display = 'block'
+  pintar()
+  esperaRival = setInterval(pintar, 1000)
+}
+
+/**
+ * Se llama al arrancar la app: si la página se recargó en plena partida, vuelve al duelo. Mientras el
+ * servidor devuelve el estado se ve un cartel «Volviendo al duelo»; si no se logra, se avisa.
+ */
+export function intentarRestaurarDuelo(): boolean {
+  if (!duelService.restaurar()) return false
+  if (!G.jugador) { duelService.disconnect(); return false }   // sin nombre no hay quién vuelva: se limpia
+  cleanupDuelGame()
+  resetDuelState()
+  D.phase = 'playing'
+  D.myNombre = G.jugador
+  mostrar('duelGameScreen')
+  mostrarOverlay('⏳ Volviendo al duelo…', true)
+  esperarReconexion()
+  return true
+}
 
 function mostrarOverlay(texto: string, esperando: boolean): void {
   const ov = document.getElementById('duelDisconnectOverlay')!
@@ -311,6 +373,7 @@ export function initDuelGameScreen(): void {
 
   // duel_end
   duelService.on('duel_end', ({ winner, scores, reason }) => {
+    ocultarEsperaRival()
     if (D.phase !== 'playing') return
     stopTimer()
     D.phase = 'ended'
@@ -325,20 +388,23 @@ export function initDuelGameScreen(): void {
   duelService.on('disconnect', () => {
     if (D.phase !== 'playing') return
     mostrarOverlay('📡 Sin conexión. Reconectando…', true)
-    if (reconexionFallida) clearTimeout(reconexionFallida)
-    reconexionFallida = setTimeout(() => {
-      if (D.phase !== 'playing') return
-      stopTimer()
-      D.phase = 'ended'
-      mostrarOverlay('⚠️ No se pudo volver al duelo', false)
-    }, ESPERA_RECONEXION_MS)
+    esperarReconexion()
   })
 
   duelService.on('duel_resync', (r) => {
     if (reconexionFallida) { clearTimeout(reconexionFallida); reconexionFallida = null }
     ocultarOverlay()
+    D.phase = 'playing'
     D.mySlot = r.slot
     D.rivalNombre = r.rivalNombre
+    // Tras recargar la página no queda nada en memoria: el servidor devuelve la categoría y el nivel.
+    const cats = r.cats.filter((c): c is CategoryKey => c in CATS)
+    if (cats.length) { D.cats = cats; D.catsNombre = cats.map(c => CATS[c].nombre).join(', ') }
+    D.nivel = r.nivel
+    if (!D.myNombre) D.myNombre = G.jugador
+    document.getElementById('duelHudNombreMe')!.textContent = D.myNombre
+    document.getElementById('duelHudNombreRival')!.textContent = D.rivalNombre
+    document.getElementById('duelHudCat')!.textContent = `${D.catsNombre} · Nv ${D.nivel}`
     D.words = r.words.map(w => ({ ...w, isCorrect: false } as typeof D.words[number]))
     D.myPowers = r.powers
     buildBoard()
@@ -363,15 +429,17 @@ export function initDuelGameScreen(): void {
 
   duelService.on('rival_reconnecting', ({ segundos }) => {
     if (D.phase !== 'playing') return
-    showBanner(`⚠️ A tu rival se le cortó la conexión. Lo esperamos hasta ${segundos} s…`)
+    mostrarEsperaRival(segundos)
   })
   duelService.on('rival_back', () => {
+    ocultarEsperaRival()
     if (D.phase !== 'playing') return
     showBanner('✅ Tu rival volvió')
   })
 
   // Rival disconnected mid-duel
   duelService.on('rival_disconnected', () => {
+    ocultarEsperaRival()
     if (D.phase !== 'playing') return
     stopTimer()
     D.phase = 'ended'

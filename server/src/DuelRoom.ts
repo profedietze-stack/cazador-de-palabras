@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto'
 import type { RoomState, PlayerState, PlayerSlot, DuelWord, PowerId } from './types'
 
 /** Cuánto se espera a que vuelva un jugador que perdió la conexión en plena partida. */
-export const GRACIA_RECONEXION_MS = Number(process.env['DUELO_GRACIA_MS'] ?? 15000)
+export const GRACIA_RECONEXION_MS = Number(process.env['DUELO_GRACIA_MS'] ?? 20000)
 
 const POWER_UNLOCK_EVERY = 3   // every N catches, earn a power
 const MAX_INVENTORY = 2

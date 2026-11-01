@@ -40,7 +40,7 @@ async function duelo(nivel = 1) {
 
 beforeAll(async () => {
   process.env.PORT = String(PUERTO)
-  process.env.DUELO_GRACIA_MS = '1500'   // la gracia real es de 15 s
+  process.env.DUELO_GRACIA_MS = '1500'   // la gracia real es de 20 s
   process.env.CORS_ORIGINS = 'http://localhost:5173'
   await import('../index')
   await new Promise(r => setTimeout(r, 200))

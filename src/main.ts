@@ -12,6 +12,7 @@ import './styles/a11y.css'
 import './styles/ajustes.css'
 import './styles/componentes.css'
 import './styles/paisaje.css'
+import './styles/splash.css'
 
 import { G } from './game/state'
 import { mostrar } from './screens/ScreenManager'
@@ -36,6 +37,8 @@ import { lsGet, lsRemove } from './utils/storage'
 import { iniciarAjustes } from './ui/aplicarAjustes'
 import { iniciarHidratacion } from './ui/emoji'
 import { iniciarPausaPorVisibilidad } from './ui/paisaje'
+import { iniciarSplash, saltarSplash } from './ui/splash'
+import { leerDueloGuardado } from './services/DuelService'
 import { iniciarFondoReactivo } from './ui/fondoMundo'
 import { alCambiarAjustes } from './storage/ajustes'
 import { initAjustesScreen } from './screens/AjustesScreen'
@@ -110,8 +113,13 @@ if ('serviceWorker' in navigator) {
   if (nombreGuardado && nombreGuardado.length >= 2) {
     G.jugador = nombreGuardado
   }
-  mostrar('menuPrincipal')
-  iniciarDecoMenu()
-  // Si la página se recargó en plena partida de un duelo, se vuelve a él.
-  intentarRestaurarDuelo()
+  const arrancar = (): void => {
+    mostrar('menuPrincipal')
+    iniciarDecoMenu()
+    // Si la página se recargó en plena partida de un duelo, se vuelve a él.
+    intentarRestaurarDuelo()
+  }
+  // Pantalla de carga (con la carga real). Si se recargó en pleno duelo no se la pasa: hay que volver ya.
+  if (leerDueloGuardado()) saltarSplash(arrancar)
+  else iniciarSplash({ alTerminar: arrancar })
 })()

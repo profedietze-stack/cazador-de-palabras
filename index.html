@@ -12,8 +12,28 @@
   <link rel="manifest" href="%BASE_URL%manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="%BASE_URL%icons/icon-192.png">
   <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png">
+  <!-- La tipografía del título se baja desde el primer instante: la pantalla de carga la necesita -->
+  <link rel="preload" href="%BASE_URL%fonts/almendra-sc-latin.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
+
+<!-- ═══════════════════════════════ PANTALLA DE CARGA ═══════════════════════════════
+     Se ve desde el primer instante; src/ui/splash.ts la llena con la carga real y la quita. -->
+<div id="splash">
+  <div class="fondo-mundo"></div>
+  <div class="splash-palabras" aria-hidden="true"><span>gato</span><span>lento</span><span>correr</span></div>
+  <div class="splash-centro">
+    <div class="splash-titulo" role="img" aria-label="Cazador de Palabras, cargando">
+      <span class="splash-titulo-base" aria-hidden="true">Cazador de Palabras</span>
+      <span class="splash-titulo-llena" aria-hidden="true">Cazador de Palabras</span>
+    </div>
+    <div class="splash-barra" role="progressbar" aria-label="Carga del juego" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
+    <p class="splash-info"><span class="splash-pct">0 %</span> <span class="splash-estado">Cargando…</span></p>
+    <button type="button" class="btn3d btn3d--principal splash-toque" hidden>Tocá para empezar</button>
+    <p class="splash-error" hidden>No se pudo cargar el juego. Revisá la conexión y <a href="">volvé a intentar</a>.</p>
+  </div>
+</div>
+<script src="%BASE_URL%splash-guardia.js" defer></script>
 
 <!-- ═══════════════════════════════ MODAL NOMBRE ═══════════════════════════════ -->
 <div id="modalNombre" role="dialog" aria-modal="true" aria-label="Tu nombre">

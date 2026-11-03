@@ -1,0 +1,59 @@
+/* Pantalla de carga: el paisaje de inicio del juego y el título que se dora a medida que carga.
+   El título es el mismo de Menú (Almendra SC, dorado de noche / marrón de día). */
+#splash{
+  position:fixed;inset:0;z-index:100000;background:#0a1a2e;overflow:hidden;
+  transition:opacity .45s ease;
+}
+#splash.saliendo{opacity:0;pointer-events:none}
+#splash .fondo-mundo{z-index:0}
+.splash-centro{
+  position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;padding:0 1rem;text-align:center;
+}
+.splash-titulo{
+  position:relative;display:inline-block;white-space:nowrap;
+  font-family:var(--font-cartel,'Almendra SC',Georgia,serif);font-weight:700;letter-spacing:.03em;line-height:1.1;
+  font-size:clamp(1.8rem,9vw,3.4rem);
+  opacity:0;transition:opacity .3s ease;   /* aparece cuando la tipografía ya está: sin saltos de letra */
+}
+#splash.fuentes-listas .splash-titulo{opacity:1}
+.splash-titulo-base{color:var(--titulo-oro,#f3d27a);opacity:.28}
+.splash-titulo-llena{
+  position:absolute;left:0;top:0;color:var(--titulo-oro,#f3d27a);text-shadow:var(--titulo-sombra,0 2px 0 rgba(60,35,5,.55));
+  clip-path:inset(0 calc(100% - var(--p,0) * 1%) 0 0);
+}
+.splash-barra{
+  width:min(420px,76vw);height:10px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12);
+}
+.splash-barra i{display:block;height:100%;width:calc(var(--p,0) * 1%);background:var(--titulo-oro,#f3d27a);border-radius:6px}
+.splash-info{
+  margin:0;font-family:var(--font-texto,'Baloo 2',sans-serif);font-weight:800;font-size:.95rem;
+  color:var(--titulo-oro,#f3d27a);text-shadow:var(--titulo-sombra,none);
+}
+.splash-estado{font-weight:500;opacity:.9}
+.splash-toque{margin-top:.4rem;min-width:min(300px,80vw);animation:splashLate 1.4s ease-in-out infinite}
+.splash-toque[hidden],.splash-error[hidden]{display:none}
+@keyframes splashLate{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.splash-error{margin:0;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.splash-error a{color:var(--titulo-oro,#f3d27a)}
+
+/* Palabras que caen detrás del título: solo transform, y apagadas con «menos movimiento» */
+.splash-palabras{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.splash-palabras span{
+  position:absolute;top:-12%;padding:.15rem .6rem;border-radius:10px;background:#fff6dc;color:#3a2200;
+  font-family:var(--font-texto,'Baloo 2',sans-serif);font-weight:800;font-size:1rem;border-bottom:3px solid #d8b56a;
+  opacity:.9;animation:splashCae 7s linear infinite;will-change:transform;
+}
+.splash-palabras span:nth-child(1){left:14%}
+.splash-palabras span:nth-child(2){left:46%;animation-delay:-2.4s}
+.splash-palabras span:nth-child(3){left:76%;animation-delay:-4.8s}
+@keyframes splashCae{from{transform:translateY(0)}to{transform:translateY(118vh)}}
+@media (prefers-reduced-motion: reduce){
+  .splash-palabras,.splash-toque{display:none}
+  .splash-toque:not([hidden]){display:inline-flex;animation:none}
+  #splash{transition:none}
+}
+html[data-movimiento="reducido"] .splash-palabras{display:none}
+html[data-movimiento="reducido"] .splash-toque{animation:none}
+html[data-movimiento="reducido"] #splash{transition:none}

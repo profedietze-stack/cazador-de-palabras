@@ -19,6 +19,14 @@ function unlockAudio(): void {
 document.addEventListener('touchend', unlockAudio, { once: false, passive: true })
 document.addEventListener('click', unlockAudio, { once: false, passive: true })
 
+/**
+ * Despierta el audio del navegador. En celulares solo se puede dentro de un toque del jugador:
+ * la pantalla de carga lo pide con «Tocá para empezar» para que la música y los efectos suenen.
+ */
+export function activarAudio(): void {
+  try { getAC() } catch (e) {}
+}
+
 function playTone(freq: number, dur: number, type: OscillatorType = 'sine', vol = 0.18): void {
   const k = ganancia(ajustes(), 'efectos')
   if (k === 0) return

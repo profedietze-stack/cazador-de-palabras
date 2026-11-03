@@ -25,7 +25,7 @@ export function horaDePantalla(id: string): Hora {
   return cieloActual() === 'dia' ? 'dia' : 'noche'
 }
 
-function sistemaReduce(): boolean {
+export function sistemaReduce(): boolean {
   return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 

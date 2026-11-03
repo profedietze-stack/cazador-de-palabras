@@ -1,7 +1,7 @@
 import type { GameRecord, Medal } from '../types'
 import { G } from './state'
 import { CATS } from '../data/categories'
-import { sonidoOk, sonidoMal, sonidoNivel, detenerMusica } from '../audio/AudioEngine'
+import { sonidoOk, sonidoMal, sonidoNivel, sonidoLanzar, sonidoClavar, sonidoRebote, detenerMusica } from '../audio/AudioEngine'
 import { addPartida } from '../storage/GameStorage'
 import { COMBOS, actualizarCombo, resetCombo } from './ComboSystem'
 import { programarPalabras, detenerWordSpawner, setWordClickHandler, esPalabraCorrecta } from './WordSpawner'
@@ -11,6 +11,7 @@ import { calcularMedalla, calcularPrecision, restaPorError } from './reglas'
 import { cargarRepasoJugador, guardarRepaso, falloEnRepaso, aciertoEnRepaso } from './sesionRepaso'
 import { setAlSalirSinTocar } from './WordPhysics'
 import { lanzarChispas, cantidadChispas } from './caida'
+import { lanzarFlecha } from './flecha'
 import { ajustes } from '../storage/ajustes'
 import { vibrar } from '../utils/vibracion'
 
@@ -161,31 +162,49 @@ function cazarPalabra(el: HTMLElement): void {
   const cx = rect.left - aRect.left + rect.width / 2
   const cy = rect.top - aRect.top
 
+  // La flecha sale al tocar. El puntaje y el combo no esperan a que llegue (la lógica es la de
+  // siempre); lo que se ve y se oye del impacto sí: va cuando se clava.
+  const vuelo = lanzarFlecha(el, area, esOk)
+  sonidoLanzar()
+  if (vuelo > 0) el.style.animationDelay = vuelo + 'ms'
+  const alImpactar = (fn: () => void): void => {
+    if (vuelo > 0) setTimeout(fn, vuelo)
+    else fn()
+  }
+
   if (esOk) {
     const mult = G.comboNivel > 0 ? COMBOS[G.comboNivel]!.mult : 1
     const pts = Math.round(ptsBase * mult)
     G.pts += pts; G.cazadas++
-    sonidoOk()
-    vibrar('acierto')
     el.classList.add('hit-ok')
     actualizarCombo(true)
-    // Chispas del color del mundo, más cuanto más alto el combo (sin «reducir movimiento»).
-    lanzarChispas(area, cx, cy + rect.height / 2, cantidadChispas(G.comboNivel), 'var(--acento, #ffb347)')
-    const label = G.comboNivel > 0 ? `+${pts} ×${COMBOS[G.comboNivel]!.mult}` : `+${pts}`
-    mostrarPuntosFlotantes(label, cx, cy, G.comboNivel >= 4 ? '#f59e0b' : G.comboNivel >= 2 ? '#a855f7' : '#10b981')
-    if (G.comboNivel >= 1 && ajustes().stickers) {
-      soltarEmojisLiterarios(cx, cy, G.comboNivel + 1)
-      mostrarStickersJuego(cx, cy, G.comboNivel)
-    }
+    const nivelCombo = G.comboNivel
+    const label = nivelCombo > 0 ? `+${pts} ×${COMBOS[nivelCombo]!.mult}` : `+${pts}`
+    alImpactar(() => {
+      sonidoClavar()
+      setTimeout(sonidoOk, 45)
+      vibrar('acierto')
+      if (!area.isConnected) return
+      // Chispas del color del mundo, más cuanto más alto el combo (sin «reducir movimiento»).
+      lanzarChispas(area, cx, cy + rect.height / 2, cantidadChispas(nivelCombo), 'var(--acento, #ffb347)')
+      mostrarPuntosFlotantes(label, cx, cy, nivelCombo >= 4 ? '#f59e0b' : nivelCombo >= 2 ? '#a855f7' : '#10b981')
+      if (nivelCombo >= 1 && ajustes().stickers) {
+        soltarEmojisLiterarios(cx, cy, nivelCombo + 1)
+        mostrarStickersJuego(cx, cy, nivelCombo)
+      }
+    })
     document.getElementById('hudPts')!.textContent = String(G.pts)
     if (!G.practica && G.pts >= G.obj) terminarJuego()
   } else {
     const resta = restaPorError(G.nivel)
     G.pts = Math.max(0, G.pts - resta); G.erradas++
-    sonidoMal()
-    vibrar('error')
     el.classList.add('hit-mal')
-    mostrarPuntosFlotantes('-' + resta, cx, cy, '#ef4444')
+    alImpactar(() => {
+      sonidoRebote()
+      setTimeout(sonidoMal, 60)
+      vibrar('error')
+      if (area.isConnected) mostrarPuntosFlotantes('-' + resta, cx, cy, '#ef4444')
+    })
     const palabra = el.dataset.palabra
     if (palabra && G.cat) {
       G.fallosPartida[palabra] = (G.fallosPartida[palabra] ?? 0) + 1
@@ -196,7 +215,7 @@ function cazarPalabra(el: HTMLElement): void {
     document.getElementById('hudPts')!.textContent = String(G.pts)
   }
 
-  setTimeout(() => el.remove(), 450)
+  setTimeout(() => el.remove(), 450 + vuelo)
 }
 
 function mostrarPuntosFlotantes(txt: string, x: number, y: number, color: string): void {

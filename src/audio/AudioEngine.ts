@@ -43,6 +43,63 @@ export function sonidoMal(): void {
   playTone(180, 0.22, 'sawtooth', 0.18)
 }
 
+/** Ráfaga de ruido filtrado: el «fiuu» de la flecha y el golpe seco al clavarse. */
+function ruido(dur: number, f0: number, f1: number, vol: number, tipo: BiquadFilterType = 'bandpass', retraso = 0): void {
+  const k = ganancia(ajustes(), 'efectos')
+  if (k === 0) return
+  try {
+    const ctx = getAC(), t = ctx.currentTime + retraso
+    const n = Math.max(1, Math.floor(ctx.sampleRate * dur))
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate)
+    const d = buf.getChannelData(0)
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1
+    const src = ctx.createBufferSource(), fil = ctx.createBiquadFilter(), g = ctx.createGain()
+    src.buffer = buf
+    fil.type = tipo; fil.Q.value = 1.2
+    fil.frequency.setValueAtTime(f0, t)
+    fil.frequency.exponentialRampToValueAtTime(f1, t + dur)
+    g.gain.setValueAtTime(0.001, t)
+    g.gain.linearRampToValueAtTime(vol * k, t + dur * 0.35)
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur)
+    src.connect(fil); fil.connect(g); g.connect(ctx.destination)
+    src.start(t)
+  } catch (e) {}
+}
+
+/** Tono que baja (o sube) de frecuencia: el «thunk» del clavado y el «tink» del rebote. */
+function barrido(f0: number, f1: number, dur: number, tipo: OscillatorType, vol: number): void {
+  const k = ganancia(ajustes(), 'efectos')
+  if (k === 0) return
+  try {
+    const ctx = getAC(), t = ctx.currentTime
+    const o = ctx.createOscillator(), g = ctx.createGain()
+    o.connect(g); g.connect(ctx.destination)
+    o.type = tipo
+    o.frequency.setValueAtTime(f0, t)
+    o.frequency.exponentialRampToValueAtTime(f1, t + dur)
+    g.gain.setValueAtTime(vol * k, t)
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur)
+    o.start(t); o.stop(t + dur + 0.02)
+  } catch (e) {}
+}
+
+/** La flecha sale: un silbido corto que sube. */
+export function sonidoLanzar(): void {
+  ruido(0.16, 700, 2600, 0.16)
+}
+
+/** La flecha se clava en una palabra: golpe seco, grave y corto. */
+export function sonidoClavar(): void {
+  barrido(210, 70, 0.1, 'sine', 0.34)
+  ruido(0.04, 3000, 900, 0.12, 'highpass')
+}
+
+/** La flecha rebota en una palabra equivocada: «tink» metálico. */
+export function sonidoRebote(): void {
+  barrido(1500, 760, 0.13, 'triangle', 0.14)
+  ruido(0.05, 4000, 1500, 0.08, 'highpass')
+}
+
 export function sonidoBtn(): void {
   playTone(660, 0.06, 'sine', 0.08)
 }

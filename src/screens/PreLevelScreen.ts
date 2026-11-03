@@ -5,12 +5,25 @@ import { iniciarJuego } from '../game/GameEngine'
 import { showAlert } from '../ui/Dialog'
 import { showModal } from './MenuScreen'
 import { lsGet } from '../utils/storage'
+import { ladosDelNivel } from '../game/entradas'
+
+/** Línea de la pantalla previa que avisa de las palabras que llegan por los costados (vacía en el nivel 1). */
+export function textoLados(nivel: number): string {
+  const l = ladosDelNivel(nivel)
+  if (l.length === 1) return ''
+  const por = l.includes('izquierda') ? 'por la derecha y por la izquierda' : 'por la derecha'
+  return `👀 ¡Ahora también llegan palabras ${por}! Mirá toda la pantalla. En la práctica caen solo desde arriba.`
+}
 
 export function mostrarPreNivel(): void {
   mostrar('preNivel')
   const cat = CATS[G.cat!]
   // El alumno sabe que su docente ve en qué se equivoca (privacidad: consentimiento informado).
   document.getElementById('avisoDocente')!.style.display = lsGet('cdp_sala') ? 'block' : 'none'
+  const lados = textoLados(G.nivel)
+  const aviso = document.getElementById('avisoLados')!
+  aviso.textContent = lados
+  aviso.style.display = lados ? 'block' : 'none'
   document.getElementById('preTitle')!.textContent = `${cat.icon} ${cat.nombre} — Nivel ${G.nivel}`
   document.getElementById('preDef')!.innerHTML = `<strong>Definición:</strong> ${cat.def}`
   document.getElementById('preEjs')!.innerHTML =

@@ -1,5 +1,6 @@
 import { G } from './state'
 import { reducirMovimientoActivo } from '../utils/movimiento'
+import { desfaseEn, factorCaidaLateral, type EntradaLateral } from './entradas'
 import { avanzar, balanceo, entrada, aplicarPosicion, lanzarAterrizaje, aterrizajeDe, lineaDeAterrizaje, debeHundirse, yDelChapuzon, DT_MAX_MS } from './caida'
 
 /** Cada cuántos ms se vuelve a medir el área de juego y la escena. */
@@ -19,7 +20,12 @@ function lineaDelAgua(area: HTMLElement): number {
   return Math.min(alto, Math.max(alto * 0.6, y))
 }
 
-export function animarCaida(el: HTMLElement, size: number): void {
+/**
+ * Hace caer una palabra. Las que entran por un costado (`lateral`, niveles 2 y 3) arrancan afuera,
+ * a media altura, y se curvan hacia abajo: el corrimiento horizontal se frena mientras la caída
+ * toma velocidad. Con «reducir movimiento» no hay curva: aparecen en su lugar y caen derechas.
+ */
+export function animarCaida(el: HTMLElement, size: number, lateral?: EntradaLateral): void {
   const area = document.getElementById('gameArea')!
   // Alto del área, línea de aterrizaje y tipo de escena se vuelven a medir cada tanto: la primera
   // palabra nace mientras el juego pasa a pantalla completa y se monta el fondo, y con lo que se
@@ -33,7 +39,8 @@ export function animarCaida(el: HTMLElement, size: number): void {
     agua = lineaDelAgua(area)
     aterrizaje = aterrizajeDe('#gameScreen')
   }
-  let y = -60
+  let y = lateral ? lateral.y0 : -60
+  let transcurrido = 0   // segundos de caída (no cuenta la pausa)
   // Misma velocidad de siempre: antes era «px por fotograma», ahora «px por segundo» (× 60), para
   // que caiga igual en pantallas de 60, 120 o 144 Hz.
   const pxPorSeg = (1.2 + Math.random() * 2) * G.velocidadBase * 60
@@ -47,8 +54,9 @@ export function animarCaida(el: HTMLElement, size: number): void {
   let entrando = true
   let hundida = false
 
+  const desliza = lateral !== undefined && !reducir
   // Antes del primer fotograma, para que no se vea un instante en (0, 0).
-  aplicarPosicion(el, { y, escala: entrada(y).escala })
+  aplicarPosicion(el, { x: desliza ? lateral.desfase : 0, y, escala: entrada(y).escala })
   el.style.opacity = '0'
 
   const raf = (ahora: number): void => {
@@ -58,12 +66,14 @@ export function animarCaida(el: HTMLElement, size: number): void {
     const dt = ultimo === null ? 1000 / 60 : ahora - ultimo
     ultimo = ahora
     if (ahora - medidoEn >= REMEDIR_MS) { medidoEn = ahora; remedir() }
-    y = avanzar(y, pxPorSeg, dt)
-    fase += Math.min(Math.max(dt, 0), DT_MAX_MS) / 1000 * frecuencia
+    const dtS = Math.min(Math.max(dt, 0), DT_MAX_MS) / 1000
+    transcurrido += dtS
+    y = avanzar(y, lateral ? pxPorSeg * factorCaidaLateral(transcurrido) : pxPorSeg, dt)
+    fase += dtS * frecuencia
 
     const { dx, rot } = balanceo(fase, amplitud, inclinacion)
     const e = entrada(y)
-    aplicarPosicion(el, { x: dx, y, rot, escala: e.escala })
+    aplicarPosicion(el, { x: dx + (desliza ? desfaseEn(lateral.desfase, transcurrido) : 0), y, rot, escala: e.escala })
     if (entrando) {
       el.style.opacity = String(e.opacidad)
       if (e.opacidad >= 1) { entrando = false; el.style.opacity = '' }

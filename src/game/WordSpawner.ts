@@ -2,6 +2,7 @@ import { G } from './state'
 import { CATS } from '../data/categories'
 import { shuffleArr } from '../utils'
 import { animarCaida } from './WordPhysics'
+import { elegirLado, planEntradaLateral, type EntradaLateral, type Lado } from './entradas'
 import { alturaDe } from './caida'
 import { puntosPorAcierto } from './reglas'
 import { distractoresParaNivel, textoVisible } from './distractores'
@@ -47,10 +48,13 @@ export function esPalabraCorrecta(el: HTMLElement): boolean {
 
 let generadorTimeout: ReturnType<typeof setTimeout> | null = null
 let generadorCiclo = 0
+// Cuándo entró la última palabra por cada costado (para no juntar dos por el mismo lado).
+let ultimosLados: Partial<Record<Lado, number>> = {}
 
 export function programarPalabras(): void {
   if (!G.activo) return
   generadorCiclo = 0
+  ultimosLados = {}
   generarOlaPalabras()
 }
 
@@ -124,7 +128,8 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   // Mínimo 18 px: las de 12-15 px giraban a 150°/s y eran ilegibles para baja
   // visión y dislexia; se castigaba un error de lectura como si fuera de gramática.
   // Ajustes ▸ tamaño de las palabras: solo cambia cuánto se ve, no la dificultad.
-  const { size, left: startX } = medidasPalabra(area.clientWidth, texto.length, MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras])
+  const medidas = medidasPalabra(area.clientWidth, texto.length, MULTIPLICADOR_TAMANO[ajustes().tamanoPalabras])
+  const { size, left: startX } = medidas
   el.style.fontSize = size + 'px'
   el.style.left = startX + 'px'
 
@@ -155,5 +160,14 @@ function crearPalabra(texto: string, esCorrecta: boolean): void {
   el.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') _onClick(el) })
 
   area.appendChild(el)
-  animarCaida(el, size)
+
+  // Niveles 2 y 3: algunas entran por un costado. Práctica: siempre desde arriba.
+  const lado = elegirLado(G.nivel, G.practica, Math.random(), Date.now(), ultimosLados)
+  let lateral: EntradaLateral | undefined
+  if (lado !== 'arriba') {
+    ultimosLados[lado] = Date.now()
+    lateral = planEntradaLateral(lado, area.clientWidth, area.clientHeight, el.offsetWidth || medidas.ancho)
+    el.style.left = lateral.left + 'px'
+  }
+  animarCaida(el, size, lateral)
 }

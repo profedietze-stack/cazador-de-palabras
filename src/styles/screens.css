@@ -454,3 +454,6 @@ html[data-theme="dark"] .sala-estado.inactiva{background:#1e293b;color:#94a3b8}
 .rs-pista{flex:1;height:.7rem;border-radius:6px;background:var(--border,#e5e7eb);overflow:hidden}
 .rs-relleno{display:block;height:100%;background:var(--acento-ui)}
 .rs-ayuda td{background:rgba(245,158,11,.12)}
+
+/* Aviso de la pantalla previa: desde el nivel 2 llegan palabras por los costados */
+.aviso-lados{background:#e0f2fe;padding:.7rem 1rem;border-radius:10px;border-left:4px solid #0284c7;margin-bottom:1rem;font-size:.9rem;color:#0c4a6e}

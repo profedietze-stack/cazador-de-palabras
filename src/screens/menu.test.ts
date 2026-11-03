@@ -88,7 +88,7 @@ describe('menú de inicio «Aventura»', () => {
     const css = ['screens', 'components', 'responsive', 'a11y', 'ajustes']
       .map(f => readFileSync(`src/styles/${f}.css`, 'utf8')).join('\n')
     for (const sel of ['.screen-title', '.titulo-cartel', '.titulo-pantalla', '.titulo-resultado']) {
-      const re = new RegExp(`${sel.replace('.', '\.')}[^{]*\{[^}]*font-family:`)
+      const re = new RegExp(sel.replace('.', String.raw`\.`) + String.raw`[^{]*\{[^}]*font-family:`)
       expect(css, sel).not.toMatch(re)
     }
   })

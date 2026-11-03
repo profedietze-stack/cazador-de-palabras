@@ -74,10 +74,22 @@ describe('menú de inicio «Aventura»', () => {
     }
   })
 
-  it('el título cartel usa la tipografía de títulos con contorno y extrusión', () => {
+  it('los títulos de pantalla usan la misma tipografía que el título del juego', () => {
     // El selector admite alias (.screen-title usa el mismo estilo).
-    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*font-family:\s*var\(--font-titulo\)/)
-    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*-webkit-text-stroke/)
-    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*text-shadow/)
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*font-family:\s*var\(--font-cartel\)/)
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*color:var\(--titulo-oro\)/)
+    expect(comp).toMatch(/\.titulo-cartel[^{]*\{[^}]*text-shadow:var\(--titulo-sombra\)/)
+    expect(comp).not.toMatch(/\.titulo-cartel[^{]*\{[^}]*-webkit-text-stroke:\s*[1-9]/)   // sin el contorno anterior
+    expect(comp).toMatch(/\.pre-box h2\{[^}]*font-family:var\(--font-cartel\)/)
+    expect(comp).toMatch(/\.modal-box h2,\.duel-result-title\{[^}]*font-family:var\(--font-cartel\)/)
+  })
+
+  it('ninguna pantalla vuelve a poner un título con la tipografía vieja', () => {
+    const css = ['screens', 'components', 'responsive', 'a11y', 'ajustes']
+      .map(f => readFileSync(`src/styles/${f}.css`, 'utf8')).join('\n')
+    for (const sel of ['.screen-title', '.titulo-cartel', '.titulo-pantalla', '.titulo-resultado']) {
+      const re = new RegExp(`${sel.replace('.', '\.')}[^{]*\{[^}]*font-family:`)
+      expect(css, sel).not.toMatch(re)
+    }
   })
 })

@@ -27,12 +27,11 @@
 .btn3d--peligro{background:var(--btn-peligro-bg);color:var(--btn-peligro-fg);border-bottom-color:var(--btn-peligro-borde)}
 .btn3d--chico{font-size:.85rem;min-height:44px;opacity:.92}
 
-/* ─── Título cartel ─── amarillo con contorno y extrusión en capas */
+/* ─── Título de pantalla ─── la misma caligrafía de bosque que el título del juego (Almendra SC):
+   dorado de noche, marrón oscuro de día, sin contorno ni extrusión. Ver .titulo-juego. */
 .titulo-cartel,.screen-title{
-  font-family:var(--font-titulo);font-weight:400;font-size:2.6rem;line-height:1.02;text-align:center;
-  color:#ffd23f;-webkit-text-stroke:1.5px #7a3f00;
-  text-shadow:0 2px 0 #e08a00,0 4px 0 #b86a00,0 6px 0 #8a4d00,0 9px 12px rgba(0,0,0,.45);
-  letter-spacing:.5px;
+  font-family:var(--font-cartel);font-weight:700;font-size:2.2rem;line-height:1.1;text-align:center;
+  letter-spacing:.03em;color:var(--titulo-oro);text-shadow:var(--titulo-sombra);-webkit-text-stroke:0;
 }
 
 /* ─── Título del juego ─── caligrafía de bosque, una sola línea, con un arco y una flecha finos debajo.
@@ -76,7 +75,7 @@ html[data-contraste="alto"] #menuBg{display:none}
 
 /* ─── Pantallas con paisaje: el contenido va por encima del fondo fijo ─── */
 .con-mundo>:not(.fondo-mundo){position:relative;z-index:1}
-.titulo-pantalla{font-size:2.1rem;margin-bottom:.4rem}
+.titulo-pantalla{font-size:1.9rem;margin-bottom:.4rem}
 .con-mundo .screen-sub{color:var(--sobre-cielo);font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 .btn3d--volver{width:100%;max-width:320px;margin:.4rem auto 1rem}
 
@@ -112,7 +111,7 @@ html[data-contraste="alto"] #menuBg{display:none}
 
 /* ─── Pantalla previa al nivel ─── placa crema sobre el paisaje del mundo */
 .pre-box{background:#fff6dc;color:#3a2200;border-radius:var(--r-lg);border-bottom:6px solid #d8b56a;box-shadow:var(--sombra-placa)}
-.pre-box h2{font-family:var(--font-titulo);font-weight:400;font-size:1.7rem;color:#3a2200}
+.pre-box h2{font-family:var(--font-cartel);font-weight:700;letter-spacing:.03em;font-size:1.7rem;color:#3a2200}
 .pre-box .definicion{background:#fff;color:#3a2200;border-left-color:var(--acento,#ff8a1f)}
 .pre-box .ejemplo-item{background:#fbeccb;color:#3a2200}
 .pre-box .sala-hint{color:#3a2200}
@@ -133,7 +132,7 @@ html[data-contraste="alto"] #menuBg{display:none}
 #confeti{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:3}
 .conf{position:absolute;top:-16px;border-radius:2px;animation:confeti-cae var(--d,4s) linear var(--dl,0s) 1 both}
 @keyframes confeti-cae{from{transform:translateY(0) rotate(0)}to{transform:translateY(110vh) rotate(560deg)}}
-.titulo-resultado{font-size:1.8rem;margin:.2rem 0 .4rem}
+.titulo-resultado{font-size:1.7rem;margin:.2rem 0 .4rem}
 .medalla-wrap{position:relative;display:flex;justify-content:center;align-items:center;margin:.2rem 0}
 .rayos{
   position:absolute;width:300px;height:300px;border-radius:50%;pointer-events:none;
@@ -173,7 +172,7 @@ html[data-contraste="alto"] #menuBg{display:none}
 html[data-movimiento="reducido"] .rayos{animation:none}
 #resultadoScreen .pa-astro{display:none}
 
-.screen-title{font-size:2rem;margin-bottom:.4rem}
+.screen-title{font-size:1.8rem;margin-bottom:.4rem}
 .screen .screen-sub{color:var(--sobre-cielo);font-weight:700;text-shadow:var(--sombra-sobre-cielo)}
 
 /* ─── Astro: en las pantallas que no son el menú queda entre las colinas, lejos de los títulos ─── */
@@ -182,7 +181,8 @@ html[data-movimiento="reducido"] .rayos{animation:none}
 
 /* ─── Títulos de pantalla en celulares angostos ─── */
 @media (max-width:420px){
-  .screen-title{font-size:1.55rem}
+  .screen-title{font-size:1.4rem}
+  .titulo-pantalla{font-size:1.5rem}
 }
 
 /* ─── Duelo: HUD, fichas y poderes con el lenguaje Aventura ─── */
@@ -252,3 +252,6 @@ html[data-movimiento="reducido"] .hoja-aterriza,
 html[data-movimiento="reducido"] .brizna-aterriza,
 html[data-movimiento="reducido"] .copo-aterriza,
 html[data-movimiento="reducido"] .polvo-aterriza{display:none}
+
+/* Títulos que viven sobre placas crema: la misma letra, con el color de la placa */
+.modal-box h2,.duel-result-title{font-family:var(--font-cartel);font-weight:700;letter-spacing:.03em}
